@@ -1,6 +1,5 @@
 .DS_Store
-.impeccable/review/
-.impeccable/config.local.json
+.impeccable/
 node_modules/
 *.png
 !docs/**
