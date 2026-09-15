@@ -1,5 +1,7 @@
 I made this because dropping an x.com link in a group chat usually does nothing useful. There's a small icon next to Share. Click it, get a white card on the clipboard, paste it. If the browser blocks the clipboard, it downloads a PNG instead.
 
+![Example card](https://raw.githubusercontent.com/icekale/x-to-img/main/docs/demo.jpg)
+
 It picks up the usual stuff — text, photos, quotes, polls, link cards. Videos are just the thumbnail. I left the gradient frame and QR code off on purpose.
 
 If X collapsed the text on the timeline, open the post first. Locked posts work if you can already see them. It just reads the page you're on.

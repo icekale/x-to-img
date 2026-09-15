@@ -2,6 +2,8 @@
 
 刷 X 的时候经常想把一条帖丢进微信群，丢链接又经常打不开。我就在分享按钮旁边加了个图标：点一下出一张白底的图，直接粘贴。复制不了就下载。
 
+<img src="docs/demo.jpg" width="360" alt="图卡示例">
+
 引用、投票、链接卡片会带上。视频只能抓封面。时间线上如果是「显示更多」，最好点进帖子再出图，不然正文是截断的。
 
 [Greasy Fork 上安装](https://greasyfork.org/zh-CN/scripts/595869-x-%E8%B4%B4%E6%96%87%E8%BD%AC%E5%9B%BE%E5%8D%A1)。先装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)，再点安装，刷新 x.com。也可以直接打开 [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js)。
