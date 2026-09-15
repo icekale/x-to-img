@@ -1,6 +1,8 @@
-I made this because dropping an x.com link in a group chat usually does nothing useful. There's a small icon next to Share. Click it, get a white card on the clipboard, paste it. If the browser blocks the clipboard, it downloads a PNG instead.
+I made this because dropping an x.com link in a group chat usually does nothing useful. There's a small icon next to Share. Click it, get a card on the clipboard, paste it. Light if X is light, dark if X is dark. If the browser blocks the clipboard, it downloads a PNG instead.
 
-![Example card](https://raw.githubusercontent.com/icekale/x-to-img/main/docs/demo.jpg)
+![Light card](https://raw.githubusercontent.com/icekale/x-to-img/main/docs/demo-light.jpg)
+
+![Dark card](https://raw.githubusercontent.com/icekale/x-to-img/main/docs/demo-dark.jpg)
 
 It picks up the usual stuff — text, photos, quotes, polls, link cards. Videos are just the thumbnail. I left the gradient frame and QR code off on purpose.
 

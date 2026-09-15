@@ -1,6 +1,8 @@
-刷到想转的帖，点分享旁边那个图标就行。出来一张白卡片，进剪贴板，微信微博直接粘。复制不了会改成下载。
+刷到想转的帖，点分享旁边那个图标就行。出来一张卡片，进剪贴板，微信微博直接粘。X 是浅色就浅色卡，深色就深色卡。复制不了会改成下载。
 
-![图卡示例](https://raw.githubusercontent.com/icekale/x-to-img/main/docs/demo.jpg)
+![浅色图卡](https://raw.githubusercontent.com/icekale/x-to-img/main/docs/demo-light.jpg)
+
+![深色图卡](https://raw.githubusercontent.com/icekale/x-to-img/main/docs/demo-dark.jpg)
 
 图上是帖子本身：谁发的、写了什么、配图、引用、投票这些。我没加渐变框，也没加二维码。
 

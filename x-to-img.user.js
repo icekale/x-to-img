@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.4.2
+// @version      0.4.3
 // @description  分享旁边点一下，把帖做成图，拿去微信粘
 // @description:en Click next to Share and get a picture of the post you can paste
 // @description:zh-CN 分享旁边点一下，把帖做成图，拿去微信粘
@@ -48,7 +48,6 @@
   const AVATAR_MAX = 128;
 
   const OPTIONS = {
-    darkCard: false,
     showAvatar: true,
     showTime: true,
     showStats: true,
@@ -203,6 +202,25 @@
     if (m) return Math.round(parseFloat(m[1]) * 1e6);
     const digits = text.match(/(\d+)/);
     return digits ? parseInt(digits[1], 10) : 0;
+  }
+
+  function pageIsDark() {
+    const scheme = `${getComputedStyle(document.documentElement).colorScheme} ${document.documentElement.style.colorScheme}`;
+    if (/\bdark\b/i.test(scheme) && !/\blight\b/i.test(scheme)) return true;
+    if (/\blight\b/i.test(scheme) && !/\bdark\b/i.test(scheme)) return false;
+    for (const el of [document.body, document.documentElement]) {
+      if (!el) continue;
+      const bg = getComputedStyle(el).backgroundColor || "";
+      const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/.exec(bg);
+      if (!m || (m[4] != null && Number(m[4]) === 0)) continue;
+      return Number(m[1]) * 299 + Number(m[2]) * 587 + Number(m[3]) * 114 < 128000;
+    }
+    return false;
+  }
+
+  function wantsDarkCard(options) {
+    if (options && options.darkCard != null) return Boolean(options.darkCard);
+    return pageIsDark();
   }
 
   function formatStamp(iso) {
@@ -833,29 +851,30 @@
     });
   }
 
-  async function renderCanvas(tweet) {
+  async function renderCanvas(tweet, options) {
     ensureFont();
     await ensureLibs();
     const resolved = await resolveTweet(tweet);
+    const darkCard = wantsDarkCard(options);
     const shadow = renderer();
-    shadow.querySelector(".stage").innerHTML = renderCard(resolved, { verified: resolved.verified });
+    shadow.querySelector(".stage").innerHTML = renderCard(resolved, { verified: resolved.verified, darkCard });
     await waitForImages(shadow);
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     const node = shadow.querySelector("[data-card-root]");
     if (!node) throw new Error("图卡没有渲染出来");
-    const options = {
+    const exportOptions = {
       pixelRatio: EXPORT_SCALE,
       cacheBust: true,
       width: CARD_WIDTH,
-      backgroundColor: "#ffffff",
+      backgroundColor: darkCard ? "#15202b" : "#ffffff",
       fetchRequestInit: { mode: "cors", credentials: "omit" },
     };
     if (!globalThis.htmlToImage?.toCanvas) throw new Error("导出库未加载");
-    return globalThis.htmlToImage.toCanvas(node, options);
+    return globalThis.htmlToImage.toCanvas(node, exportOptions);
   }
 
-  function renderPngBlob(tweet) {
-    return renderCanvas(tweet).then((canvas) => canvasToBlob(canvas, "image/png"));
+  function renderPngBlob(tweet, options) {
+    return renderCanvas(tweet, options).then((canvas) => canvasToBlob(canvas, "image/png"));
   }
 
   function downloadBlob(blob, filename) {
@@ -881,8 +900,8 @@
     await clipboard.write([new Item({ "image/png": pngPromise })]);
   }
 
-  async function generateCard(tweet) {
-    const blob = await renderPngBlob(tweet);
+  async function generateCard(tweet, options) {
+    const blob = await renderPngBlob(tweet, options);
     try {
       await copyPng(Promise.resolve(blob));
       toast(copiedMessage(tweet, false));
@@ -1013,5 +1032,5 @@
   const onX = /(?:^|\.)(?:x|twitter)\.com$/i.test(location.hostname);
   if (onX || document.documentElement.dataset.x2imgPreview === "1") boot();
 
-  window.X2IMG = { generateCard, parseTweet, sampleTweet, renderCard, injectAll };
+  window.X2IMG = { generateCard, parseTweet, sampleTweet, renderCard, injectAll, renderCanvas };
 })();
