@@ -8,15 +8,16 @@ On [X](https://x.com), a photo icon appears next to the native Share button. One
 
 ## 安装 / Install
 
+- 中文： [Greasy Fork · X 贴文转图卡](https://greasyfork.org/zh-CN/scripts/595869-x-%E8%B4%B4%E6%96%87%E8%BD%AC%E5%9B%BE%E5%8D%A1)
+- English: [Greasy Fork · X Post to Image Card](https://greasyfork.org/en/scripts/595869)
+
 1. 安装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)
-2. 打开本仓库的 [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js)，浏览器扩展会提示安装
+2. 打开安装页，点「安装此脚本」；或直接打开 [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js)
 3. 刷新 `https://x.com`
 
 1. Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/)
-2. Open [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js) and confirm the install prompt
+2. Open the listing and click **Install this script**, or open [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js)
 3. Refresh `https://x.com`
-
-Greasy Fork 安装页发布后会补到这里。
 
 ## X 贴文转图卡
 
