@@ -3,10 +3,10 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.4.1
-// @description  在 X 分享按钮旁一键复制贴文图卡，方便发到微信、微博
-// @description:en One click beside X's share button copies the post as an image card for chat apps
-// @description:zh-CN 在 X 分享按钮旁一键复制贴文图卡，方便发到微信、微博
+// @version      0.4.2
+// @description  分享旁边点一下，把帖做成图，拿去微信粘
+// @description:en Click next to Share and get a picture of the post you can paste
+// @description:zh-CN 分享旁边点一下，把帖做成图，拿去微信粘
 // @author       Kale
 // @homepageURL  https://github.com/icekale/x-to-img
 // @supportURL   https://github.com/icekale/x-to-img/issues

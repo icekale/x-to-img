@@ -1,44 +1,25 @@
-# X 贴文转图卡 / X Post to Image Card
+# X 贴文转图卡
 
-[English](#x-post-to-image-card) · [中文](#x-贴文转图卡)
+刷 X 的时候经常想把一条帖丢进微信群，丢链接又经常打不开。我就在分享按钮旁边加了个图标：点一下出一张白底的图，直接粘贴。复制不了就下载。
 
-在 [X](https://x.com) 时间线或贴文详情里，每条贴文的分享按钮旁边会出现一枚图片图标。点一下，图卡会复制到剪贴板，直接去微信、微博或其它聊天软件粘贴。复制失败时才会改为下载。
+引用、投票、链接卡片会带上。视频只能抓封面。时间线上如果是「显示更多」，最好点进帖子再出图，不然正文是截断的。
 
-On [X](https://x.com), a photo icon appears next to the native Share button. One click copies a clean image card to the clipboard so you can paste it into chat apps. If copying fails, the script downloads a PNG instead.
+[Greasy Fork 上安装](https://greasyfork.org/zh-CN/scripts/595869-x-%E8%B4%B4%E6%96%87%E8%BD%AC%E5%9B%BE%E5%8D%A1)。先装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)，再点安装，刷新 x.com。也可以直接打开 [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js)。
 
-## 安装 / Install
+# X Post to Image Card
 
-- 中文： [Greasy Fork · X 贴文转图卡](https://greasyfork.org/zh-CN/scripts/595869-x-%E8%B4%B4%E6%96%87%E8%BD%AC%E5%9B%BE%E5%8D%A1)
-- English: [Greasy Fork · X Post to Image Card](https://greasyfork.org/en/scripts/595869)
+I got tired of pasting x.com links into chats that don't unfurl them. There's a small icon next to Share. Click it and you get a plain white card on the clipboard.
 
-1. 安装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)
-2. 打开安装页，点「安装此脚本」；或直接打开 [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js)
-3. 刷新 `https://x.com`
+Quotes, polls, and link previews come along. Video is just the poster. If the timeline collapsed the text, open the post first.
 
-1. Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/)
-2. Open the listing and click **Install this script**, or open [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js)
-3. Refresh `https://x.com`
+[Install from Greasy Fork](https://greasyfork.org/en/scripts/595869). You'll need [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/). Or open [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js) directly.
 
-## X 贴文转图卡
-
-图卡保留贴文本身的排版：头像、姓名、认证、正文、图片、视频封面、引用、链接预览、投票和互动数。没有彩色外框，也没有二维码。导出库已打进脚本，不依赖 jsDelivr。
-
-时间线上被折叠的长贴文可能只有半截正文。打开详情再点，能拿到全文。私密贴文只要你自己能看见，就可以导出。
-
-## X Post to Image Card
-
-The card keeps the post’s own layout: avatar, name, verification, text, photos, video posters, quotes, link previews, polls, and stats. No colorful frame, no QR code. The export library is bundled, so it does not depend on jsDelivr.
-
-Timeline posts that show “Show more” may be truncated. Open the status page and click again for the full text. Private posts work as long as you can see them.
-
-## 本地预览 / Local preview
+本地看一眼：
 
 ```bash
 python3 -m http.server 8765
 ```
 
-Open http://127.0.0.1:8765/preview.html
-
-## License
+http://127.0.0.1:8765/preview.html
 
 MIT
