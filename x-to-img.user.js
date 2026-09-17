@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.4.6
+// @version      0.4.7
 // @description  分享旁边点一下，把帖做成图，拿去微信粘
 // @description:en Click next to Share and get a picture of the post you can paste
 // @description:zh-CN 分享旁边点一下，把帖做成图，拿去微信粘
@@ -98,9 +98,9 @@
     .col{flex:1;min-width:0;display:flex;flex-direction:column;}
     .head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
     .who{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
-    .name-row{display:flex;align-items:center;gap:4px;min-width:0;}
-    .name{font-size:18px;line-height:28px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#0e1c71;}
-    .handle,.time{font-size:14px;line-height:20px;color:#94a3b8;white-space:nowrap;}
+    .name-row{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;min-width:0;}
+    .name{font-size:18px;line-height:28px;font-weight:700;color:#0e1c71;flex:0 1 auto;overflow-wrap:anywhere;}
+    .handle,.time{font-size:14px;line-height:20px;color:#94a3b8;white-space:nowrap;flex-shrink:0;}
     .badge{width:20px;height:20px;flex-shrink:0;display:block;}
     .badge svg{width:20px;height:20px;display:block;}
     .xmark{width:24px;height:24px;color:#9ca3af;flex-shrink:0;}
@@ -517,13 +517,63 @@
     }
   }
 
-  function authorFromBlock(root) {
-    const nameRoot = root.querySelector('[data-testid="User-Name"]');
-    const name = nameRoot?.querySelector("span")?.textContent?.trim() || "";
-    const href = nameRoot?.querySelector('a[href^="/"]')?.getAttribute("href") || "";
-    const handleFromLink = href.replace(/^\//, "").split("/")[0];
+  function escapeRegExp(value) {
+    return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function normalizePersonName(raw, handle) {
+    let name = String(raw || "").replace(/\s+/g, " ").trim();
+    if (!name) return "";
+    if (handle) {
+      name = name.replace(new RegExp(`(?:^|\\s)@${escapeRegExp(handle)}\\b.*$`, "i"), "").trim();
+    }
+    name = name.replace(/\s*[·•|].*$/, "").trim();
+    name = name.replace(/[.…]+$/u, "").trim();
+    return name;
+  }
+
+  function profileNameLinks(nameRoot) {
+    return [...(nameRoot?.querySelectorAll('a[href^="/"]') || [])].filter((a) => {
+      const href = a.getAttribute("href") || "";
+      return !/\/status\//.test(href) && !a.querySelector("time");
+    });
+  }
+
+  function displayNameFrom(nameRoot, handle) {
+    const links = profileNameLinks(nameRoot);
+    const nameLink =
+      links.find((a) => !/^@/.test((a.textContent || "").trim())) ||
+      links[0] ||
+      nameRoot?.querySelector('a[role="link"]');
+    const aria = normalizePersonName(nameLink?.getAttribute("aria-label") || "", handle);
+    const candidates = [];
+    if (nameLink) {
+      for (const node of [nameLink, ...nameLink.querySelectorAll("span")]) {
+        const text = normalizePersonName(node.textContent, handle);
+        if (text && text.length < 80 && !/^@/.test(text) && text.toLowerCase() !== String(handle || "").toLowerCase()) {
+          candidates.push(text);
+        }
+      }
+    }
+    const uniqueNames = [...new Set(candidates)].sort((a, b) => a.length - b.length);
+    const shortest = uniqueNames[0] || "";
+    if (aria && shortest && aria.length > shortest.length && aria.toLowerCase().startsWith(shortest.toLowerCase())) {
+      return aria;
+    }
+    return shortest || aria || normalizePersonName(nameRoot?.querySelector("span")?.textContent, handle);
+  }
+
+  function parseAuthor(nameRoot) {
+    const href = (nameRoot?.querySelector('a[href^="/"]')?.getAttribute("href") || "")
+      .replace(/^\//, "")
+      .split("/")[0];
     const handleMatch = (nameRoot?.innerText || "").match(/@([A-Za-z0-9_]+)/);
-    return { name, handle: handleFromLink || (handleMatch ? handleMatch[1] : "") };
+    const handle = href || (handleMatch ? handleMatch[1] : "");
+    return { name: displayNameFrom(nameRoot, handle), handle };
+  }
+
+  function authorFromBlock(root) {
+    return parseAuthor(root.querySelector('[data-testid="User-Name"]') || root);
   }
 
   function parseQuote(article) {
@@ -927,16 +977,8 @@
 
   function parseTweet(article) {
     const nameRoot = article.querySelector('[data-testid="User-Name"]');
-    const nameLink = nameRoot?.querySelector('a[role="link"]');
-    const displayName =
-      nameRoot?.querySelector("span")?.textContent?.trim() ||
-      nameLink?.textContent?.trim() ||
-      "";
-    const handleFromLink = (nameRoot?.querySelector('a[href^="/"]')?.getAttribute("href") || "")
-      .replace(/^\//, "")
-      .split("/")[0];
-    const handleText = (nameRoot?.innerText || "").match(/@([A-Za-z0-9_]+)/);
-    const handle = handleFromLink || (handleText ? handleText[1] : "");
+    const { name: displayName, handle } = parseAuthor(nameRoot);
+    const nameLink = profileNameLinks(nameRoot)[0] || nameRoot?.querySelector('a[role="link"]');
     const time = article.querySelector("time");
     const createdAt = time?.getAttribute("datetime") || "";
     const statusAnchor = time?.closest("a") || article.querySelector('a[href*="/status/"]') || nameLink;

@@ -71,6 +71,33 @@
           </div>
         </div>
       </article>
+      <article data-testid="tweet" id="x2img-name-tweet">
+        <div class="row">
+          <div data-testid="Tweet-User-Avatar">
+            <img class="ava" alt="" src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&auto=format&fit=crop" />
+          </div>
+          <div style="flex:1;min-width:0">
+            <div data-testid="User-Name">
+              <span>
+                <a role="link" href="/business" aria-label="Bloomberg"><span>Bloomberg</span></a>
+                <span data-testid="icon-verified"></span>
+                <a role="link" href="/business"><span>@business</span></a>
+                ·
+                <a href="/business/status/2008"><time datetime="2026-09-17T12:50:00">Sep 17</time></a>
+              </span>
+            </div>
+            <div data-testid="tweetText">中国已将其境内中央清算系统扩展至更多外币，这是推动人民币直接交易并减少对美元依赖的又一举措。</div>
+            <div class="bar">
+              <span data-testid="reply" aria-label="4 replies">4</span>
+              <span data-testid="retweet" aria-label="10 reposts">10</span>
+              <span data-testid="like" aria-label="255000 likes">25.5万</span>
+              <button type="button" data-testid="share" aria-label="Share post" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
       <article data-testid="tweet">
         <div class="row">
           <div data-testid="Tweet-User-Avatar">
@@ -307,7 +334,7 @@
         </div>
       </article>
     </div>
-    <script src="x-to-img.user.js?v=0.4.6"></script>
+    <script src="x-to-img.user.js?v=0.4.7"></script>
     <script>
       (function () {
         const article = document.getElementById("x2img-fiber-tweet");
