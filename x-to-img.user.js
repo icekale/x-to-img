@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.4.3
+// @version      0.4.4
 // @description  分享旁边点一下，把帖做成图，拿去微信粘
 // @description:en Click next to Share and get a picture of the post you can paste
 // @description:zh-CN 分享旁边点一下，把帖做成图，拿去微信粘
@@ -40,12 +40,14 @@
   "use strict";
 
   const HOST_ID = "x2img-host";
-  const FONT_ID = "x2img-font";
   const CARD_WIDTH = 600;
   const EXPORT_SCALE = 2;
   const JPEG_QUALITY = 0.92;
   const PHOTO_MAX = 960;
   const AVATAR_MAX = 128;
+  const FETCH_MAX = 8 * 1024 * 1024;
+  const IMAGE_HOSTS = [/(^|\.)twimg\.com$/i, /^ton\.twitter\.com$/i];
+  const PREVIEW_IMAGE_HOSTS = [/(^|\.)unsplash\.com$/i, /(^|\.)primefaces\.org$/i];
 
   const OPTIONS = {
     showAvatar: true,
@@ -162,15 +164,6 @@
     if (typeof GM_addStyle === "function" && !id) GM_addStyle(css);
   }
 
-  function ensureFont() {
-    if (document.getElementById(FONT_ID)) return;
-    const link = document.createElement("link");
-    link.id = FONT_ID;
-    link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap";
-    document.documentElement.appendChild(link);
-  }
-
   function escapeHtml(value) {
     return String(value ?? "")
       .replace(/&/g, "&amp;")
@@ -250,6 +243,58 @@
     throw new Error("导出库未内置，请重新安装脚本");
   }
 
+  function isPrivateHost(host) {
+    const name = String(host || "").toLowerCase();
+    if (name === "localhost" || name.endsWith(".localhost") || name === "127.0.0.1" || name === "0.0.0.0" || name === "::1") {
+      return true;
+    }
+    const ip = /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/.exec(name);
+    if (!ip) return false;
+    const a = Number(ip[1]);
+    const b = Number(ip[2]);
+    return a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168);
+  }
+
+  function isAllowedImageUrl(url) {
+    const raw = String(url || "");
+    if (!raw) return false;
+    if (raw.startsWith("data:")) return /^data:image\/(jpeg|jpg|png|webp|gif)[;,]/i.test(raw);
+    if (raw.startsWith("blob:")) return false;
+    let parsed;
+    try {
+      parsed = new URL(raw, location.href);
+    } catch {
+      return false;
+    }
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password) return false;
+    if (isPrivateHost(parsed.hostname)) return false;
+    if (IMAGE_HOSTS.some((re) => re.test(parsed.hostname))) return true;
+    return document.documentElement.dataset.x2imgPreview === "1" && PREVIEW_IMAGE_HOSTS.some((re) => re.test(parsed.hostname));
+  }
+
+  async function blobLooksLikeImage(blob) {
+    const type = String(blob.type || "").toLowerCase();
+    if (/^image\/(jpeg|jpg|png|webp|gif)$/.test(type)) return true;
+    const bytes = new Uint8Array(await blob.slice(0, 16).arrayBuffer());
+    if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return true;
+    if (bytes.length >= 4 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return true;
+    if (bytes.length >= 3 && bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46) return true;
+    if (
+      bytes.length >= 12 &&
+      bytes[0] === 0x52 &&
+      bytes[1] === 0x49 &&
+      bytes[2] === 0x46 &&
+      bytes[3] === 0x46 &&
+      bytes[8] === 0x57 &&
+      bytes[9] === 0x45 &&
+      bytes[10] === 0x42 &&
+      bytes[11] === 0x50
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   function gmRequest(url) {
     return new Promise((resolve, reject) => {
       if (typeof GM_xmlhttpRequest !== "function") {
@@ -261,11 +306,21 @@
         url,
         responseType: "blob",
         anonymous: true,
+        timeout: 15000,
         onload: (res) => {
-          if (res.status >= 200 && res.status < 300 && res.response) resolve(res.response);
-          else reject(new Error(String(res.status)));
+          const blob = res.response;
+          if (res.status < 200 || res.status >= 300 || !blob) {
+            reject(new Error(String(res.status)));
+            return;
+          }
+          if (blob.size > FETCH_MAX) {
+            reject(new Error("too-large"));
+            return;
+          }
+          resolve(blob);
         },
         onerror: () => reject(new Error("network")),
+        ontimeout: () => reject(new Error("timeout")),
       });
     });
   }
@@ -279,21 +334,30 @@
     });
   }
 
-  async function toDataUrl(url) {
-    if (!url) return "";
-    if (url.startsWith("data:") || url.startsWith("blob:")) return url;
+  async function readImageBlob(url) {
     try {
       const blob = await gmRequest(url);
-      return await blobToDataUrl(blob);
+      if (await blobLooksLikeImage(blob)) return blob;
     } catch {
-      try {
-        const res = await fetch(url, { mode: "cors" });
-        if (!res.ok) throw new Error("fetch");
-        return await blobToDataUrl(await res.blob());
-      } catch {
-        return url;
-      }
+      /* fall through to page fetch */
     }
+    try {
+      const res = await fetch(url, { mode: "cors", credentials: "omit" });
+      if (!res.ok) return null;
+      const blob = await res.blob();
+      if (blob.size > FETCH_MAX) return null;
+      if (!(await blobLooksLikeImage(blob))) return null;
+      return blob;
+    } catch {
+      return null;
+    }
+  }
+
+  async function toDataUrl(url) {
+    if (!isAllowedImageUrl(url)) return "";
+    if (String(url).startsWith("data:")) return String(url);
+    const blob = await readImageBlob(url);
+    return blob ? blobToDataUrl(blob) : "";
   }
 
   function loadImage(src) {
@@ -323,7 +387,7 @@
       ctx.drawImage(img, 0, 0, width, height);
       return canvas.toDataURL("image/jpeg", 0.9);
     } catch {
-      return src;
+      return "";
     }
   }
 
@@ -361,6 +425,12 @@
       /(https?:\/\/[^\s]+|@[\w_]+|#[^\s#@]+)/g,
       (m) => `<span class="entity">${m}</span>`
     );
+  }
+
+  function cardTextHtml(tweet) {
+    const html = tweet?.textHtml;
+    if (html && /^(?:[^<]|<span class="entity">[^<]*<\/span>)*$/.test(html)) return html;
+    return decoratePlainText(tweet?.text || "");
   }
 
   function pickStat(article, testId) {
@@ -681,7 +751,7 @@
   }
 
   function mediaHtml(tweet) {
-    const shots = tweet.photos.slice(0, 4);
+    const shots = (tweet.photos || []).filter(Boolean).slice(0, 4);
     if (!shots.length && tweet.videoPoster) {
       return `<div class="media n1"><div class="poster"><img alt="" src="${escapeHtml(tweet.videoPoster)}"><div class="play"></div></div></div>`;
     }
@@ -742,7 +812,7 @@
     const avatar = opts.showAvatar
       ? `<div class="avatar">${tweet.avatar ? `<img alt="" src="${escapeHtml(tweet.avatar)}">` : `<div class="avatar-fallback">${escapeHtml(initial)}</div>`}</div>`
       : "";
-    const body = tweet.textHtml || decoratePlainText(tweet.text || "");
+    const body = cardTextHtml(tweet);
     return `
       <div class="card${opts.darkCard ? " is-dark" : ""}" data-card-root>
         <div class="main">
@@ -822,11 +892,11 @@
     return {
       ...tweet,
       avatar,
-      photos,
+      photos: photos.filter(Boolean),
       videoPoster,
-      quote: tweet.quote ? { ...tweet.quote, photos: quotePhotos } : null,
+      quote: tweet.quote ? { ...tweet.quote, photos: quotePhotos.filter(Boolean) } : null,
       linkCard: tweet.linkCard ? { ...tweet.linkCard, image: linkImage } : null,
-      textHtml: tweet.textHtml || decoratePlainText(tweet.text || ""),
+      textHtml: cardTextHtml(tweet),
     };
   }
 
@@ -852,7 +922,6 @@
   }
 
   async function renderCanvas(tweet, options) {
-    ensureFont();
     await ensureLibs();
     const resolved = await resolveTweet(tweet);
     const darkCard = wantsDarkCard(options);
@@ -864,7 +933,7 @@
     if (!node) throw new Error("图卡没有渲染出来");
     const exportOptions = {
       pixelRatio: EXPORT_SCALE,
-      cacheBust: true,
+      skipFonts: true,
       width: CARD_WIDTH,
       backgroundColor: darkCard ? "#15202b" : "#ffffff",
       fetchRequestInit: { mode: "cors", credentials: "omit" },
@@ -1011,7 +1080,6 @@
 
   function boot() {
     injectPageStyle(PAGE_CSS, "x2img-page-style");
-    ensureFont();
     let timer = 0;
     const schedule = () => {
       clearTimeout(timer);
@@ -1030,7 +1098,7 @@
   }
 
   const onX = /(?:^|\.)(?:x|twitter)\.com$/i.test(location.hostname);
-  if (onX || document.documentElement.dataset.x2imgPreview === "1") boot();
-
-  window.X2IMG = { generateCard, parseTweet, sampleTweet, renderCard, injectAll, renderCanvas };
+  const preview = document.documentElement.dataset.x2imgPreview === "1";
+  if (onX || preview) boot();
+  if (preview) window.X2IMG = { generateCard, parseTweet, sampleTweet, renderCard, injectAll, renderCanvas };
 })();
