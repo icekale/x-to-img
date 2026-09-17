@@ -525,6 +525,35 @@
           </div>
         </div>
       </article>
+      <article data-testid="tweet" id="x2img-blob-video">
+        <div class="row">
+          <div data-testid="Tweet-User-Avatar">
+            <img class="ava" alt="" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop" />
+          </div>
+          <div style="flex:1;min-width:0">
+            <div data-testid="User-Name">
+              <a role="link" href="/blobvid"><span>BlobVid</span></a>
+              <span class="handle">@blobvid</span>
+              ·
+              <a href="/blobvid/status/2017"><time datetime="2026-09-17T19:10:00">Sep 17</time></a>
+            </div>
+            <div data-testid="tweetText">播放器里有视频，地址却是 blob。</div>
+            <div data-testid="placementTracking">
+              <div data-testid="videoPlayer">
+                <video poster="https://pbs.twimg.com/amplify_video_thumb/2017/img/demo.jpg" src="blob:https://x.com/x2img-blob-video"></video>
+              </div>
+            </div>
+            <div class="bar">
+              <span data-testid="reply" aria-label="2 replies">2</span>
+              <span data-testid="retweet" aria-label="1 repost">1</span>
+              <span data-testid="like" aria-label="9 likes">9</span>
+              <button type="button" data-testid="share" aria-label="Share post" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
       <article data-testid="tweet" id="x2img-adult-video">
         <div class="row">
           <div data-testid="Tweet-User-Avatar">
@@ -599,7 +628,7 @@
         true
       );
     </script>
-    <script src="x-to-img.user.js?v=0.5.6"></script>
+    <script src="x-to-img.user.js?v=0.5.7"></script>
     <script>
       (function () {
         const article = document.getElementById("x2img-fiber-tweet");
@@ -621,6 +650,25 @@
           },
           return: null,
         };
+        const blobVideo = document.getElementById("x2img-blob-video");
+        if (blobVideo) {
+          blobVideo.__reactFiber$preview = {
+            memoizedProps: {
+              media: {
+                type: "video",
+                expanded_url: "https://x.com/blobvid/status/2017/video/1",
+                video_info: {
+                  variants: [
+                    { content_type: "application/x-mpegURL", url: "https://video.twimg.com/amplify_video/2017/pl/demo.m3u8" },
+                    { content_type: "video/mp4", bitrate: 832000, url: "https://video.twimg.com/amplify_video/2017/vid/avc1/640x360/demo.mp4" },
+                    { content_type: "video/mp4", bitrate: 2176000, url: "https://video.twimg.com/amplify_video/2017/vid/avc1/1280x720/demo.mp4" },
+                  ],
+                },
+              },
+            },
+            return: null,
+          };
+        }
       })();
       document.getElementById("x2img-open-settings")?.addEventListener("click", () => window.X2IMG?.openSettingsPanel());
     </script>

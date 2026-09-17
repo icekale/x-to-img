@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.5.6
+// @version      0.5.7
 // @description  分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
 // @description:en Click next to Share for a card. Also hide adult spam/ads, download media, and lift age covers
 // @description:zh-CN 分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
@@ -1691,10 +1691,27 @@
     return { adult, ad };
   }
 
-  function collectFiberMedia(article, wantId) {
+  function collectFiberMediaRaw(article, wantId) {
     const found = { photos: [], videos: [], gifs: [] };
+    wantId = String(wantId || "");
+
     function fiberOf(node) {
       if (!node) return null;
+      let names = [];
+      try {
+        names = Object.getOwnPropertyNames(node);
+      } catch {
+        names = [];
+      }
+      for (const key of names) {
+        if (key.startsWith("__reactFiber$") || key.startsWith("__reactInternalInstance$")) {
+          try {
+            return node[key];
+          } catch {
+            /* xray */
+          }
+        }
+      }
       try {
         for (const key in node) {
           if (key.startsWith("__reactFiber$") || key.startsWith("__reactInternalInstance$")) return node[key];
@@ -1704,80 +1721,176 @@
       }
       return null;
     }
+
+    function isNode(value) {
+      return Boolean(value && (value.nodeType === 1 || value.nodeType === 3 || value.nodeType === 9 || value.nodeType === 11));
+    }
+
+    function tweetIdFromHref(href) {
+      const match = String(href || "").match(/status\/(\d+)/);
+      return match ? match[1] : "";
+    }
+
     function tweetIdOf(value) {
       if (!value || typeof value !== "object") return "";
       return String(value.rest_id || value.restId || value.legacy?.id_str || value.legacy?.idStr || "");
     }
+
+    function variantsOf(item) {
+      return item?.video_info?.variants || item?.videoInfo?.variants || [];
+    }
+
+    function takeItem(item, allowUnbound) {
+      if (!item || typeof item !== "object" || isNode(item)) return;
+      const bound = tweetIdFromHref(item.expanded_url || item.expandedUrl || item.url || "");
+      if (wantId && bound && bound !== wantId) return;
+      if (wantId && !bound && !allowUnbound) return;
+      const type = String(item.type || item.media_type || "");
+      const mp4s = variantsOf(item)
+        .filter((row) => /mp4/i.test(row.content_type || row.contentType || "") && row.url)
+        .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
+      const modest = mp4s.filter((row) => (row.bitrate || 0) > 0 && row.bitrate <= 2176000);
+      const picked = (modest[0] || mp4s[mp4s.length - 1] || {}).url;
+      if (picked) {
+        if (type === "animated_gif") found.gifs.push(picked);
+        else found.videos.push(picked);
+        return;
+      }
+      if (type === "video" || type === "animated_gif") return;
+      const photo = item.media_url_https || item.mediaUrlHttps || item.media_url;
+      if (photo) found.photos.push(photo);
+    }
+
     function unwrap(value, depth) {
-      if (!value || typeof value !== "object" || depth > 6) return null;
+      if (!value || typeof value !== "object" || isNode(value) || depth > 6) return null;
       if (value.legacy?.extended_entities?.media || value.legacy?.extendedEntities?.media || value.legacy?.entities?.media) {
         return value;
       }
-      return unwrap(value.result, depth + 1) || unwrap(value.tweet, depth + 1) || unwrap(value.tweetResult, depth + 1);
+      return (
+        unwrap(value.result, depth + 1) ||
+        unwrap(value.tweet, depth + 1) ||
+        unwrap(value.tweetResult, depth + 1) ||
+        unwrap(value.tweet_results, depth + 1) ||
+        unwrap(value.tweetResults, depth + 1)
+      );
     }
-    function take(value) {
+
+    function take(value, allowUnbound) {
+      if (variantsOf(value).length || /^(video|animated_gif|photo)$/i.test(String(value.type || value.media_type || ""))) {
+        takeItem(value, allowUnbound);
+      }
       const tweet = unwrap(value, 0);
       if (!tweet) return;
       const id = tweetIdOf(tweet);
-      if (wantId && id && id !== String(wantId)) return;
-      const media = tweet.legacy?.extended_entities?.media || tweet.legacy?.extendedEntities?.media || tweet.legacy?.entities?.media || [];
-      for (const item of media) {
-        const type = String(item.type || item.media_type || "");
-        const variants = item.video_info?.variants || item.videoInfo?.variants || [];
-        const mp4s = variants
-          .filter((row) => /mp4/i.test(row.content_type || row.contentType || "") && row.url)
-          .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
-        if (type === "animated_gif" && mp4s[0]?.url) found.gifs.push(mp4s[0].url);
-        else if ((type === "video" || mp4s.length) && mp4s[0]?.url) found.videos.push(mp4s[0].url);
-        else if (item.media_url_https || item.mediaUrlHttps || item.media_url) {
-          found.photos.push(upgradePbsUrl(item.media_url_https || item.mediaUrlHttps || item.media_url));
-        }
-      }
+      if (wantId && id && id !== wantId) return;
+      const media =
+        tweet.legacy?.extended_entities?.media ||
+        tweet.legacy?.extendedEntities?.media ||
+        tweet.legacy?.entities?.media ||
+        [];
+      for (const item of media) takeItem(item, true);
     }
-    function search(root) {
+
+    function search(root, allowUnbound) {
       const seen = new Set();
       const queue = [[root, 0]];
       let steps = 0;
-      while (queue.length && steps < 80) {
+      while (queue.length && steps < 240) {
         const [value, depth] = queue.shift();
         steps += 1;
-        if (!value || typeof value !== "object" || seen.has(value)) continue;
+        if (!value || typeof value !== "object" || isNode(value) || seen.has(value)) continue;
         seen.add(value);
-        take(value);
-        if (depth >= 5) continue;
-        const kids = Array.isArray(value) ? value.slice(0, 16) : Object.values(value).slice(0, 24);
+        take(value, allowUnbound);
+        if (depth >= 8) continue;
+        let kids = [];
+        try {
+          kids = Array.isArray(value) ? value.slice(0, 24) : Object.values(value).slice(0, 40);
+        } catch {
+          kids = [];
+        }
         for (const kid of kids) queue.push([kid, depth + 1]);
       }
     }
-    let fiber = fiberOf(article);
-    for (let hop = 0; hop < 50 && fiber; hop += 1) {
-      search(fiber.memoizedProps || fiber.pendingProps);
-      fiber = fiber.return;
+
+    function walkNode(node, hops, allowUnbound) {
+      let fiber = fiberOf(node);
+      for (let hop = 0; hop < hops && fiber; hop += 1) {
+        search(fiber.memoizedProps || fiber.pendingProps, allowUnbound && hop < 8);
+        fiber = fiber.return;
+      }
+    }
+
+    walkNode(article, 50, true);
+    try {
+      const players = article.querySelectorAll(
+        '[data-testid="videoPlayer"], [data-testid="videoComponent"], [data-testid="tweetPhoto"], video'
+      );
+      for (const player of players) walkNode(player, 24, true);
+    } catch {
+      /* sandbox */
     }
     return found;
+  }
+
+  function collectFiberMedia(article, wantId) {
+    const merged = { photos: [], videos: [], gifs: [] };
+    const source = collectFiberMediaRaw.toString();
+    const runners = [];
+    try {
+      if (typeof unsafeWindow !== "undefined" && typeof unsafeWindow.Function === "function") {
+        runners.push(unsafeWindow.Function("return (" + source + ").apply(null, arguments)"));
+      }
+    } catch {
+      /* sandbox */
+    }
+    runners.push(collectFiberMediaRaw);
+    const nodes = [article, article?.wrappedJSObject].filter(Boolean);
+    for (const node of nodes) {
+      for (const run of runners) {
+        try {
+          const got = run(node, wantId || "");
+          if (!got) continue;
+          merged.photos.push(...(got.photos || []));
+          merged.videos.push(...(got.videos || []));
+          merged.gifs.push(...(got.gifs || []));
+        } catch {
+          /* fiber shape drifted */
+        }
+      }
+    }
+    return {
+      photos: unique(merged.photos),
+      videos: unique(merged.videos),
+      gifs: unique(merged.gifs),
+    };
   }
 
   function collectDownloadMedia(article) {
     const tweet = parseTweet(article);
     const fiber = collectFiberMedia(article, tweet.id);
-    const photos = unique([...(tweet.photos || []), ...fiber.photos].filter((url) => isAllowedImageUrl(url)));
+    const photos = unique(
+      [...(tweet.photos || []), ...fiber.photos].map((url) => upgradePbsUrl(url)).filter((url) => isAllowedImageUrl(url))
+    );
     const domMedia = [];
     for (const el of article.querySelectorAll("video, source")) {
+      if (!ownedByArticle(el, article)) continue;
       domMedia.push(el.currentSrc || "", el.src || "", el.getAttribute("src") || "");
     }
     for (const el of article.querySelectorAll("[href], [poster]")) {
+      if (!ownedByArticle(el, article)) continue;
       domMedia.push(el.getAttribute("href") || "", el.getAttribute("poster") || "");
     }
     const videos = unique(
       [
         ...fiber.videos,
-        ...domMedia.filter((src) => /video\.twimg\.com\/(?:ext_tw_video|amplify_video)\//i.test(src)),
+        ...domMedia.filter((src) => /video\.twimg\.com\/[^\s"'<>]+?\.mp4(?:$|[?#])/i.test(src)),
       ].filter((url) => isAllowedImageUrl(url))
     );
     const gifs = unique(
       [
         ...fiber.gifs,
         ...[...article.querySelectorAll("video[poster], img[src*='tweet_video_thumb']")].flatMap((el) => {
+          if (!ownedByArticle(el, article)) return [];
           const match = String(el.getAttribute("poster") || el.getAttribute("src") || "").match(/tweet_video_thumb\/([A-Za-z0-9_-]+)/);
           return match ? [`https://video.twimg.com/tweet_video/${match[1]}.mp4`] : [];
         }),
