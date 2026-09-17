@@ -273,7 +273,7 @@
           </div>
         </div>
       </article>
-      <article data-testid="tweet">
+      <article data-testid="tweet" id="x2img-clips-tweet">
         <div class="row">
           <div data-testid="Tweet-User-Avatar">
             <img class="ava" alt="" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop" />
@@ -287,7 +287,9 @@
             </div>
             <div data-testid="tweetText">视频过不了画布，封面还是要清楚。</div>
             <div data-testid="videoPlayer">
-              <video poster="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&auto=format&fit=crop"></video>
+              <video poster="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&auto=format&fit=crop">
+                <source src="https://video.twimg.com/ext_tw_video/2004/pu/vid/1280x720/demo.mp4" type="video/mp4" />
+              </video>
               <img alt="" src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&auto=format&fit=crop" />
               <div class="play"></div>
             </div>
@@ -365,7 +367,7 @@
               <a href="/fold/status/2007"><time datetime="2026-09-09T11:11:00">Sep 9</time></a>
             </div>
             <div data-testid="tweetText">这截正文出不去完整卡。</div>
-            <a href="/fold/status/2007" data-testid="tweet-text-show-more-link">显示更多</a>
+            <a href="#" data-testid="tweet-text-show-more-link" onclick="const t=this.closest('article').querySelector('[data-testid=tweetText]'); t.textContent='这截正文出不去完整卡。点显示更多之后整段都在。'; this.remove(); return false;">显示更多</a>
             <div class="bar">
               <span data-testid="reply" aria-label="1 reply">1</span>
               <span data-testid="retweet" aria-label="0 reposts">0</span>
@@ -394,6 +396,37 @@
               <span data-testid="reply" aria-label="1 reply">1</span>
               <span data-testid="retweet" aria-label="0 reposts">0</span>
               <span data-testid="like" aria-label="2 likes">2</span>
+              <button type="button" data-testid="share" aria-label="Share post" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article data-testid="tweet" id="x2img-quote-clean">
+        <div class="row">
+          <div data-testid="Tweet-User-Avatar">
+            <img class="ava" alt="" src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=200&auto=format&fit=crop" />
+          </div>
+          <div style="flex:1;min-width:0">
+            <div data-testid="User-Name">
+              <a role="link" href="/kale"><span>Kale</span></a>
+              <span class="handle">@kale</span>
+              ·
+              <a href="/kale/status/2014"><time datetime="2026-09-17T17:00:00">Sep 17</time></a>
+            </div>
+            <div data-testid="tweetText">这种引流别信。</div>
+            <div data-testid="quoteTweet" role="link">
+              <div data-testid="User-Name">
+                <a role="link" href="/spammy"><span>Spammy</span></a>
+                <span class="handle">@spammy</span>
+              </div>
+              <div data-testid="tweetText">onlyfans 看置顶，telegram 免费看。</div>
+            </div>
+            <div class="bar">
+              <span data-testid="reply" aria-label="1 reply">1</span>
+              <span data-testid="retweet" aria-label="0 reposts">0</span>
+              <span data-testid="like" aria-label="4 likes">4</span>
               <button type="button" data-testid="share" aria-label="Share post" title="Share">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
               </button>
@@ -490,8 +523,48 @@
           </div>
         </div>
       </article>
+      <article data-testid="tweet" id="x2img-age-click">
+        <div class="row">
+          <div data-testid="Tweet-User-Avatar">
+            <img class="ava" alt="" src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=200&auto=format&fit=crop" />
+          </div>
+          <div style="flex:1;min-width:0">
+            <div data-testid="User-Name">
+              <a role="link" href="/gated2"><span>Gated2</span></a>
+              <span class="handle">@gated2</span>
+              ·
+              <a href="/gated2/status/2015"><time datetime="2026-09-17T17:10:00">Sep 17</time></a>
+            </div>
+            <div data-testid="tweetText">遮罩后面没有现成图，只能点查看。</div>
+            <div data-x2img-age-block>
+              <div>敏感内容，可能不适合所有人。验证年龄后查看。</div>
+              <button type="button" id="x2img-age-view">查看</button>
+            </div>
+            <button type="button" id="x2img-age-showmore">显示更多</button>
+            <div class="bar">
+              <span data-testid="reply" aria-label="0 replies">0</span>
+              <span data-testid="retweet" aria-label="0 reposts">0</span>
+              <span data-testid="like" aria-label="1 like">1</span>
+              <button type="button" data-testid="share" aria-label="Share post" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
     </div>
-    <script src="x-to-img.user.js?v=0.5.3"></script>
+    <script>
+      document.addEventListener(
+        "click",
+        (e) => {
+          const el = e.target.closest?.("#x2img-age-view, #x2img-age-showmore");
+          if (!el) return;
+          el.dataset.clicks = String(Number(el.dataset.clicks || "0") + 1);
+        },
+        true
+      );
+    </script>
+    <script src="x-to-img.user.js?v=0.5.4"></script>
     <script>
       (function () {
         const article = document.getElementById("x2img-fiber-tweet");

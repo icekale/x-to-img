@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.5.3
+// @version      0.5.4
 // @description  分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
 // @description:en Click next to Share for a card. Also hide adult spam/ads, download media, and lift age covers
 // @description:zh-CN 分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
@@ -807,10 +807,13 @@
 
   function expandTarget(el) {
     if (!el || showMoreNavigates(el)) return null;
-    const button = el.closest?.("button, [role='button']");
+    const button = el.closest?.("button");
     if (button && !showMoreNavigates(button)) return button;
-    if (!el.closest?.("a[href]")) return el;
-    return null;
+    const roleButton = el.closest?.("[role='button']");
+    if (roleButton && !showMoreNavigates(roleButton)) return roleButton;
+    const link = el.closest?.("a[href]") || (el.tagName === "A" ? el : null);
+    if (link && !showMoreNavigates(link)) return link;
+    return el;
   }
 
   function canExpandInPlace(article) {
@@ -1011,14 +1014,16 @@
   }
 
   function parseTweet(article) {
-    const nameRoot = article.querySelector('[data-testid="User-Name"]');
+    const nameRoot =
+      [...article.querySelectorAll('[data-testid="User-Name"]')].find((el) => ownedByArticle(el, article)) ||
+      article.querySelector('[data-testid="User-Name"]');
     const { name: displayName, handle } = parseAuthor(nameRoot);
     const nameLink = profileNameLinks(nameRoot)[0] || nameRoot?.querySelector('a[role="link"]');
     const time = article.querySelector("time");
     const createdAt = time?.getAttribute("datetime") || "";
     const statusAnchor = time?.closest("a") || article.querySelector('a[href*="/status/"]') || nameLink;
     const url = statusAnchor?.href || (handle ? `https://x.com/${handle}` : location.href);
-    const textEl = article.querySelector('[data-testid="tweetText"]');
+    const textEl = [...article.querySelectorAll('[data-testid="tweetText"]')].find((el) => ownedByArticle(el, article));
     const rich = extractRichText(textEl);
     const avatarEl =
       article.querySelector('[data-testid="Tweet-User-Avatar"] img, img[src*="profile_images"]') ||
@@ -1492,6 +1497,7 @@
     /年龄限制|年齡限制|成人内容|成人內容|敏感内容|敏感內容|敏感媒体|敏感媒體|可能不适合|可能不適合|验证.{0,6}年龄|驗證.{0,6}年齡|age[- ]?restricted|adult content|sensitive (?:media|content)|might not be suitable|verify your age|潛在的敏感/i;
   const PROFILE_GATE_BTN_RE =
     /^(?:是[，,]\s*查看(?:個人|个人)(?:資料|资料)|Yes,?\s*view profile|はい[、,]?\s*プロフィールを(?:表示|見る))$/i;
+  const AGE_VIEW_BTN_RE = /^(?:查看|查看内容|查看圖片|查看图片|View|View media|View image|View photo|Show)$/i;
   let settings = { ...DEFAULT_SETTINGS };
 
   function readStore(key, fallback) {
@@ -1569,10 +1575,6 @@
     return terms.reduce((sum, term) => (hay.includes(compactText(term)) ? sum + 1 : sum), 0);
   }
 
-  function isFollowingTimeline() {
-    return /\/home/.test(location.pathname) && /following/i.test(location.search + location.hash + document.title);
-  }
-
   function fiberFollowing(article, handle) {
     const want = String(handle || "").toLowerCase();
     if (!want || !article) return false;
@@ -1607,15 +1609,21 @@
     return false;
   }
 
+  function adultCorpus(article, tweet) {
+    const ownedText = [...article.querySelectorAll('[data-testid="tweetText"]')].find((el) => ownedByArticle(el, article));
+    const ownedName = [...article.querySelectorAll('[data-testid="User-Name"]')].find((el) => ownedByArticle(el, article));
+    return [tweet.name, tweet.handle, tweet.text, ownedText?.innerText, ownedName?.innerText].filter(Boolean).join("\n");
+  }
+
   function scoreAdult(article, tweet) {
     const handle = String(tweet.handle || "").toLowerCase();
     if (handle && settings.whitelist.includes(handle)) return { hide: false, reason: "whitelist" };
-    const text = [tweet.name, tweet.handle, tweet.text, article.innerText].filter(Boolean).join("\n");
+    const text = adultCorpus(article, tweet);
     const compact = compactText(text);
     const customHit = settings.customWords.find((word) => compact.includes(compactText(word)));
     if (customHit) return { hide: true, reason: "custom" };
     if (!settings.hideAdult) return { hide: false, reason: "" };
-    if (settings.skipFollowing && (fiberFollowing(article, handle) || isFollowingTimeline())) {
+    if (settings.skipFollowing && fiberFollowing(article, handle)) {
       return { hide: false, reason: "following" };
     }
     const strong = countTerms(compact, ADULT_STRONG);
@@ -1738,20 +1746,27 @@
     const tweet = parseTweet(article);
     const fiber = collectFiberMedia(article, tweet.id);
     const photos = unique([...(tweet.photos || []), ...fiber.photos].filter((url) => isAllowedImageUrl(url)));
+    const domMedia = [];
+    for (const el of article.querySelectorAll("video, source")) {
+      domMedia.push(el.currentSrc || "", el.src || "", el.getAttribute("src") || "");
+    }
+    for (const el of article.querySelectorAll("[href], [poster]")) {
+      domMedia.push(el.getAttribute("href") || "", el.getAttribute("poster") || "");
+    }
     const videos = unique(
       [
         ...fiber.videos,
-        ...[...article.querySelectorAll("video")].map((video) => video.currentSrc || video.src).filter((src) => /video\.twimg\.com\/(?:ext_tw_video|amplify)/i.test(src)),
+        ...domMedia.filter((src) => /video\.twimg\.com\/(?:ext_tw_video|amplify_video)\//i.test(src)),
       ].filter((url) => isAllowedImageUrl(url))
     );
     const gifs = unique(
       [
         ...fiber.gifs,
-        ...[...article.querySelectorAll("video[poster]")].flatMap((video) => {
-          const match = String(video.getAttribute("poster") || "").match(/tweet_video_thumb\/([A-Za-z0-9_-]+)/);
+        ...[...article.querySelectorAll("video[poster], img[src*='tweet_video_thumb']")].flatMap((el) => {
+          const match = String(el.getAttribute("poster") || el.getAttribute("src") || "").match(/tweet_video_thumb\/([A-Za-z0-9_-]+)/);
           return match ? [`https://video.twimg.com/tweet_video/${match[1]}.mp4`] : [];
         }),
-        ...[...article.querySelectorAll("video")].map((video) => video.currentSrc || video.src).filter((src) => /video\.twimg\.com\/tweet_video\//i.test(src)),
+        ...domMedia.filter((src) => /video\.twimg\.com\/tweet_video\//i.test(src)),
       ].filter((url) => isAllowedImageUrl(url))
     );
     return {
@@ -1967,6 +1982,17 @@
       .trim();
   }
 
+  function findAgeViewControl(cover) {
+    if (!cover) return null;
+    for (const el of cover.querySelectorAll("button, [role='button']")) {
+      const label = controlLabel(el);
+      if (!label || label.length > 28) continue;
+      if (SHOW_MORE_RE.test(label) || PROFILE_GATE_BTN_RE.test(label)) continue;
+      if (AGE_VIEW_BTN_RE.test(label)) return el;
+    }
+    return null;
+  }
+
   function findSensitiveProfileGate() {
     const root = document.querySelector("main") || document.body;
     if (!root) return null;
@@ -2022,20 +2048,24 @@
       cover = parent;
     }
     cover.classList.add("x2img-age-cover");
-    if (article.querySelector("[data-x2img-unlocked]")) return;
-    const alreadyShown = [...article.querySelectorAll('[data-testid="tweetPhoto"] img, video')].some((el) => {
+    if (article.querySelector("[data-x2img-unlocked]") || article.dataset.x2imgUnmaskPending === "1") return;
+    const nativeMedia = [...article.querySelectorAll('[data-testid="tweetPhoto"] img, [data-testid="videoPlayer"] video, video')].filter(
+      (el) => !el.closest("[data-x2img-unlocked]")
+    );
+    const alreadyShown = nativeMedia.some((el) => {
       const src = el.currentSrc || el.src || "";
       return src && !/abs\.twimg\.com|placeholder/i.test(src);
     });
     if (alreadyShown) return;
     const { items } = collectDownloadMedia(article);
     if (!items.length) {
-      const view = [...article.querySelectorAll("button, [role='button']")].find((el) =>
-        /查看|View|Show/i.test((el.textContent || "").trim())
-      );
-      view?.click();
+      const view = findAgeViewControl(cover);
+      if (!view) return;
+      article.dataset.x2imgUnmaskPending = "1";
+      view.click();
       return;
     }
+    if (nativeMedia.length) return;
     const box = document.createElement("div");
     box.dataset.x2imgUnlocked = "1";
     box.style.cssText = "display:grid;gap:2px;border-radius:12px;overflow:hidden;margin-top:8px;";
@@ -2097,6 +2127,7 @@
       <label class="row">隐藏黄推 / 引流机器人 <input type="checkbox" data-k="hideAdult" ${settings.hideAdult ? "checked" : ""}></label>
       <label class="row">隐藏广告 / Premium 推销 <input type="checkbox" data-k="hideAds" ${settings.hideAds ? "checked" : ""}></label>
       <label class="row">已关注的不藏 <input type="checkbox" data-k="skipFollowing" ${settings.skipFollowing ? "checked" : ""}></label>
+      <div class="hint">按账号是否已关注，不按 Following 时间线整页放行</div>
       <div class="hint">强度</div>
       <select data-k="adultLevel">
         <option value="balanced" ${settings.adultLevel === "balanced" ? "selected" : ""}>均衡</option>
