@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.5.1
+// @version      0.5.2
 // @description  分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
 // @description:en Click next to Share for a card. Also hide adult spam/ads, download media, and lift age covers
 // @description:zh-CN 分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
@@ -70,28 +70,23 @@
     views: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 18.2V13h2.4v5.2H4.5zm6.3 0V6h2.4v12.2h-2.4zm6.3 0v-8h2.4v8h-2.4z" fill="currentColor"/></svg>`,
     verified: `<svg viewBox="0 0 22 22" aria-hidden="true"><path d="M11 1.6l2.1 1.5 2.5-.4 1.2 2.3 2.3 1.2-.4 2.5L20.2 11l-1.5 2.1.4 2.5-2.3 1.2-1.2 2.3-2.5-.4L11 20.4l-2.1-1.5-2.5.4-1.2-2.3-2.3-1.2.4-2.5L1.8 11l1.5-2.1L2.9 6.4l2.3-1.2 1.2-2.3 2.5.4L11 1.6z" fill="#60a5fa"/><path d="M9.4 11.6l-1.5-1.5-1.1 1.1 2.6 2.6 5.1-5.1-1.1-1.1-4 4z" fill="#fff"/></svg>`,
     xlogo: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 10.3L22 2h-2.2l-6 6.9L8.8 2H2l7.7 10.9L2 22h2.2l6.6-7.6L15.2 22H22l-7.3-11.7zm-2.3 2.7l-.8-1.1L4.8 3.5h2.6l5.1 7.3.8 1.1 6.7 9.6h-2.6l-5.4-7.5z" fill="currentColor"/></svg>`,
-    download: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.2v11.2l3.7-3.7 1.4 1.4L12 18.2l-5.1-5.1 1.4-1.4L11 14.4V3.2h1zM4.4 19.4h15.2V21H4.4v-1.6z"/></svg>`,
+    download: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.41 6.3 15.7l1.41-1.42L11 17.59V8h2v9.59l3.29-3.3 1.42 1.42L12 21.41zM3 9l.02-3.51C3.02 4.11 4.14 3 5.52 3H18.5C19.88 3 21 4.12 21 5.5V9h-2V5.5c0-.28-.22-.5-.5-.5H5.52c-.28 0-.5.22-.5.5L5 9H3z"/></svg>`,
   };
 
   const PAGE_CSS = `
-    [data-x2img-action]{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:2px;}
-    [data-x2img-action] button{width:34.75px;height:34.75px;border:0;padding:0;background:transparent;border-radius:999px;color:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;}
-    [data-x2img-action] button svg{width:18.75px;height:18.75px;display:block;}
-    [data-x2img-action] button:hover{background:rgba(29,155,240,.1);color:rgb(29,155,240);}
-    [data-x2img-action] button:focus-visible{outline:2px solid rgba(29,155,240,.6);outline-offset:0;}
-    [data-x2img-action] button[data-busy="1"]{cursor:wait;opacity:.75;}
-    [data-x2img-action] .x2img-spin{transform-origin:center;animation:x2img-rot .7s linear infinite;}
+    [data-x2img-tools]{display:inline-flex;align-items:center;align-self:center;vertical-align:middle;flex:0 0 auto;line-height:0;}
+    [data-x2img-action],[data-x2img-download]{display:flex;align-items:center;justify-content:center;width:34.75px;height:34.75px;margin:0;line-height:0;flex:0 0 auto;}
+    [data-x2img-tools] button{width:34.75px;height:34.75px;border:0;padding:0;background:transparent;border-radius:999px;color:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    [data-x2img-tools] button svg{width:18.75px;height:18.75px;display:block;}
+    [data-x2img-tools] button:hover{background:rgba(29,155,240,.1);color:rgb(29,155,240);}
+    [data-x2img-tools] button:focus-visible{outline:2px solid rgba(29,155,240,.6);outline-offset:0;}
+    [data-x2img-tools] button[data-busy="1"]{cursor:wait;opacity:.75;}
+    [data-x2img-tools] .x2img-spin{transform-origin:center;animation:x2img-rot .7s linear infinite;}
     @keyframes x2img-rot{to{transform:rotate(360deg);}}
     #x2img-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,12px);z-index:2147483647;padding:10px 14px;border-radius:999px;background:#0f1419;color:#fff;font:650 13px/1.2 TwitterChirp,-apple-system,"PingFang SC",sans-serif;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;}
     #x2img-toast[data-show="1"]{opacity:1;transform:translate(-50%,0);}
     #x2img-toast[data-kind="err"]{background:#9f1239;}
     [data-x2img-hide="1"]{display:none !important;}
-    [data-x2img-download]{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:2px;}
-    [data-x2img-download] button{width:34.75px;height:34.75px;border:0;padding:0;background:transparent;border-radius:999px;color:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;}
-    [data-x2img-download] button svg{width:18.75px;height:18.75px;display:block;}
-    [data-x2img-download] button:hover{background:rgba(29,155,240,.1);color:rgb(29,155,240);}
-    [data-x2img-download] button:focus-visible{outline:2px solid rgba(29,155,240,.6);outline-offset:0;}
-    [data-x2img-download] button[data-busy="1"]{cursor:wait;opacity:.75;}
     html[data-x2img-grid="1"] article[data-x2img-grid] nav[role="navigation"]{overflow:visible !important;}
     html[data-x2img-grid="1"] article[data-x2img-grid] [data-testid="ScrollSnap-List"]{display:grid !important;gap:2px;transform:none !important;width:100% !important;}
     html[data-x2img-grid="1"] article[data-x2img-grid="2"] [data-testid="ScrollSnap-List"]{grid-template-columns:1fr 1fr;}
@@ -1343,6 +1338,26 @@
     return reply?.closest('[role="group"]') || null;
   }
 
+  function ensureToolsWrap(article, anchor) {
+    let tools = article.querySelector("[data-x2img-tools]");
+    if (tools && tools.previousElementSibling === anchor) return tools;
+    const card = tools?.querySelector("[data-x2img-action]");
+    const download = tools?.querySelector("[data-x2img-download]");
+    tools?.remove();
+    tools = document.createElement("div");
+    tools.dataset.x2imgTools = "1";
+    if (card) tools.appendChild(card);
+    if (download) tools.appendChild(download);
+    const shareCell = wrappingCell(findShareButton(article));
+    if (shareCell) {
+      const height = getComputedStyle(shareCell).height;
+      if (height && height !== "auto") tools.style.height = height;
+    }
+    if (anchor.matches?.('[role="group"]') && !findShareButton(article)) anchor.appendChild(tools);
+    else anchor.after(tools);
+    return tools;
+  }
+
   function beginExport(tweet, button) {
     if (tweet.truncated) {
       toast("正文折叠了，点进帖再出", "err");
@@ -1419,8 +1434,9 @@
       "x";
     const anchor = findMountAnchor(article);
     if (!anchor) return;
-    let wrap = article.querySelector("[data-x2img-action]");
-    if (wrap && wrap.dataset.tweetId === id && wrap.previousElementSibling === anchor) return;
+    const tools = ensureToolsWrap(article, anchor);
+    let wrap = tools.querySelector("[data-x2img-action]");
+    if (wrap && wrap.dataset.tweetId === id) return;
     wrap?.remove();
     wrap = document.createElement("div");
     wrap.dataset.x2imgAction = "1";
@@ -1437,8 +1453,7 @@
       },
       true
     );
-    if (anchor.matches?.('[role="group"]') && !findShareButton(article)) anchor.appendChild(wrap);
-    else anchor.after(wrap);
+    tools.prepend(wrap);
   }
 
   function injectAll() {
@@ -1891,6 +1906,8 @@
   function mountDownload(article) {
     if (!settings.mediaDownload) {
       article.querySelector("[data-x2img-download]")?.remove();
+      const tools = article.querySelector("[data-x2img-tools]");
+      if (tools && !tools.querySelector("[data-x2img-action]")) tools.remove();
       return;
     }
     if (article.parentElement?.closest('article[data-testid="tweet"]')) return;
@@ -1898,16 +1915,16 @@
       tweetIdFromHref(article.querySelector('a[href*="/status/"]')?.href || "") ||
       article.querySelector("time")?.dateTime ||
       "x";
-    const card = article.querySelector("[data-x2img-action]");
-    const anchor = card || findMountAnchor(article);
+    const anchor = findMountAnchor(article);
     if (!anchor) return;
-    let wrap = article.querySelector("[data-x2img-download]");
-    if (wrap && wrap.dataset.tweetId === id && wrap.previousElementSibling === (card || findMountAnchor(article))) return;
+    const tools = ensureToolsWrap(article, anchor);
+    let wrap = tools.querySelector("[data-x2img-download]");
+    if (wrap && wrap.dataset.tweetId === id) return;
     wrap?.remove();
     wrap = document.createElement("div");
     wrap.dataset.x2imgDownload = "1";
     wrap.dataset.tweetId = id;
-    const colorSource = article.querySelector("[data-x2img-action]") || findShareButton(article);
+    const colorSource = tools.querySelector("[data-x2img-action]") || findShareButton(article);
     if (colorSource) wrap.style.color = getComputedStyle(colorSource).color;
     wrap.innerHTML = `<button type="button" aria-label="下载媒体" title="下载媒体">${ICONS.download}</button>`;
     wrap.addEventListener(
@@ -1928,9 +1945,7 @@
       },
       true
     );
-    if (card) card.after(wrap);
-    else if (anchor.matches?.('[role="group"]') && !findShareButton(article)) anchor.appendChild(wrap);
-    else anchor.after(wrap);
+    tools.appendChild(wrap);
   }
 
   function applyMediaGrid(article) {

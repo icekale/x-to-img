@@ -35,7 +35,8 @@
       [data-testid="videoPlayer"] .play::after { content: ""; position: absolute; inset: 0; margin: auto; width: 0; height: 0; border-left: 14px solid #fff; border-top: 9px solid transparent; border-bottom: 9px solid transparent; margin-left: 18px; }
       .bar { display: flex; align-items: center; gap: 4px; color: #71767b; font-size: 13px; padding: 4px 0 0; }
       .bar > span { min-width: 56px; }
-      .bar button { width: 34.75px; height: 34.75px; border: 0; background: transparent; color: inherit; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-left: auto; }
+      .bar button { width: 34.75px; height: 34.75px; border: 0; background: transparent; color: inherit; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+      .bar > button[data-testid="share"] { margin-left: auto; }
       .bar button:hover { background: rgba(29,155,240,.1); color: #1d9bf0; }
       .bar button svg { width: 18.75px; height: 18.75px; }
       [data-testid="ScrollSnap-List"] { display: flex; overflow: auto; gap: 2px; }
@@ -451,7 +452,7 @@
         </div>
       </article>
     </div>
-    <script src="x-to-img.user.js?v=0.5.1"></script>
+    <script src="x-to-img.user.js?v=0.5.2"></script>
     <script>
       (function () {
         const article = document.getElementById("x2img-fiber-tweet");
