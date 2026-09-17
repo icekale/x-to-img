@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.4.4
+// @version      0.4.5
 // @description  分享旁边点一下，把帖做成图，拿去微信粘
 // @description:en Click next to Share and get a picture of the post you can paste
 // @description:zh-CN 分享旁边点一下，把帖做成图，拿去微信粘
@@ -48,6 +48,8 @@
   const FETCH_MAX = 8 * 1024 * 1024;
   const IMAGE_HOSTS = [/(^|\.)twimg\.com$/i, /^ton\.twitter\.com$/i];
   const PREVIEW_IMAGE_HOSTS = [/(^|\.)unsplash\.com$/i, /(^|\.)primefaces\.org$/i];
+  const SHOW_MORE_RE =
+    /^(Show more|Show More|显示更多|顯示更多|展開|展开|もっと見る|더 보기|Mostrar más|Mostrar mais|Afficher plus|Mehr anzeigen)$/i;
 
   const OPTIONS = {
     showAvatar: true,
@@ -391,9 +393,17 @@
     }
   }
 
+  function isShowMoreLabel(value) {
+    return SHOW_MORE_RE.test(String(value || "").replace(/\s+/g, " ").trim());
+  }
+
   function extractRichText(el) {
     if (!el) return { html: "", text: "" };
     const clone = el.cloneNode(true);
+    clone.querySelectorAll('[data-testid="tweet-text-show-more-link"]').forEach((node) => node.remove());
+    clone.querySelectorAll("a, button, [role='button']").forEach((node) => {
+      if (isShowMoreLabel(node.textContent)) node.remove();
+    });
     clone.querySelectorAll("img").forEach((img) => {
       const span = document.createElement("span");
       span.textContent = img.alt || "";
@@ -657,13 +667,236 @@
     ).slice(0, 4);
   }
 
-  function isTruncated(article) {
-    if (article.querySelector('[data-testid="tweet-text-show-more-link"]')) return true;
-    const textEl = article.querySelector('[data-testid="tweetText"]');
-    const scope = textEl?.parentElement || article;
-    return [...scope.querySelectorAll("a, button, span")].some((el) =>
-      /^(Show more|显示更多|顯示更多|展開|もっと見る)$/i.test((el.textContent || "").trim())
+  function ownedByArticle(el, article) {
+    return Boolean(el && article.contains(el) && !isInsideQuote(el, article) && !isInsideCardOrPoll(el, article));
+  }
+
+  function findShowMoreControl(article) {
+    const byTestId = [...article.querySelectorAll('[data-testid="tweet-text-show-more-link"]')].find((el) =>
+      ownedByArticle(el, article)
     );
+    if (byTestId) return byTestId;
+    const textEl = [...article.querySelectorAll('[data-testid="tweetText"]')].find((el) => ownedByArticle(el, article));
+    const scope = textEl?.parentElement || article;
+    return (
+      [...scope.querySelectorAll("a, button, [role='button'], span")].find((el) => {
+        if (!ownedByArticle(el, article)) return false;
+        const label = (el.textContent || "").trim();
+        return isShowMoreLabel(label) && label.length <= 16;
+      }) || null
+    );
+  }
+
+  function isTruncated(article) {
+    return Boolean(findShowMoreControl(article));
+  }
+
+  function showMoreNavigates(el) {
+    if (!el) return false;
+    const link = el.closest?.("a[href]") || (el.tagName === "A" ? el : null);
+    if (!link) return false;
+    const raw = link.getAttribute("href") || "";
+    if (!raw || raw === "#" || /^javascript:/i.test(raw)) return false;
+    const id = tweetIdFromHref(link.href || raw);
+    const here = tweetIdFromHref(location.href);
+    if (id && here && id === here) return false;
+    return Boolean(id) || /\/status\//.test(raw);
+  }
+
+  function expandTarget(el) {
+    if (!el || showMoreNavigates(el)) return null;
+    const button = el.closest?.("button, [role='button']");
+    if (button && !showMoreNavigates(button)) return button;
+    if (!el.closest?.("a[href]")) return el;
+    return null;
+  }
+
+  function canExpandInPlace(article) {
+    return Boolean(expandTarget(findShowMoreControl(article)));
+  }
+
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function expandTweetText(article) {
+    const target = expandTarget(findShowMoreControl(article));
+    if (!target) return false;
+    const before = [...article.querySelectorAll('[data-testid="tweetText"]')].find((el) =>
+      ownedByArticle(el, article)
+    )?.innerText || "";
+    target.click();
+    const start = Date.now();
+    while (Date.now() - start < 900) {
+      if (!isTruncated(article)) return true;
+      const after = [...article.querySelectorAll('[data-testid="tweetText"]')].find((el) =>
+        ownedByArticle(el, article)
+      )?.innerText || "";
+      if (after.length > before.length + 8) return true;
+      await sleep(50);
+    }
+    return !isTruncated(article);
+  }
+
+  function readNoteTextRaw(article, wantId) {
+    wantId = String(wantId || "");
+    if (!article) return "";
+
+    function fiberOf(node) {
+      if (!node) return null;
+      let names = [];
+      try {
+        names = Object.getOwnPropertyNames(node);
+      } catch {
+        names = [];
+      }
+      for (const key of names) {
+        if (key.startsWith("__reactFiber$") || key.startsWith("__reactInternalInstance$")) {
+          try {
+            return node[key];
+          } catch {
+            /* xray */
+          }
+        }
+      }
+      try {
+        for (const key in node) {
+          if (key.startsWith("__reactFiber$") || key.startsWith("__reactInternalInstance$")) return node[key];
+        }
+      } catch {
+        /* xray */
+      }
+      return null;
+    }
+
+    function isNode(value) {
+      return Boolean(value && (value.nodeType === 1 || value.nodeType === 3 || value.nodeType === 9 || value.nodeType === 11));
+    }
+
+    function tweetIdOf(value) {
+      if (!value || typeof value !== "object") return "";
+      if (value.rest_id) return String(value.rest_id);
+      if (value.restId) return String(value.restId);
+      if (value.legacy?.id_str) return String(value.legacy.id_str);
+      if (value.legacy?.idStr) return String(value.legacy.idStr);
+      return "";
+    }
+
+    function noteFrom(value) {
+      if (!value || typeof value !== "object") return null;
+      const block = value.note_tweet || value.noteTweet;
+      if (!block) return null;
+      const results = block.note_tweet_results || block.noteTweetResults;
+      return results?.result || null;
+    }
+
+    function unwrapTweet(value, depth) {
+      if (!value || typeof value !== "object" || isNode(value) || depth > 6) return null;
+      if (noteFrom(value)) return value;
+      return (
+        unwrapTweet(value.result, depth + 1) ||
+        unwrapTweet(value.tweet, depth + 1) ||
+        unwrapTweet(value.tweetResult, depth + 1) ||
+        unwrapTweet(value.tweet_results, depth + 1) ||
+        unwrapTweet(value.tweetResults, depth + 1) ||
+        null
+      );
+    }
+
+    function textOf(value) {
+      const tweet = unwrapTweet(value, 0);
+      if (!tweet) return "";
+      const id = tweetIdOf(tweet);
+      if (wantId && id && id !== wantId) return "";
+      return String(noteFrom(tweet)?.text || "").trim();
+    }
+
+    function search(root) {
+      const seen = new Set();
+      const queue = [[root, 0]];
+      let steps = 0;
+      while (queue.length && steps < 100) {
+        const [value, depth] = queue.shift();
+        steps += 1;
+        if (!value || typeof value !== "object" || isNode(value) || seen.has(value)) continue;
+        seen.add(value);
+        const text = textOf(value);
+        if (text) return text;
+        if (depth >= 5) continue;
+        let kids = [];
+        try {
+          kids = Array.isArray(value) ? value.slice(0, 16) : Object.values(value).slice(0, 28);
+        } catch {
+          kids = [];
+        }
+        for (const kid of kids) queue.push([kid, depth + 1]);
+      }
+      return "";
+    }
+
+    let fiber = fiberOf(article);
+    for (let hop = 0; hop < 60 && fiber; hop += 1) {
+      const text = search(fiber.memoizedProps || fiber.pendingProps);
+      if (text) return text;
+      fiber = fiber.return;
+    }
+    return "";
+  }
+
+  function fullTextFromPage(article, wantId) {
+    const nodes = [article, article?.wrappedJSObject].filter(Boolean);
+    const source = readNoteTextRaw.toString();
+    const runners = [];
+    try {
+      if (typeof unsafeWindow !== "undefined" && typeof unsafeWindow.Function === "function") {
+        runners.push(unsafeWindow.Function("return (" + source + ").apply(null, arguments)"));
+      }
+    } catch {
+      /* sandbox */
+    }
+    runners.push(readNoteTextRaw);
+    for (const node of nodes) {
+      for (const run of runners) {
+        try {
+          const text = String(run(node, wantId || "") || "").trim();
+          if (text) return text;
+        } catch {
+          /* fiber shape drifted */
+        }
+      }
+    }
+    return "";
+  }
+
+  function shouldUseFullText(full, current) {
+    const a = String(full || "").replace(/\s+/g, " ").trim();
+    const b = String(current || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/[.…]+$/u, "")
+      .trim();
+    if (a.length <= b.length + 8) return false;
+    if (!b) return a.length > 0;
+    return a.startsWith(b.slice(0, Math.min(32, b.length))) || a.length >= b.length * 1.25;
+  }
+
+  function hydrateTweet(article) {
+    const tweet = parseTweet(article);
+    const full = fullTextFromPage(article, tweet.id);
+    if (!shouldUseFullText(full, tweet.text)) return tweet;
+    return {
+      ...tweet,
+      text: full,
+      textHtml: decoratePlainText(full),
+      truncated: false,
+    };
+  }
+
+  async function completeTweet(article) {
+    let tweet = hydrateTweet(article);
+    if (!tweet.truncated || !canExpandInPlace(article)) return tweet;
+    await expandTweetText(article);
+    return hydrateTweet(article);
   }
 
   function copiedMessage(tweet, downloaded) {
@@ -854,7 +1087,7 @@
     clearTimeout(toast._timer);
     toast._timer = setTimeout(() => {
       el.dataset.show = "0";
-    }, message.length > 16 ? 3600 : 2400);
+    }, kind === "err" || message.length > 16 ? 3600 : 2400);
   }
 
   function renderer() {
@@ -1011,9 +1244,11 @@
     return reply?.closest('[role="group"]') || null;
   }
 
-  function startCopyFromClick(article, button) {
-    if (button.dataset.busy === "1") return;
-    const tweet = parseTweet(article);
+  function beginExport(tweet, button) {
+    if (tweet.truncated) {
+      toast("正文折叠了，点进帖再出", "err");
+      return;
+    }
     if (!hasCardContent(tweet)) {
       toast("没有读到贴文内容", "err");
       return;
@@ -1042,6 +1277,39 @@
       button.dataset.busy = "0";
       button.innerHTML = ICONS.card;
     });
+  }
+
+  function startCopyFromClick(article, button) {
+    if (button.dataset.busy === "1") return;
+    const tweet = hydrateTweet(article);
+    if (!tweet.truncated) {
+      beginExport(tweet, button);
+      return;
+    }
+    if (!canExpandInPlace(article)) {
+      toast("正文折叠了，点进帖再出", "err");
+      return;
+    }
+    button.dataset.busy = "1";
+    button.innerHTML = ICONS.spin;
+    expandTweetText(article)
+      .then(() => {
+        const next = hydrateTweet(article);
+        if (next.truncated) {
+          toast("正文折叠了，点进帖再出", "err");
+          return;
+        }
+        if (!hasCardContent(next)) {
+          toast("没有读到贴文内容", "err");
+          return;
+        }
+        return generateCard(next);
+      })
+      .catch((err) => toast(err.message || "生成失败，请再试一次", "err"))
+      .finally(() => {
+        button.dataset.busy = "0";
+        button.innerHTML = ICONS.card;
+      });
   }
 
   function mountButton(article) {
@@ -1092,7 +1360,17 @@
     if (typeof GM_registerMenuCommand === "function") {
       GM_registerMenuCommand("将当前贴文转成图卡", () => {
         const article = document.querySelector('article[data-testid="tweet"]');
-        if (article) generateCard(parseTweet(article)).catch((err) => toast(err.message, "err"));
+        if (!article) {
+          toast("没有读到贴文内容", "err");
+          return;
+        }
+        completeTweet(article)
+          .then((tweet) => {
+            if (tweet.truncated) throw new Error("正文折叠了，点进帖再出");
+            if (!hasCardContent(tweet)) throw new Error("没有读到贴文内容");
+            return generateCard(tweet);
+          })
+          .catch((err) => toast(err.message, "err"));
       });
     }
   }
@@ -1100,5 +1378,5 @@
   const onX = /(?:^|\.)(?:x|twitter)\.com$/i.test(location.hostname);
   const preview = document.documentElement.dataset.x2imgPreview === "1";
   if (onX || preview) boot();
-  if (preview) window.X2IMG = { generateCard, parseTweet, sampleTweet, renderCard, injectAll, renderCanvas };
+  if (preview) window.X2IMG = { generateCard, parseTweet, sampleTweet, renderCard, injectAll, renderCanvas, hydrateTweet, completeTweet };
 })();

@@ -18,6 +18,7 @@
       [data-testid="User-Name"] a { color: inherit; text-decoration: none; }
       .handle { color: #8b98a5; font-weight: 400; }
       [data-testid="tweetText"] { margin: 4px 0 0; font-size: 15px; line-height: 1.5; }
+      [data-testid="tweet-text-show-more-link"] { display: inline-block; margin-top: 4px; color: #1d9bf0; font-size: 15px; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
       [data-testid="tweetPhoto"] img { width: 100%; border-radius: 16px; margin-top: 12px; display: block; }
       [data-testid="quoteTweet"] { margin-top: 12px; border: 1px solid #2f3336; border-radius: 16px; padding: 12px; }
       [data-testid="quoteTweet"] [data-testid="tweetPhoto"] img { margin-top: 8px; }
@@ -42,7 +43,7 @@
   <body>
     <div class="rail">
       <div class="head">Home</div>
-      <p class="hint">分享按钮旁边的图片图标是脚本加的。点一下会生成图卡并复制，浅色深色跟着页面走。</p>
+      <p class="hint">分享按钮旁边的图片图标是脚本加的。点一下会生成图卡并复制，浅色深色跟着页面走。折叠正文会先试着展开，展不开会提醒你点进帖。</p>
       <article data-testid="tweet">
         <div class="row">
           <div data-testid="Tweet-User-Avatar">
@@ -230,7 +231,105 @@
           </div>
         </div>
       </article>
+      <article data-testid="tweet" id="x2img-fiber-tweet">
+        <div class="row">
+          <div data-testid="Tweet-User-Avatar">
+            <img class="ava" alt="" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&auto=format&fit=crop" />
+          </div>
+          <div style="flex:1;min-width:0">
+            <div data-testid="User-Name">
+              <a role="link" href="/long"><span>Longform</span></a>
+              <span class="handle">@long</span>
+              ·
+              <a href="/long/status/2005"><time datetime="2026-09-11T09:00:00">Sep 11</time></a>
+            </div>
+            <div data-testid="tweetText">时间线上只能看到这一截……</div>
+            <a href="/long/status/2005" data-testid="tweet-text-show-more-link">显示更多</a>
+            <div class="bar">
+              <span data-testid="reply" aria-label="5 replies">5</span>
+              <span data-testid="retweet" aria-label="1 repost">1</span>
+              <span data-testid="like" aria-label="22 likes">22</span>
+              <button type="button" data-testid="share" aria-label="Share post" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article data-testid="tweet" id="x2img-expand-tweet">
+        <div class="row">
+          <div data-testid="Tweet-User-Avatar">
+            <img class="ava" alt="" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&auto=format&fit=crop" />
+          </div>
+          <div style="flex:1;min-width:0">
+            <div data-testid="User-Name">
+              <a role="link" href="/unfold"><span>Unfold</span></a>
+              <span class="handle">@unfold</span>
+              ·
+              <a href="/unfold/status/2006"><time datetime="2026-09-10T16:20:00">Sep 10</time></a>
+            </div>
+            <div data-testid="tweetText">时间线先露出这一句，后面被折起来了。</div>
+            <button type="button" data-testid="tweet-text-show-more-link" onclick="const t=this.closest('article').querySelector('[data-testid=tweetText]'); t.textContent='时间线先露出这一句，后面被折起来了。点显示更多之后整段都在，图卡要带上后半句。'; this.remove();">显示更多</button>
+            <div class="bar">
+              <span data-testid="reply" aria-label="3 replies">3</span>
+              <span data-testid="retweet" aria-label="2 reposts">2</span>
+              <span data-testid="like" aria-label="19 likes">19</span>
+              <button type="button" data-testid="share" aria-label="Share post" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article data-testid="tweet" id="x2img-fold-tweet">
+        <div class="row">
+          <div data-testid="Tweet-User-Avatar">
+            <img class="ava" alt="" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop" />
+          </div>
+          <div style="flex:1;min-width:0">
+            <div data-testid="User-Name">
+              <a role="link" href="/fold"><span>Folded</span></a>
+              <span class="handle">@fold</span>
+              ·
+              <a href="/fold/status/2007"><time datetime="2026-09-09T11:11:00">Sep 9</time></a>
+            </div>
+            <div data-testid="tweetText">这截正文出不去完整卡。</div>
+            <a href="/fold/status/2007" data-testid="tweet-text-show-more-link">显示更多</a>
+            <div class="bar">
+              <span data-testid="reply" aria-label="1 reply">1</span>
+              <span data-testid="retweet" aria-label="0 reposts">0</span>
+              <span data-testid="like" aria-label="8 likes">8</span>
+              <button type="button" data-testid="share" aria-label="Share post" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
     </div>
-    <script src="x-to-img.user.js?v=0.4.4"></script>
+    <script src="x-to-img.user.js?v=0.4.5"></script>
+    <script>
+      (function () {
+        const article = document.getElementById("x2img-fiber-tweet");
+        if (!article) return;
+        article.__reactFiber$preview = {
+          memoizedProps: {
+            tweetResult: {
+              result: {
+                rest_id: "2005",
+                note_tweet: {
+                  note_tweet_results: {
+                    result: {
+                      text: "时间线上只能看到这一截，后面其实还有整段。折叠正文应该直接出完整卡，不用再点进帖。",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          return: null,
+        };
+      })();
+    </script>
   </body>
 </html>
