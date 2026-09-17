@@ -15,7 +15,7 @@
 - **一键下原图、视频、GIF。** 分享旁边那个下载按钮。多个文件打成 ZIP，文件名能写 `{handle} {id} {name} {date} {n}`。
 - **多图排成网格。**
 - **揭开年龄遮罩。** 帖里的成人内容提示、个人资料敏感页，只在当前页拿掉，不改你的 X 账号设置。片子还在。
-- **阅读光带。** 长帖或线程点一下，窄栏重排，光带盯着当前几行。周围只降对比，不遮、不虚化。可拖、可点一句、按 F 跟随。Alt+S 也能开。
+- **阅读光带。** 盖在时间线整页上，光带盯着当前几行。周围只降对比，不遮、不虚化。可拖、可点一句、按 F 跟随。Alt+S 开关。
 
 油猴菜单里有「设置」。
 
@@ -35,7 +35,7 @@ Also on the timeline:
 - **Download photos, videos, and GIFs.** ZIP when there's more than one file. Names can use `{handle} {id} {name} {date} {n}`.
 - **Photo grid** for multi-image posts.
 - **Lift age covers** and the sensitive-profile prompt on this page only. The video stays put.
-- **Reading spotlight.** Long posts and threads open in a narrow column with a band on the current lines. Everything else just loses contrast — no cover, no blur. Drag it, click a sentence, or press F to follow the pointer. Alt+S toggles it.
+- **Reading spotlight.** A band over the live timeline, on the current lines. Everything else just loses contrast — no cover, no blur. Drag it, click a sentence, or press F to follow the pointer. Alt+S toggles it.
 
 Settings are in the userscript menu.
 
