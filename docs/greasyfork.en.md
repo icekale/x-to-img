@@ -14,7 +14,7 @@ The timeline extras, if you want them:
 - **Download photos, videos, and GIFs.** Same toolbar as Share. Several files go into a ZIP. Name them with `{handle} {id} {name} {date} {n}`.
 - **Photo grid** when a post has more than one image.
 - **Lift age covers** on the post and the sensitive-profile prompt. This page only; it doesn't change your X account settings. The video stays put.
-- **Reading spotlight.** Enter it above More in the left rail. A band over the live timeline; everything else just loses contrast — no cover, no blur. Drag it, click a sentence, or press F to follow the pointer. Alt+S toggles it.
+- **Whole-page spotlight.** Enter it above More in the left rail. A band over the live timeline; everything else drops to a paper veil — no cover, no blur. Drag the right handle, click a sentence, press F to follow, or use the arrow keys. Alt+S toggles it.
 
 Open **Settings** from the userscript menu.
 

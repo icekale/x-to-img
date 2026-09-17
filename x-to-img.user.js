@@ -3,10 +3,10 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.6.2
-// @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、时间线整页阅读光带
-// @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers, spotlight the timeline
-// @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、时间线整页阅读光带
+// @version      0.6.3
+// @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光阅读
+// @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers, whole-page reading spotlight
+// @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光阅读
 // @author       Kale
 // @homepageURL  https://github.com/icekale/x-to-img
 // @supportURL   https://github.com/icekale/x-to-img/issues
@@ -127,37 +127,20 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     #x2img-panel button.act{flex:1;border:0;border-radius:999px;padding:9px 12px;font:700 13px/1 TwitterChirp,sans-serif;cursor:pointer;}
     #x2img-panel button.pri{background:#1d9bf0;color:#fff;}
     #x2img-panel button.ghost{background:transparent;color:#1d9bf0;box-shadow:inset 0 0 0 1px #38444d;}
-    @property --x2img-bt{syntax:"<length>";inherits:true;initial-value:0px;}
-    @property --x2img-bb{syntax:"<length>";inherits:true;initial-value:120px;}
-    @property --x2img-bf{syntax:"<length>";inherits:true;initial-value:20px;}
-    #x2img-spot{position:fixed;inset:0;z-index:2147483644;pointer-events:none;color:#e7e9ea;}
-    #x2img-spot[data-light="1"]{color:#0f1419;}
-    #x2img-spot .veil,#x2img-spot .glow,#x2img-spot .grip,#x2img-spot .edge{position:absolute;left:0;right:0;pointer-events:none;}
-    #x2img-spot .veil{inset:0;background:linear-gradient(to bottom,var(--dim) 0,var(--dim) var(--x2img-bt),transparent calc(var(--x2img-bt) + var(--x2img-bf)),transparent calc(var(--x2img-bb) - var(--x2img-bf)),var(--dim) var(--x2img-bb),var(--dim) 100%);--dim:rgba(255,255,255,.2);}
-    #x2img-spot[data-light="1"] .veil{--dim:rgba(15,20,25,.2);}
-    #x2img-spot .glow{top:var(--x2img-bt);height:calc(var(--x2img-bb) - var(--x2img-bt));background:rgba(29,155,240,.07);box-shadow:inset 3px 0 0 #1d9bf0;}
-    #x2img-spot[data-light="1"] .glow{background:rgba(29,155,240,.05);}
-    #x2img-spot .veil,#x2img-spot .glow,#x2img-spot .grip,#x2img-spot .edge{transition:--x2img-bt .2s ease,--x2img-bb .2s ease,top .2s ease,height .2s ease;}
-    #x2img-spot.is-drag .veil,#x2img-spot.is-drag .glow,#x2img-spot.is-drag .grip,#x2img-spot.is-drag .edge{transition:none;}
-    #x2img-spot.is-follow .veil,#x2img-spot.is-follow .glow,#x2img-spot.is-follow .grip,#x2img-spot.is-follow .edge{transition:--x2img-bt .08s linear,--x2img-bb .08s linear,top .08s linear,height .08s linear;}
-    #x2img-spot.is-follow .grip,#x2img-spot.is-follow .edge{pointer-events:none;}
-    #x2img-spot .grip{top:var(--x2img-bt);height:22px;pointer-events:auto;cursor:grab;touch-action:none;}
+    @property --x2img-t{syntax:"<length>";inherits:true;initial-value:0px;}
+    @property --x2img-b{syntax:"<length>";inherits:true;initial-value:112px;}
+    #x2img-spot{position:fixed;inset:0;z-index:2147483644;pointer-events:none;color:#8b98a5;--pf:0,0,0;--dim:.86;--f:130px;--band:rgba(255,255,255,.075);--snap:.18s;--x2img-gl:0px;--x2img-gr:10px;}
+    #x2img-spot[data-light="1"]{color:#536471;}
+    #x2img-spot .veil{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(to bottom,rgba(var(--pf),var(--dim)) 0,rgba(var(--pf),var(--dim)) max(0px,calc(var(--x2img-t) - var(--f))),rgba(var(--pf),0) var(--x2img-t),rgba(var(--pf),0) var(--x2img-b),rgba(var(--pf),var(--dim)) calc(var(--x2img-b) + var(--f)),rgba(var(--pf),var(--dim)) 100%);}
+    #x2img-spot .bandbox{position:absolute;left:var(--x2img-gl);right:var(--x2img-gr);top:var(--x2img-t);height:calc(var(--x2img-b) - var(--x2img-t));z-index:1;background:var(--band);border-radius:10px;pointer-events:none;-webkit-mask-image:linear-gradient(transparent 0,#000 15px,#000 calc(100% - 15px),transparent 100%);mask-image:linear-gradient(transparent 0,#000 15px,#000 calc(100% - 15px),transparent 100%);}
+    #x2img-spot .grip{position:absolute;right:var(--x2img-gr);top:var(--x2img-t);height:calc(var(--x2img-b) - var(--x2img-t));width:30px;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:grab;touch-action:none;}
+    #x2img-spot .grip::before{content:"";width:4px;height:34px;border-radius:99px;background:currentColor;opacity:.4;}
     #x2img-spot .grip:active{cursor:grabbing;}
-    #x2img-spot .grip i{position:absolute;left:50%;top:8px;width:42px;height:4px;margin-left:-21px;border-radius:99px;background:currentColor;opacity:.34;}
-    #x2img-spot .edge{height:10px;pointer-events:auto;cursor:ns-resize;touch-action:none;}
-    #x2img-spot .edge.n{top:var(--x2img-bt);}
-    #x2img-spot .edge.s{top:calc(var(--x2img-bb) - 10px);}
-    #x2img-spot .hud{position:absolute;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:10px;max-width:calc(100% - 24px);padding:8px 10px 8px 14px;border-radius:999px;pointer-events:auto;background:rgba(15,20,25,.88);box-shadow:0 0 0 1px #2f3336,0 10px 28px rgba(0,0,0,.28);font:12px/1.35 TwitterChirp,"PingFang SC",sans-serif;color:#8b98a5;}
-    #x2img-spot[data-light="1"] .hud{background:rgba(255,255,255,.94);box-shadow:0 0 0 1px #eff3f4,0 10px 28px rgba(15,20,25,.1);}
-    #x2img-spot .hud span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    #x2img-spot .hud button{border:0;background:transparent;color:#1d9bf0;cursor:pointer;border-radius:999px;font:700 12px/1 TwitterChirp,sans-serif;}
-    #x2img-spot .hud [data-follow]{padding:6px 10px;box-shadow:inset 0 0 0 1px #38444d;}
-    #x2img-spot[data-light="1"] .hud [data-follow]{box-shadow:inset 0 0 0 1px #cfd9de;}
-    #x2img-spot .hud [data-follow][aria-pressed="true"]{background:#1d9bf0;color:#fff;box-shadow:none;}
-    #x2img-spot .hud [data-close]{width:28px;height:28px;font:700 18px/1 TwitterChirp,sans-serif;color:inherit;}
-    #x2img-spot .hud button:hover{background:rgba(239,243,244,.1);}
-    #x2img-spot[data-light="1"] .hud button:hover{background:rgba(15,20,25,.08);}
-    @media (max-width:700px){#x2img-spot .hud{bottom:76px;}}
+    #x2img-spot .grip:active::before{opacity:.75;}
+    #x2img-spot.is-follow .grip{opacity:0;pointer-events:none;}
+    #x2img-spot.is-snap{transition:--x2img-t var(--snap) ease-out,--x2img-b var(--snap) ease-out;}
+    #x2img-spot.is-snap .bandbox,#x2img-spot.is-snap .grip{transition:top var(--snap) ease-out,height var(--snap) ease-out,right var(--snap) ease-out;}
+    #x2img-spot.is-drag,#x2img-spot.is-drag .bandbox,#x2img-spot.is-drag .grip{transition:none;}
     [data-x2img-nav-spot]{cursor:pointer;}
     [data-x2img-nav-spot] a,[data-x2img-nav-spot] button{color:inherit;text-decoration:none;}
     [data-x2img-nav-spot][data-on="1"],[data-x2img-nav-spot][data-on="1"] span{font-weight:700;}
@@ -281,6 +264,23 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (m) return Math.round(parseFloat(m[1]) * 1e6);
     const digits = text.match(/(\d+)/);
     return digits ? parseInt(digits[1], 10) : 0;
+  }
+
+  function pagePaperRGB() {
+    const nodes = [
+      document.querySelector('[data-testid="primaryColumn"]'),
+      document.querySelector(".rail"),
+      document.body,
+      document.documentElement,
+    ].filter(Boolean);
+    for (const el of nodes) {
+      const bg = getComputedStyle(el).backgroundColor || "";
+      const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/.exec(bg);
+      if (!m) continue;
+      if (m[4] != null && Number(m[4]) < 0.5) continue;
+      return [Number(m[1]), Number(m[2]), Number(m[3])];
+    }
+    return pageIsDark() ? [0, 0, 0] : [255, 255, 255];
   }
 
   function pageIsDark() {
@@ -2503,8 +2503,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     follow: false,
     drag: null,
     bandTop: 0,
-    bandH: 120,
+    bandH: 112,
     sourceEl: null,
+    snapTimer: 0,
+    lastLine: null,
   };
 
   function isSpotChrome(node) {
@@ -2648,42 +2650,60 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     return rect;
   }
 
+  function spotLane() {
+    const col =
+      document.querySelector('[data-testid="primaryColumn"]') ||
+      document.querySelector(".rail") ||
+      document.querySelector('[role="main"]');
+    if (!col) return { left: 0, right: 10 };
+    const box = col.getBoundingClientRect();
+    return {
+      left: Math.max(0, Math.round(box.left)),
+      right: Math.max(0, Math.round(window.innerWidth - box.right)),
+    };
+  }
+
+  function applySpotPaper(root) {
+    const [r, g, b] = pagePaperRGB();
+    const dark = r * 299 + g * 587 + b * 114 < 128000;
+    root.style.setProperty("--pf", `${r},${g},${b}`);
+    root.style.setProperty("--dim", dark ? ".86" : ".84");
+    root.style.setProperty("--band", dark ? "rgba(255,255,255,.075)" : "rgba(15,20,25,.08)");
+    if (dark) delete root.dataset.light;
+    else root.dataset.light = "1";
+  }
+
+  function pulseSpotSnap() {
+    const root = spot.root;
+    if (!root || spot.drag) return;
+    root.classList.add("is-snap");
+    clearTimeout(spot.snapTimer);
+    spot.snapTimer = setTimeout(() => root.classList.remove("is-snap"), 260);
+  }
+
   function paintSpot() {
     const root = spot.root;
     if (!root) return;
     const h = window.innerHeight;
-    spot.bandH = Math.max(56, Math.min(spot.bandH, Math.round(h * 0.62)));
-    spot.bandTop = Math.max(0, Math.min(spot.bandTop, h - spot.bandH));
-    const fade = Math.max(10, Math.min(28, Math.round(spot.bandH / 5)));
-    root.style.setProperty("--x2img-bt", `${spot.bandTop}px`);
-    root.style.setProperty("--x2img-bb", `${spot.bandTop + spot.bandH}px`);
-    root.style.setProperty("--x2img-bf", `${fade}px`);
+    spot.bandH = Math.max(40, Math.min(spot.bandH, Math.round(h * 0.62)));
+    spot.bandTop = Math.max(8, Math.min(spot.bandTop, h - spot.bandH - 8));
+    const lane = spotLane();
+    root.style.setProperty("--x2img-t", `${spot.bandTop}px`);
+    root.style.setProperty("--x2img-b", `${spot.bandTop + spot.bandH}px`);
+    root.style.setProperty("--x2img-gl", `${lane.left}px`);
+    root.style.setProperty("--x2img-gr", `${lane.right}px`);
     root.classList.toggle("is-follow", spot.follow);
     root.classList.toggle("is-drag", Boolean(spot.drag));
-    if (!pageIsDark()) root.dataset.light = "1";
-    else delete root.dataset.light;
-    const followBtn = root.querySelector("[data-follow]");
-    if (followBtn) followBtn.setAttribute("aria-pressed", spot.follow ? "true" : "false");
+    applySpotPaper(root);
   }
 
   function snapToRect(rect) {
     if (!rect) return;
-    const pad = 7;
-    let top = rect.top - pad;
-    let bottom = rect.bottom + pad;
-    const minH = Math.max(56, Math.round(window.innerHeight * 0.11));
-    if (bottom - top < minH) {
-      const mid = (top + bottom) / 2;
-      top = mid - minH / 2;
-      bottom = mid + minH / 2;
-    }
-    const maxH = Math.round(window.innerHeight * 0.5);
-    if (bottom - top > maxH) {
-      top = rect.top - pad;
-      bottom = top + maxH;
-    }
-    spot.bandTop = top;
-    spot.bandH = bottom - top;
+    const height = Math.max(40, Math.round((rect.bottom - rect.top) + 14));
+    const maxH = Math.min(260, Math.round(window.innerHeight * 0.5));
+    spot.bandH = Math.min(height, maxH);
+    spot.bandTop = Math.round(rect.top) - 7;
+    pulseSpotSnap();
     paintSpot();
   }
 
@@ -2695,7 +2715,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     spot.sourceEl = article;
     if (!text) {
       const box = article.getBoundingClientRect();
-      snapToRect({ top: box.top + 36, bottom: box.top + 36 + Math.max(72, spot.bandH) });
+      placeBand({ top: box.top + 36, bottom: box.top + 148 }, false);
       return;
     }
     const box = text.getBoundingClientRect();
@@ -2704,37 +2724,97 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     }
     const next = text.getBoundingClientRect();
     const hit = sentenceRectFromPoint(next.left + 24, Math.min(Math.max(next.top + 10, 40), window.innerHeight - 40));
-    snapToRect(hit || next);
+    placeBand(hit || next, false);
+  }
+
+  function placeBand(rect, hug) {
+    if (!rect) return;
+    if (hug) {
+      snapToRect(rect);
+      return;
+    }
+    spot.bandH = 112;
+    spot.bandTop = Math.round(rect.top) - 8;
+    pulseSpotSnap();
+    paintSpot();
   }
 
   function setFollow(on) {
     spot.follow = Boolean(on);
+    spot.lastLine = null;
     paintSpot();
+  }
+
+  function spotScroller() {
+    const start = document.querySelector('article[data-testid="tweet"]') || document.body;
+    let node = start;
+    while (node && node !== document.documentElement) {
+      const style = getComputedStyle(node);
+      if (/(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight + 20) return node;
+      node = node.parentElement;
+    }
+    return document.scrollingElement || document.documentElement;
+  }
+
+  function spotLineHeight() {
+    const text = document.querySelector('[data-testid="tweetText"]');
+    const lh = text ? parseFloat(getComputedStyle(text).lineHeight) : 0;
+    return Math.max(20, Math.round(lh || 24));
+  }
+
+  function listSpotLines() {
+    const out = [];
+    for (const el of document.querySelectorAll('[data-testid="tweetText"]')) {
+      if (!el.getClientRects().length) continue;
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      for (const box of range.getClientRects()) {
+        if (box.width > 8 && box.height > 8) out.push(box);
+      }
+    }
+    out.sort((a, b) => a.top - b.top || a.bottom - b.bottom);
+    return out;
+  }
+
+  function stepSpot(dir) {
+    const lines = listSpotLines();
+    const cur = lines.findIndex((box) => box.bottom > spot.bandTop + 4);
+    const next = cur < 0 ? null : lines[cur + dir];
+    if (next) {
+      if (next.top < 8 || next.bottom > window.innerHeight - 8) {
+        spotScroller().scrollBy({ top: dir * (next.bottom - next.top + 8), left: 0, behavior: "instant" });
+      }
+      if (spot.follow) snapToRect(next);
+      else {
+        spot.bandTop = Math.round(next.top) - 8;
+        pulseSpotSnap();
+        paintSpot();
+      }
+      return;
+    }
+    const step = spotLineHeight();
+    const nextTop = spot.bandTop + dir * step;
+    const maxTop = window.innerHeight - spot.bandH - 8;
+    if (nextTop < 8 || nextTop > maxTop) spotScroller().scrollBy({ top: dir * step, left: 0, behavior: "instant" });
+    else {
+      spot.bandTop = nextTop;
+      paintSpot();
+    }
   }
 
   function onSpotPointerMove(e) {
     if (spot.drag) {
-      const h = window.innerHeight;
-      const dy = e.clientY - spot.drag.y;
-      if (spot.drag.kind === "move") {
-        spot.bandTop = spot.drag.top + dy;
-      } else if (spot.drag.kind === "n") {
-        const nextTop = spot.drag.top + dy;
-        const nextH = spot.drag.height - dy;
-        if (nextH >= 56) {
-          spot.bandTop = nextTop;
-          spot.bandH = nextH;
-        }
-      } else if (spot.drag.kind === "s") {
-        spot.bandH = spot.drag.height + dy;
-      }
-      spot.bandTop = Math.max(0, Math.min(spot.bandTop, h - 56));
+      spot.bandTop = spot.drag.top + (e.clientY - spot.drag.y);
       paintSpot();
       return;
     }
-    if (!spot.follow || !spot.root || e.target.closest?.(".hud")) return;
+    if (!spot.follow || !spot.root || e.pointerType !== "mouse") return;
     const rect = sentenceRectFromPoint(e.clientX, e.clientY);
-    if (rect) snapToRect(rect);
+    if (!rect) return;
+    const key = `${Math.round(rect.top)}:${Math.round(rect.bottom)}`;
+    if (key === spot.lastLine) return;
+    spot.lastLine = key;
+    snapToRect(rect);
   }
 
   function onSpotPointerUp() {
@@ -2749,7 +2829,13 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (isSpotChrome(e.target)) return;
     const sel = window.getSelection();
     if (sel && !sel.isCollapsed) return;
-    if (!e.target.closest?.('[data-testid="tweetText"]')) return;
+    if (
+      e.target.closest?.(
+        'a,button,[role="button"],[role="link"],input,textarea,select,[data-testid="tweetPhoto"],[data-testid="videoPlayer"],[data-testid="card.wrapper"]'
+      )
+    ) {
+      return;
+    }
     const rect = sentenceRectFromPoint(e.clientX, e.clientY);
     if (!rect) return;
     e.preventDefault();
@@ -2761,8 +2847,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (!spot.root || e.isComposing) return;
     if (e.key === "Escape") {
       e.preventDefault();
-      if (spot.follow) setFollow(false);
-      else closeSpot();
+      closeSpot();
       return;
     }
     const typing =
@@ -2772,26 +2857,26 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if ((e.key === "f" || e.key === "F") && !e.altKey && !e.metaKey && !e.ctrlKey) {
       e.preventDefault();
       setFollow(!spot.follow);
+      return;
+    }
+    if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " ") {
+      e.preventDefault();
+      stepSpot(e.key === "ArrowUp" ? -1 : 1);
     }
   }
 
   function bindSpotChrome(root) {
-    root.querySelector("[data-close]")?.addEventListener("click", closeSpot);
-    root.querySelector("[data-follow]")?.addEventListener("click", () => setFollow(!spot.follow));
-    const startDrag = (kind) => (e) => {
+    root.querySelector(".grip")?.addEventListener("pointerdown", (e) => {
       if (e.button !== 0) return;
       e.preventDefault();
       e.stopPropagation();
       spot.follow = false;
-      spot.drag = { kind, y: e.clientY, top: spot.bandTop, height: spot.bandH };
+      spot.drag = { y: e.clientY, top: spot.bandTop };
       try {
         e.currentTarget.setPointerCapture(e.pointerId);
       } catch {}
       paintSpot();
-    };
-    root.querySelector(".grip")?.addEventListener("pointerdown", startDrag("move"));
-    root.querySelector(".edge.n")?.addEventListener("pointerdown", startDrag("n"));
-    root.querySelector(".edge.s")?.addEventListener("pointerdown", startDrag("s"));
+    });
   }
 
   function openSpot() {
@@ -2802,33 +2887,28 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     const root = document.createElement("div");
     root.id = "x2img-spot";
     root.setAttribute("role", "region");
-    root.setAttribute("aria-label", "阅读光带");
+    root.setAttribute("aria-label", "聚光阅读");
     root.innerHTML = `
       <div class="veil" aria-hidden="true"></div>
-      <div class="glow" aria-hidden="true"></div>
-      <div class="grip" aria-hidden="true"><i></i></div>
-      <div class="edge n" aria-hidden="true"></div>
-      <div class="edge s" aria-hidden="true"></div>
-      <div class="hud">
-        <span>拖动手把 · 点一句 · F 跟随 · Esc 关</span>
-        <button type="button" data-follow aria-pressed="false">跟随</button>
-        <button type="button" data-close aria-label="关闭" title="关闭">×</button>
-      </div>
+      <div class="bandbox" aria-hidden="true"></div>
+      <div class="grip" aria-hidden="true"></div>
     `;
     spot.root = root;
     spot.follow = false;
     spot.drag = null;
     spot.sourceEl = null;
+    spot.lastLine = null;
     document.documentElement.appendChild(root);
     bindSpotChrome(root);
-    spot.bandH = Math.max(96, Math.round(window.innerHeight * 0.16));
-    spot.bandTop = Math.round(window.innerHeight * 0.36);
+    spot.bandH = 112;
+    spot.bandTop = Math.round(window.innerHeight * 0.42) - 56;
     paintSpot();
     window.addEventListener("pointermove", onSpotPointerMove);
     window.addEventListener("pointerup", onSpotPointerUp);
     window.addEventListener("pointercancel", onSpotPointerUp);
     window.addEventListener("keydown", onSpotKey);
     window.addEventListener("resize", paintSpot);
+    window.addEventListener("scroll", paintSpot, true);
     document.addEventListener("click", onSpotClick, true);
     syncNavSpot();
   }
@@ -2840,22 +2920,33 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     window.removeEventListener("pointercancel", onSpotPointerUp);
     window.removeEventListener("keydown", onSpotKey);
     window.removeEventListener("resize", paintSpot);
+    window.removeEventListener("scroll", paintSpot, true);
     document.removeEventListener("click", onSpotClick, true);
+    clearTimeout(spot.snapTimer);
     spot.root.remove();
     spot.root = null;
     spot.follow = false;
     spot.drag = null;
     spot.sourceEl = null;
+    spot.lastLine = null;
     syncNavSpot();
   }
 
   function firstVisibleTweet() {
-    return [...document.querySelectorAll('article[data-testid="tweet"]')].find((article) => {
+    const articles = [...document.querySelectorAll('article[data-testid="tweet"]')].filter((article) => {
       if (article.parentElement?.closest('article[data-testid="tweet"]')) return false;
       const text = article.querySelector('[data-testid="tweetText"]');
       const box = (text || article).getBoundingClientRect();
       return box.bottom > 80 && box.top < window.innerHeight - 80;
     });
+    return (
+      articles.find((article) => {
+        const text = article.querySelector('[data-testid="tweetText"]');
+        return text && text.getBoundingClientRect().height >= 48;
+      }) ||
+      articles[0] ||
+      null
+    );
   }
 
   function toggleSpot() {
@@ -2908,7 +2999,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <div class="hint">帖内年龄遮罩，以及个人资料敏感提示。只作用于当前页，不改 X 账号设置。</div>
       <h3>阅读</h3>
       <label class="row">阅读光带 <input type="checkbox" data-k="readingBand" ${settings.readingBand ? "checked" : ""}></label>
-      <div class="hint">左侧栏「更多」上面进入。盖在时间线整页上，周围只降对比。Alt+S 开关，F 跟随，点一句跳一句。</div>
+      <div class="hint">左侧栏「更多」上面进入整页聚光。周围用纸色压对比，光带贴当前句。拖右侧把手，点一句，F 跟随，↑↓ 换行，Esc 关。Alt+S 也能开。</div>
       </div>
       <div class="bar">
         <button type="button" class="act pri" data-save>保存</button>
