@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.4.5
+// @version      0.4.6
 // @description  分享旁边点一下，把帖做成图，拿去微信粘
 // @description:en Click next to Share and get a picture of the post you can paste
 // @description:zh-CN 分享旁边点一下，把帖做成图，拿去微信粘
@@ -42,9 +42,9 @@
   const HOST_ID = "x2img-host";
   const CARD_WIDTH = 600;
   const EXPORT_SCALE = 2;
-  const JPEG_QUALITY = 0.92;
-  const PHOTO_MAX = 960;
-  const AVATAR_MAX = 128;
+  const JPEG_QUALITY = 0.95;
+  const PHOTO_MAX = 2048;
+  const AVATAR_MAX = 400;
   const FETCH_MAX = 8 * 1024 * 1024;
   const IMAGE_HOSTS = [/(^|\.)twimg\.com$/i, /^ton\.twitter\.com$/i];
   const PREVIEW_IMAGE_HOSTS = [/(^|\.)unsplash\.com$/i, /(^|\.)primefaces\.org$/i];
@@ -372,12 +372,14 @@
   }
 
   async function fitImage(url, maxEdge) {
-    const src = await toDataUrl(url);
+    const upgraded = upgradePbsUrl(url);
+    const src = (await toDataUrl(upgraded)) || (upgraded !== String(url || "") ? await toDataUrl(url) : "");
     if (!src) return "";
     try {
       const img = await loadImage(src);
       const longest = Math.max(img.naturalWidth, img.naturalHeight);
-      const scale = Math.min(1, maxEdge / longest);
+      if (!longest || longest <= maxEdge) return src;
+      const scale = maxEdge / longest;
       const width = Math.max(1, Math.round(img.naturalWidth * scale));
       const height = Math.max(1, Math.round(img.naturalHeight * scale));
       const canvas = document.createElement("canvas");
@@ -387,7 +389,9 @@
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
       ctx.drawImage(img, 0, 0, width, height);
-      return canvas.toDataURL("image/jpeg", 0.9);
+      return src.startsWith("data:image/png")
+        ? canvas.toDataURL("image/png")
+        : canvas.toDataURL("image/jpeg", JPEG_QUALITY);
     } catch {
       return "";
     }
@@ -472,20 +476,33 @@
     );
   }
 
-  function upgradePbsUrl(url, bumpThumbs) {
+  function imageSource(img) {
+    if (!img) return "";
+    const listed = unique([
+      ...(img.getAttribute("srcset") || img.srcset || "")
+        .split(",")
+        .map((part) => part.trim().split(/\s+/)[0]),
+      img.currentSrc,
+      img.src,
+    ]);
+    return (
+      listed.find((src) => /(?:[?&]name=|:)(large|orig)\b/i.test(src)) ||
+      listed[0] ||
+      ""
+    );
+  }
+
+  function upgradePbsUrl(url) {
     if (!url) return "";
     const raw = String(url);
     if (raw.startsWith("data:")) return raw;
     if (raw.startsWith("blob:")) return "";
-    if (!bumpThumbs) return raw;
     try {
       const parsed = new URL(raw, location.href);
-      if (/(^|\.)twimg\.com$/i.test(parsed.hostname) && parsed.searchParams.has("name")) {
-        const name = parsed.searchParams.get("name") || "";
-        if (/^(tiny|thumb|120x120|240x240|360x360|small)$/i.test(name)) {
-          parsed.searchParams.set("name", "medium");
-        }
-      }
+      if (!/(^|\.)twimg\.com$/i.test(parsed.hostname)) return raw;
+      parsed.pathname = parsed.pathname.replace(/:(tiny|thumb|small|medium|large|orig|\d+x\d+)$/i, "");
+      const name = parsed.searchParams.get("name") || "";
+      if (!/^(large|orig)$/i.test(name)) parsed.searchParams.set("name", "large");
       return parsed.toString();
     } catch {
       return raw;
@@ -525,7 +542,7 @@
     const photos = unique(
       [...nested.querySelectorAll('[data-testid="tweetPhoto"] img')]
         .filter((img) => !img.closest("video"))
-        .map((img) => upgradePbsUrl(img.currentSrc || img.src, false))
+        .map((img) => upgradePbsUrl(imageSource(img)))
     ).slice(0, 1);
     const text = textEl ? textEl.innerText.trim() : "";
     if (!name && !handle && !text && !photos.length) return null;
@@ -561,7 +578,7 @@
       lines.find((line) => line !== domainLine && line !== domain && line.length > 6) ||
       lines.find((line) => line !== domainLine && line !== domain) ||
       "";
-    const image = upgradePbsUrl(img?.currentSrc || img?.src || "", true);
+    const image = upgradePbsUrl(imageSource(img));
     if (!title && !image && !domain) return null;
     return { title, domain, url: href, image };
   }
@@ -648,13 +665,13 @@
         /background-image/i.test(el.getAttribute("style") || "")
       );
       const bg = (styled?.getAttribute("style") || "").match(/url\((['"]?)([^"')]+)\1\)/);
-      sources.push(video?.poster, img?.currentSrc, img?.src, bg?.[2]);
+      sources.push(video?.poster, imageSource(img), bg?.[2]);
     }
     for (const video of article.querySelectorAll("video")) {
       if (isInsideQuote(video, article) || isInsideCardOrPoll(video, article)) continue;
       sources.push(video.poster);
     }
-    return upgradePbsUrl(sources.find((src) => src && !String(src).startsWith("blob:")) || "", true);
+    return upgradePbsUrl(sources.find((src) => src && !String(src).startsWith("blob:")) || "");
   }
 
   function collectPhotos(article) {
@@ -662,7 +679,7 @@
       [...article.querySelectorAll('[data-testid="tweetPhoto"]')]
         .filter((box) => !isInsideQuote(box, article) && !isInsideCardOrPoll(box, article) && !box.querySelector("video"))
         .flatMap((box) =>
-          [...box.querySelectorAll("img")].map((img) => upgradePbsUrl(img.currentSrc || img.src, false))
+          [...box.querySelectorAll("img")].map((img) => upgradePbsUrl(imageSource(img)))
         )
     ).slice(0, 4);
   }
