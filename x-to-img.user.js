@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.5.4
+// @version      0.5.5
 // @description  分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
 // @description:en Click next to Share for a card. Also hide adult spam/ads, download media, and lift age covers
 // @description:zh-CN 分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
@@ -1639,9 +1639,17 @@
     return { hide: anchored && score >= threshold, reason: anchored ? "adult" : "" };
   }
 
+  function isOrganicMediaTracking(node) {
+    return Boolean(
+      node?.querySelector?.(
+        '[data-testid="videoPlayer"], [data-testid="videoComponent"], [data-testid="tweetPhoto"], video'
+      )
+    );
+  }
+
   function isAdArticle(article) {
     const cell = article.closest('[data-testid="cellInnerDiv"]') || article;
-    if (cell.querySelector?.('[data-testid$="impression-pixel"], [data-testid="placementTracking"]')) return true;
+    if (cell.querySelector?.('[data-testid$="impression-pixel"]')) return true;
     for (const el of article.querySelectorAll("span, div[dir='ltr']")) {
       if (el.closest('[data-testid="tweetText"]')) continue;
       const label = (el.textContent || "").trim();
@@ -1658,7 +1666,7 @@
 
   function sweepAds() {
     document.querySelectorAll('[data-testid="placementTracking"], aside[role="complementary"]').forEach((node) => {
-      if (!settings.hideAds) {
+      if (!settings.hideAds || isOrganicMediaTracking(node)) {
         hideNode(node, false);
         return;
       }

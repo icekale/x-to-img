@@ -286,12 +286,14 @@
               <a href="/clips/status/2004"><time datetime="2026-09-12T21:05:00">Sep 12</time></a>
             </div>
             <div data-testid="tweetText">视频过不了画布，封面还是要清楚。</div>
-            <div data-testid="videoPlayer">
-              <video poster="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&auto=format&fit=crop">
-                <source src="https://video.twimg.com/ext_tw_video/2004/pu/vid/1280x720/demo.mp4" type="video/mp4" />
-              </video>
-              <img alt="" src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&auto=format&fit=crop" />
-              <div class="play"></div>
+            <div data-testid="placementTracking">
+              <div data-testid="videoPlayer">
+                <video poster="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&auto=format&fit=crop">
+                  <source src="https://video.twimg.com/ext_tw_video/2004/pu/vid/1280x720/demo.mp4" type="video/mp4" />
+                </video>
+                <img alt="" src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&auto=format&fit=crop" />
+                <div class="play"></div>
+              </div>
             </div>
             <div class="bar">
               <span data-testid="reply" aria-label="7 replies">7</span>
@@ -564,7 +566,7 @@
         true
       );
     </script>
-    <script src="x-to-img.user.js?v=0.5.4"></script>
+    <script src="x-to-img.user.js?v=0.5.5"></script>
     <script>
       (function () {
         const article = document.getElementById("x2img-fiber-tweet");
