@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.5.2
+// @version      0.5.3
 // @description  分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
 // @description:en Click next to Share for a card. Also hide adult spam/ads, download media, and lift age covers
 // @description:zh-CN 分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
@@ -1489,7 +1489,9 @@
   const ADULT_SOFT = ["反差", "黑丝", "白丝", "巨乳", "少妇", "学生妹", "涩涩", "纯欲", "调教", "炮友"];
   const AD_LABELS = new Set(["推荐", "廣告", "广告", "Promoted", "Ad", "プロモーション", "Promoted by"]);
   const AGE_WARN_RE =
-    /年龄限制|成人内容|敏感内容|敏感媒体|可能不适合|验证.{0,6}年龄|age[- ]?restricted|adult content|sensitive (?:media|content)|might not be suitable|verify your age/i;
+    /年龄限制|年齡限制|成人内容|成人內容|敏感内容|敏感內容|敏感媒体|敏感媒體|可能不适合|可能不適合|验证.{0,6}年龄|驗證.{0,6}年齡|age[- ]?restricted|adult content|sensitive (?:media|content)|might not be suitable|verify your age|潛在的敏感/i;
+  const PROFILE_GATE_BTN_RE =
+    /^(?:是[，,]\s*查看(?:個人|个人)(?:資料|资料)|Yes,?\s*view profile|はい[、,]?\s*プロフィールを(?:表示|見る))$/i;
   let settings = { ...DEFAULT_SETTINGS };
 
   function readStore(key, fallback) {
@@ -1959,6 +1961,51 @@
     else article.removeAttribute("data-x2img-grid");
   }
 
+  function controlLabel(el) {
+    return String(el?.textContent || el?.getAttribute?.("aria-label") || "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function findSensitiveProfileGate() {
+    const root = document.querySelector("main") || document.body;
+    if (!root) return null;
+    const labeled = (el) => {
+      if (el.closest('article[data-testid="tweet"]')) return false;
+      const label = controlLabel(el);
+      return Boolean(label && label.length <= 48 && PROFILE_GATE_BTN_RE.test(label));
+    };
+    for (const el of root.querySelectorAll("button, [role='button']")) {
+      if (labeled(el)) return el;
+    }
+    for (const el of root.querySelectorAll("span")) {
+      if (!labeled(el)) continue;
+      const button = el.closest("button, [role='button']");
+      if (button && !button.closest('article[data-testid="tweet"]')) return button;
+    }
+    return null;
+  }
+
+  const profileGateState = { path: "", clicks: 0 };
+
+  function dismissSensitiveProfileGate() {
+    if (!settings.unmaskAge) {
+      profileGateState.path = "";
+      profileGateState.clicks = 0;
+      return;
+    }
+    const path = location.pathname.replace(/\/+$/, "") || "/";
+    if (profileGateState.path !== path) {
+      profileGateState.path = path;
+      profileGateState.clicks = 0;
+    }
+    if (profileGateState.clicks >= 2) return;
+    const button = findSensitiveProfileGate();
+    if (!button) return;
+    profileGateState.clicks += 1;
+    button.click();
+  }
+
   function applyAgeUnmask(article) {
     if (!settings.unmaskAge) return;
     const nodes = [...article.querySelectorAll("span, div")];
@@ -2021,6 +2068,7 @@
     loadSettings();
     document.documentElement.dataset.x2imgGrid = settings.mediaGrid ? "1" : "0";
     document.documentElement.dataset.x2imgUnmask = settings.unmaskAge ? "1" : "0";
+    dismissSensitiveProfileGate();
     sweepAds();
     document.querySelectorAll('article[data-testid="tweet"]').forEach((article) => {
       hideArticle(article);
@@ -2065,6 +2113,7 @@
       <input type="text" data-k="fileName" value="${escapeHtml(settings.fileName)}">
       <label class="row">多媒体网格视图 <input type="checkbox" data-k="mediaGrid" ${settings.mediaGrid ? "checked" : ""}></label>
       <label class="row">本地去掉年龄遮罩 <input type="checkbox" data-k="unmaskAge" ${settings.unmaskAge ? "checked" : ""}></label>
+      <div class="hint">帖内年龄遮罩，以及个人资料敏感提示。只作用于当前页，不改 X 账号设置。</div>
       </div>
       <div class="bar">
         <button type="button" class="act pri" data-save>保存</button>
@@ -2147,6 +2196,7 @@
       zipStore,
       applyTimelineExtras,
       openSettingsPanel,
+      dismissSensitiveProfileGate,
     };
   }
 })();

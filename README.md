@@ -5,7 +5,7 @@
 <img src="docs/demo-light.jpg" width="280" alt="浅色图卡">
 <img src="docs/demo-dark.jpg" width="280" alt="深色图卡">
 
-引用、投票、链接卡片会带上。视频只能抓封面。时间线上折叠的正文会先试着展开；展不开会提醒你点进帖再出，不会默默出半截。黄推广告可以藏，图片视频可以下，多图能排成网格，年龄遮罩只在当前页拿掉。油猴菜单里改。
+引用、投票、链接卡片会带上。视频只能抓封面。时间线上折叠的正文会先试着展开；展不开会提醒你点进帖再出，不会默默出半截。黄推广告可以藏，图片视频可以下，多图能排成网格，帖内年龄遮罩和个人资料敏感提示只在当前页拿掉。油猴菜单里改。
 
 [Greasy Fork 上安装](https://greasyfork.org/zh-CN/scripts/595869-x-%E8%B4%B4%E6%96%87%E8%BD%AC%E5%9B%BE%E5%8D%A1)。先装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)，再点安装，刷新 x.com。也可以直接打开 [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js)。
 
@@ -13,7 +13,7 @@
 
 I got tired of pasting x.com links into chats that don't unfurl them. There's a small icon next to Share. Click it and you get a card on the clipboard, light or dark depending on the site.
 
-Quotes, polls, and link previews come along. Video is just the poster. Collapsed timeline text is expanded when possible; otherwise it asks you to open the post. It can hide adult spam and ads, download media (ZIP if there's more than one file), show a photo grid, and lift age covers on the current page. Settings are in the userscript menu.
+Quotes, polls, and link previews come along. Video is just the poster. Collapsed timeline text is expanded when possible; otherwise it asks you to open the post. It can hide adult spam and ads, download media (ZIP if there's more than one file), show a photo grid, and lift age covers plus the sensitive-profile prompt on the current page. Settings are in the userscript menu.
 
 [Install from Greasy Fork](https://greasyfork.org/en/scripts/595869). You'll need [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/). Or open [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js) directly.
 

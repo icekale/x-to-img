@@ -43,12 +43,51 @@
       [data-testid="ScrollSnap-List"] > [role="presentation"] { min-width: 78%; }
       [data-testid="ScrollSnap-List"] img { width: 100%; height: 180px; object-fit: cover; display: block; }
       .hint button { margin-left: 8px; border: 0; border-radius: 999px; padding: 4px 10px; background: #1d9bf0; color: #fff; font: 650 12px Outfit, sans-serif; cursor: pointer; }
+      #x2img-profile-gate { padding: 48px 24px 64px; text-align: center; border-bottom: 1px solid #2f3336; }
+      #x2img-profile-gate h2 { margin: 0 0 12px; font-size: 28px; font-weight: 800; color: #e7e9ea; }
+      #x2img-profile-gate p { margin: 0 auto 24px; max-width: 360px; color: #8b98a5; font-size: 15px; line-height: 1.5; }
+      #x2img-profile-gate button { border: 0; border-radius: 999px; padding: 12px 28px; background: #1d9bf0; color: #fff; font: 700 15px Outfit, "PingFang SC", sans-serif; cursor: pointer; }
     </style>
   </head>
   <body>
     <div class="rail">
       <div class="head">Home</div>
       <p class="hint">分享旁边出图卡。还能藏黄推广告、下媒体、解开年龄遮罩。<button type="button" id="x2img-open-settings">设置</button></p>
+      <section id="x2img-profile-gate">
+        <h2>警告：此個人資料可能包含潛在的敏感內容</h2>
+        <p>你看到這則警告，因為其帖子涉嫌使用不良圖片或語言。是否仍要查看？</p>
+        <button type="button" id="x2img-view-profile">是，查看個人資料</button>
+      </section>
+      <script>
+        document.getElementById("x2img-view-profile")?.addEventListener("click", () => {
+          document.getElementById("x2img-profile-gate")?.remove();
+          document.getElementById("x2img-gated-profile-tweet")?.removeAttribute("hidden");
+        });
+      </script>
+      <article data-testid="tweet" id="x2img-gated-profile-tweet" hidden>
+        <div class="row">
+          <div data-testid="Tweet-User-Avatar">
+            <img class="ava" alt="" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop" />
+          </div>
+          <div style="flex:1;min-width:0">
+            <div data-testid="User-Name">
+              <a role="link" href="/swangang"><span>Swangang</span></a>
+              <span class="handle">@SWa28800</span>
+              ·
+              <a href="/swangang/status/2014"><time datetime="2026-09-17T17:00:00">Sep 17</time></a>
+            </div>
+            <div data-testid="tweetText">个人资料敏感提示点过后，时间线应该露出来。</div>
+            <div class="bar">
+              <span data-testid="reply" aria-label="0 replies">0</span>
+              <span data-testid="retweet" aria-label="0 reposts">0</span>
+              <span data-testid="like" aria-label="1 like">1</span>
+              <button type="button" data-testid="share" aria-label="Share post" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
       <article data-testid="tweet">
         <div class="row">
           <div data-testid="Tweet-User-Avatar">
@@ -452,7 +491,7 @@
         </div>
       </article>
     </div>
-    <script src="x-to-img.user.js?v=0.5.2"></script>
+    <script src="x-to-img.user.js?v=0.5.3"></script>
     <script>
       (function () {
         const article = document.getElementById("x2img-fiber-tweet");

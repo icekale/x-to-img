@@ -8,7 +8,7 @@ It picks up the usual stuff — text, photos, quotes, polls, link cards. Videos 
 
 If the timeline collapsed the text, it tries to expand first and tells you to open the post when it can't. Locked posts work if you can already see them. It just reads the page you're on.
 
-It can also hide adult spam, bait bots, and ads, with strength, an allowlist, and your own block words. There's a download button for images, videos, and GIFs, packed as ZIP when there's more than one. Multi-image posts can use a grid, and age covers come off on this page only — it doesn't change your X settings. Open **Settings** from the userscript menu.
+It can also hide adult spam, bait bots, and ads, with strength, an allowlist, and your own block words. There's a download button for images, videos, and GIFs, packed as ZIP when there's more than one. Multi-image posts can use a grid, and age covers plus the sensitive-profile prompt come off on this page only — it doesn't change your X settings. Open **Settings** from the userscript menu.
 
 Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/), then hit **Install this script** on this page and refresh x.com.
 
