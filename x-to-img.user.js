@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.4.7
+// @version      0.4.8
 // @description  分享旁边点一下，把帖做成图，拿去微信粘
 // @description:en Click next to Share and get a picture of the post you can paste
 // @description:zh-CN 分享旁边点一下，把帖做成图，拿去微信粘
@@ -97,11 +97,12 @@
     .card.is-dark .avatar-fallback{background:#31404e;color:#e7e9ea;}
     .col{flex:1;min-width:0;display:flex;flex-direction:column;}
     .head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
-    .who{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
-    .name-row{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;min-width:0;}
-    .name{font-size:18px;line-height:28px;font-weight:700;color:#0e1c71;flex:0 1 auto;overflow-wrap:anywhere;}
-    .handle,.time{font-size:14px;line-height:20px;color:#94a3b8;white-space:nowrap;flex-shrink:0;}
-    .badge{width:20px;height:20px;flex-shrink:0;display:block;}
+    .who{display:block;min-width:0;flex:1;}
+    .name-row{display:block;line-height:28px;min-width:0;}
+    .name{display:inline;font-size:18px;line-height:28px;font-weight:700;color:#0e1c71;}
+    .handle{display:inline;font-size:14px;line-height:20px;color:#94a3b8;white-space:nowrap;margin-left:6px;}
+    .time{display:block;margin-top:2px;font-size:14px;line-height:20px;color:#94a3b8;white-space:nowrap;}
+    .badge{display:inline-block;width:20px;height:20px;vertical-align:middle;margin:0 4px;}
     .badge svg{width:20px;height:20px;display:block;}
     .xmark{width:24px;height:24px;color:#9ca3af;flex-shrink:0;}
     .xmark svg{width:24px;height:24px;display:block;}
