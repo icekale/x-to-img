@@ -4,11 +4,18 @@ I made this because dropping an x.com link in a group chat usually does nothing 
 
 ![Dark card](https://raw.githubusercontent.com/icekale/x-to-img/main/docs/demo-dark.jpg)
 
-It picks up the usual stuff — text, photos, quotes, polls, link cards. Videos are just the thumbnail. I left the gradient frame and QR code off on purpose.
+It picks up the usual stuff — who posted, the text, photos, quotes, polls, link cards. Videos are just the thumbnail on the card. I left the gradient frame and QR code off on purpose.
 
 If the timeline collapsed the text, it tries to expand first and tells you to open the post when it can't. Locked posts work if you can already see them. It just reads the page you're on.
 
-It can also hide adult spam, bait bots, and ads, with strength, an allowlist, and your own block words. There's a download button for images, videos, and GIFs, packed as ZIP when there's more than one. Multi-image posts can use a grid, and age covers plus the sensitive-profile prompt come off on this page only — it doesn't change your X settings. Open **Settings** from the userscript menu.
+The timeline extras, if you want them:
+
+- **Hide adult spam, bait bots, and ads.** Strength, block words, and an allowlist are yours. Accounts you follow stay visible by default. Allowlisted handles aren't treated as spam, and their adult-content warnings come off too. Ads are the promoted ones — regular videos stay.
+- **Download photos, videos, and GIFs.** Same toolbar as Share. Several files go into a ZIP. Name them with `{handle} {id} {name} {date} {n}`.
+- **Photo grid** when a post has more than one image.
+- **Lift age covers** on the post and the sensitive-profile prompt. This page only; it doesn't change your X account settings. The video stays put.
+
+Open **Settings** from the userscript menu.
 
 Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/), then hit **Install this script** on this page and refresh x.com.
 

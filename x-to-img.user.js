@@ -3,10 +3,10 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.5.7
-// @description  分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
-// @description:en Click next to Share for a card. Also hide adult spam/ads, download media, and lift age covers
-// @description:zh-CN 分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
+// @version      0.5.8
+// @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩
+// @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers
+// @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩
 // @author       Kale
 // @homepageURL  https://github.com/icekale/x-to-img
 // @supportURL   https://github.com/icekale/x-to-img/issues
