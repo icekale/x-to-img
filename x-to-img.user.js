@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.6.3
+// @version      0.6.4
 // @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光阅读
 // @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers, whole-page reading spotlight
 // @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光阅读
@@ -121,6 +121,16 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     #x2img-panel select,#x2img-panel input[type="text"],#x2img-panel textarea{width:100%;margin:4px 0 8px;padding:8px 10px;border:1px solid #38444d;border-radius:10px;background:#0f1419;color:#e7e9ea;font:inherit;}
     #x2img-panel[data-light="1"] select,#x2img-panel[data-light="1"] input[type="text"],#x2img-panel[data-light="1"] textarea{background:#f7f9f9;border-color:#cfd9de;color:#0f1419;}
     #x2img-panel textarea{min-height:72px;resize:vertical;}
+    #x2img-panel .papers,#x2img-spot .papers{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    #x2img-panel .papers{margin:8px 0 12px;}
+    #x2img-panel .pchip,#x2img-spot .pchip{width:22px;height:22px;padding:0;border:0;border-radius:50%;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(15,20,25,.16);}
+    #x2img-panel .pchip[aria-pressed="true"],#x2img-spot .pchip[aria-pressed="true"]{box-shadow:0 0 0 2px #1d9bf0;transform:scale(1.12);}
+    #x2img-panel .pchip[data-mix="1"],#x2img-spot .pchip[data-mix="1"]{box-shadow:0 0 0 2px #c6a48f;}
+    #x2img-panel .pchip[aria-pressed="true"][data-mix="1"],#x2img-spot .pchip[aria-pressed="true"][data-mix="1"]{box-shadow:0 0 0 2px #1d9bf0,0 0 0 4px #c6a48f;}
+    #x2img-panel .slide{display:flex;align-items:center;gap:10px;margin:8px 0 12px;}
+    #x2img-panel input[type="range"]{flex:1;accent-color:#1d9bf0;}
+    #x2img-panel .slide b{min-width:3.6em;text-align:right;color:#8b98a5;font-weight:650;}
+    #x2img-panel button.link{border:0;background:transparent;color:#1d9bf0;cursor:pointer;padding:0 0 8px;font:650 12px/1.4 TwitterChirp,sans-serif;}
     #x2img-panel .hint{color:#8b98a5;font-size:12px;margin:0 0 8px;}
     #x2img-panel .bar{display:flex;gap:8px;margin:0;padding:12px 16px 14px;flex-shrink:0;border-top:1px solid #38444d;background:inherit;}
     #x2img-panel[data-light="1"] .bar{border-top-color:#eff3f4;}
@@ -141,6 +151,18 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     #x2img-spot.is-snap{transition:--x2img-t var(--snap) ease-out,--x2img-b var(--snap) ease-out;}
     #x2img-spot.is-snap .bandbox,#x2img-spot.is-snap .grip{transition:top var(--snap) ease-out,height var(--snap) ease-out,right var(--snap) ease-out;}
     #x2img-spot.is-drag,#x2img-spot.is-drag .bandbox,#x2img-spot.is-drag .grip{transition:none;}
+    #x2img-spot .dock{position:absolute;left:0;right:0;bottom:0;z-index:4;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px max(10px,env(safe-area-inset-bottom));pointer-events:auto;background:rgba(var(--pf),.94);color:inherit;border-top:1px solid rgba(255,255,255,.08);font:12px/1.3 TwitterChirp,"PingFang SC",sans-serif;}
+    #x2img-spot[data-light="1"] .dock{border-top-color:rgba(15,20,25,.1);}
+    #x2img-spot .dock .hint{flex:1;min-width:140px;color:inherit;opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    #x2img-spot .dock button.tbtn{border:0;border-radius:999px;padding:6px 11px;background:transparent;color:inherit;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(139,152,165,.45);font:650 12px/1 TwitterChirp,"PingFang SC",sans-serif;}
+    #x2img-spot .dock button.tbtn[aria-pressed="true"]{background:currentColor;}
+    #x2img-spot .dock button.tbtn[data-follow][aria-pressed="true"]{background:#1d9bf0;color:#fff;box-shadow:none;}
+    #x2img-spot .tune{display:none;position:absolute;left:12px;right:12px;bottom:58px;z-index:4;max-width:420px;margin:0 auto;padding:14px 16px 12px;border-radius:14px;pointer-events:auto;background:rgba(var(--pf),.96);box-shadow:0 10px 28px rgba(0,0,0,.28);font:12px/1.4 TwitterChirp,"PingFang SC",sans-serif;}
+    #x2img-spot .tune.on{display:block;}
+    #x2img-spot .tune .row{display:flex;align-items:center;gap:10px;}
+    #x2img-spot .tune input[type="range"]{flex:1;accent-color:#1d9bf0;}
+    #x2img-spot .tune b{min-width:3.6em;text-align:right;opacity:.7;}
+    #x2img-spot .tune .link{margin-top:10px;border:0;background:transparent;color:#1d9bf0;cursor:pointer;padding:0;font:650 12px/1 TwitterChirp,sans-serif;}
     [data-x2img-nav-spot]{cursor:pointer;}
     [data-x2img-nav-spot] a,[data-x2img-nav-spot] button{color:inherit;text-decoration:none;}
     [data-x2img-nav-spot][data-on="1"],[data-x2img-nav-spot][data-on="1"] span{font-weight:700;}
@@ -1574,7 +1596,22 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     mediaGrid: true,
     unmaskAge: true,
     readingBand: true,
+    spotPaperLight: "moss",
+    spotPaperDark: "night",
+    spotHeight: 112,
+    spotFollow: false,
+    spotMix: [],
   };
+  const SPOT_PAPERS = [
+    { id: "butter", name: "米黄", pf: "247,241,227", paper: "#F7F1E3", ink2: "#6E695E", band: "rgba(226,190,110,.30)", dim: ".84" },
+    { id: "rose", name: "晨粉", pf: "249,240,238", paper: "#F9F0EE", ink2: "#736765", band: "rgba(226,164,158,.26)", dim: ".84" },
+    { id: "lilac", name: "淡紫", pf: "244,241,247", paper: "#F4F1F7", ink2: "#6C6672", band: "rgba(180,164,214,.26)", dim: ".84" },
+    { id: "mist", name: "雾蓝", pf: "240,243,246", paper: "#F0F3F6", ink2: "#666E73", band: "rgba(150,186,219,.28)", dim: ".84" },
+    { id: "moss", name: "苔绿", pf: "236,243,235", paper: "#ECF3EB", ink2: "#5F6B5E", band: "rgba(140,182,140,.32)", dim: ".84" },
+    { id: "ash", name: "雾灰", pf: "242,242,241", paper: "#F2F2F1", ink2: "#6B6B6A", band: "rgba(120,120,118,.14)", dim: ".84" },
+    { id: "night", name: "夜色", pf: "24,23,22", paper: "#181716", ink2: "#948D85", band: "rgba(255,255,255,.075)", dim: ".88" },
+  ];
+  const SPOT_PAPER_IDS = SPOT_PAPERS.map((item) => item.id);
   const ADULT_STRONG = [
     "onlyfans", "fansly", "fanvue", "justforfans", "porn", "nudes", "nudeleak",
     "约炮", "约啪", "援交", "裸聊", "福利姬", "黄片", "外围", "包夜", "无套",
@@ -1645,14 +1682,30 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       customWords: normalizeList(parsed.customWords),
       whitelist: normalizeList(parsed.whitelist).map((item) => item.toLowerCase()),
       fileName: String(parsed.fileName || DEFAULT_SETTINGS.fileName).slice(0, 180) || DEFAULT_SETTINGS.fileName,
+      spotPaperLight: SPOT_PAPER_IDS.includes(parsed.spotPaperLight) ? parsed.spotPaperLight : DEFAULT_SETTINGS.spotPaperLight,
+      spotPaperDark: SPOT_PAPER_IDS.includes(parsed.spotPaperDark) ? parsed.spotPaperDark : DEFAULT_SETTINGS.spotPaperDark,
+      spotHeight: clampSpotHeight(parsed.spotHeight),
+      spotFollow: Boolean(parsed.spotFollow),
+      spotMix: normalizeList(parsed.spotMix).filter((id) => SPOT_PAPER_IDS.includes(id)).slice(0, 3),
     };
     return settings;
+  }
+
+  function clampSpotHeight(value) {
+    const n = Math.round(Number(value));
+    if (!Number.isFinite(n)) return DEFAULT_SETTINGS.spotHeight;
+    return Math.max(56, Math.min(260, n));
   }
 
   function saveSettings(next) {
     settings = { ...loadSettings(), ...next };
     settings.customWords = normalizeList(settings.customWords);
     settings.whitelist = normalizeList(settings.whitelist).map((item) => item.toLowerCase());
+    settings.spotPaperLight = SPOT_PAPER_IDS.includes(settings.spotPaperLight) ? settings.spotPaperLight : DEFAULT_SETTINGS.spotPaperLight;
+    settings.spotPaperDark = SPOT_PAPER_IDS.includes(settings.spotPaperDark) ? settings.spotPaperDark : DEFAULT_SETTINGS.spotPaperDark;
+    settings.spotHeight = clampSpotHeight(settings.spotHeight);
+    settings.spotFollow = Boolean(settings.spotFollow);
+    settings.spotMix = normalizeList(settings.spotMix).filter((id) => SPOT_PAPER_IDS.includes(id)).slice(0, 3);
     writeStore(SETTINGS_KEY, JSON.stringify(settings));
     applyTimelineExtras();
     return settings;
@@ -2663,14 +2716,92 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     };
   }
 
-  function applySpotPaper(root) {
+  function spotThemeDark() {
     const [r, g, b] = pagePaperRGB();
+    return r * 299 + g * 587 + b * 114 < 128000;
+  }
+
+  function currentSpotPaper() {
+    const id = spotThemeDark() ? settings.spotPaperDark : settings.spotPaperLight;
+    return SPOT_PAPERS.find((item) => item.id === id) || SPOT_PAPERS[spotThemeDark() ? 6 : 4];
+  }
+
+  function paperButtonsHtml() {
+    const current = currentSpotPaper().id;
+    return SPOT_PAPERS.map((item, index) => {
+      const mix = settings.spotMix.includes(item.id) ? "1" : "0";
+      const on = item.id === current ? "true" : "false";
+      return `<button type="button" class="pchip" data-paper="${item.id}" aria-label="${item.name}" title="${index + 1} ${item.name}" aria-pressed="${on}" data-mix="${mix}" style="background:${item.paper}"></button>`;
+    }).join("");
+  }
+
+  function applySpotBand(root) {
+    const box = root.querySelector(".bandbox");
+    if (!box) return;
+    const mix = settings.spotMix.map((id) => SPOT_PAPERS.find((item) => item.id === id)).filter(Boolean);
+    if (mix.length < 2) {
+      box.style.background = "";
+      return;
+    }
+    const stops = [];
+    mix.forEach((item, i) => {
+      stops.push(`${item.band} ${((i / mix.length) * 100).toFixed(2)}%`);
+      stops.push(`${item.band} ${(((i + 1) / mix.length) * 100).toFixed(2)}%`);
+    });
+    box.style.background = `linear-gradient(to bottom,${stops.join(",")})`;
+  }
+
+  function applySpotPaper(root) {
+    const paper = currentSpotPaper();
+    const [r, g, b] = paper.pf.split(",").map((n) => Number(n));
     const dark = r * 299 + g * 587 + b * 114 < 128000;
-    root.style.setProperty("--pf", `${r},${g},${b}`);
-    root.style.setProperty("--dim", dark ? ".86" : ".84");
-    root.style.setProperty("--band", dark ? "rgba(255,255,255,.075)" : "rgba(15,20,25,.08)");
+    root.style.setProperty("--pf", paper.pf);
+    root.style.setProperty("--dim", paper.dim);
+    root.style.setProperty("--band", paper.band);
+    root.style.color = paper.ink2;
     if (dark) delete root.dataset.light;
     else root.dataset.light = "1";
+    applySpotBand(root);
+  }
+
+  function persistSpot(patch) {
+    saveSettings(patch);
+    paintSpot();
+    syncSpotChrome();
+    syncSettingsSpotControls();
+  }
+
+  function setSpotPaper(id, mix) {
+    if (!SPOT_PAPER_IDS.includes(id)) return;
+    if (mix) {
+      const next = settings.spotMix.includes(id)
+        ? settings.spotMix.filter((item) => item !== id)
+        : [...settings.spotMix, id].slice(-3);
+      persistSpot({ spotMix: next });
+      return;
+    }
+    persistSpot(spotThemeDark() ? { spotPaperDark: id } : { spotPaperLight: id });
+  }
+
+  function setSpotHeight(value) {
+    const next = clampSpotHeight(value);
+    if (spot.root) spot.bandH = next;
+    persistSpot({ spotHeight: next });
+  }
+
+  function resetSpotSettings() {
+    persistSpot({
+      spotPaperLight: DEFAULT_SETTINGS.spotPaperLight,
+      spotPaperDark: DEFAULT_SETTINGS.spotPaperDark,
+      spotHeight: DEFAULT_SETTINGS.spotHeight,
+      spotFollow: DEFAULT_SETTINGS.spotFollow,
+      spotMix: [],
+    });
+    if (spot.root) {
+      spot.follow = false;
+      spot.bandH = settings.spotHeight;
+      paintSpot();
+    }
   }
 
   function pulseSpotSnap() {
@@ -2733,16 +2864,51 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       snapToRect(rect);
       return;
     }
-    spot.bandH = 112;
+    spot.bandH = settings.spotHeight;
     spot.bandTop = Math.round(rect.top) - 8;
     pulseSpotSnap();
     paintSpot();
   }
 
+  function syncSpotChrome() {
+    const root = spot.root;
+    if (!root) return;
+    const paper = currentSpotPaper();
+    root.querySelectorAll("[data-paper]").forEach((btn) => {
+      btn.setAttribute("aria-pressed", btn.dataset.paper === paper.id ? "true" : "false");
+      btn.dataset.mix = settings.spotMix.includes(btn.dataset.paper) ? "1" : "0";
+    });
+    const followBtn = root.querySelector("[data-follow]");
+    if (followBtn) {
+      followBtn.setAttribute("aria-pressed", spot.follow ? "true" : "false");
+      followBtn.textContent = spot.follow ? "跟随中" : "跟随鼠标";
+    }
+    const height = root.querySelector("[data-bh]");
+    if (height) height.value = String(settings.spotHeight);
+    const label = root.querySelector("[data-hv]");
+    if (label) label.textContent = `${settings.spotHeight}px`;
+  }
+
+  function syncSettingsSpotControls() {
+    const panel = document.getElementById("x2img-panel");
+    if (!panel) return;
+    const paper = currentSpotPaper();
+    panel.querySelectorAll("[data-paper]").forEach((btn) => {
+      btn.setAttribute("aria-pressed", btn.dataset.paper === paper.id ? "true" : "false");
+      btn.dataset.mix = settings.spotMix.includes(btn.dataset.paper) ? "1" : "0";
+    });
+    const height = panel.querySelector('[data-k="spotHeight"]');
+    if (height) height.value = String(settings.spotHeight);
+    const label = panel.querySelector("[data-hv]");
+    if (label) label.textContent = `${settings.spotHeight}px`;
+    const follow = panel.querySelector('[data-k="spotFollow"]');
+    if (follow) follow.checked = settings.spotFollow;
+  }
+
   function setFollow(on) {
     spot.follow = Boolean(on);
     spot.lastLine = null;
-    paintSpot();
+    persistSpot({ spotFollow: spot.follow });
   }
 
   function spotScroller() {
@@ -2809,6 +2975,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       return;
     }
     if (!spot.follow || !spot.root || e.pointerType !== "mouse") return;
+    if (e.target.closest?.(".dock,.tune,.grip")) return;
     const rect = sentenceRectFromPoint(e.clientX, e.clientY);
     if (!rect) return;
     const key = `${Math.round(rect.top)}:${Math.round(rect.bottom)}`;
@@ -2847,6 +3014,11 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (!spot.root || e.isComposing) return;
     if (e.key === "Escape") {
       e.preventDefault();
+      const tune = spot.root.querySelector(".tune.on");
+      if (tune) {
+        tune.classList.remove("on");
+        return;
+      }
       closeSpot();
       return;
     }
@@ -2862,6 +3034,12 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " ") {
       e.preventDefault();
       stepSpot(e.key === "ArrowUp" ? -1 : 1);
+      return;
+    }
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (/^[1-7]$/.test(e.key)) {
+      e.preventDefault();
+      setSpotPaper(SPOT_PAPER_IDS[Number(e.key) - 1], e.shiftKey);
     }
   }
 
@@ -2870,12 +3048,42 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       if (e.button !== 0) return;
       e.preventDefault();
       e.stopPropagation();
-      spot.follow = false;
+      if (spot.follow) setFollow(false);
       spot.drag = { y: e.clientY, top: spot.bandTop };
       try {
         e.currentTarget.setPointerCapture(e.pointerId);
       } catch {}
       paintSpot();
+    });
+    root.querySelectorAll("[data-paper]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setSpotPaper(btn.dataset.paper, e.shiftKey);
+      });
+    });
+    root.querySelector("[data-follow]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setFollow(!spot.follow);
+    });
+    root.querySelector("[data-tune]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      root.querySelector(".tune")?.classList.toggle("on");
+    });
+    root.querySelector("[data-close]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeSpot();
+    });
+    root.querySelector("[data-bh]")?.addEventListener("input", (e) => {
+      setSpotHeight(e.target.value);
+    });
+    root.querySelector("[data-spot-reset]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      resetSpotSettings();
     });
   }
 
@@ -2892,17 +3100,33 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <div class="veil" aria-hidden="true"></div>
       <div class="bandbox" aria-hidden="true"></div>
       <div class="grip" aria-hidden="true"></div>
+      <div class="tune">
+        <div class="row">
+          <span>高度</span>
+          <input type="range" data-bh min="56" max="260" value="${settings.spotHeight}" aria-label="光带高度">
+          <b data-hv>${settings.spotHeight}px</b>
+        </div>
+        <button type="button" class="link" data-spot-reset>恢复默认</button>
+      </div>
+      <div class="dock">
+        <div class="papers">${paperButtonsHtml()}</div>
+        <button type="button" class="tbtn" data-tune>高度</button>
+        <button type="button" class="tbtn" data-follow aria-pressed="false">跟随鼠标</button>
+        <span class="hint">拖右侧把手 · 点一句 · ↑↓ · F 跟随 · 1–7 换纸 · Shift 叠色 · Esc 关</span>
+        <button type="button" class="tbtn" data-close>退出</button>
+      </div>
     `;
     spot.root = root;
-    spot.follow = false;
+    spot.follow = settings.spotFollow;
     spot.drag = null;
     spot.sourceEl = null;
     spot.lastLine = null;
     document.documentElement.appendChild(root);
     bindSpotChrome(root);
-    spot.bandH = 112;
-    spot.bandTop = Math.round(window.innerHeight * 0.42) - 56;
+    spot.bandH = settings.spotHeight;
+    spot.bandTop = Math.round(window.innerHeight * 0.42) - Math.round(settings.spotHeight / 2);
     paintSpot();
+    syncSpotChrome();
     window.addEventListener("pointermove", onSpotPointerMove);
     window.addEventListener("pointerup", onSpotPointerUp);
     window.addEventListener("pointercancel", onSpotPointerUp);
@@ -2998,8 +3222,15 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <label class="row">本地去掉年龄遮罩 <input type="checkbox" data-k="unmaskAge" ${settings.unmaskAge ? "checked" : ""}></label>
       <div class="hint">帖内年龄遮罩，以及个人资料敏感提示。只作用于当前页，不改 X 账号设置。</div>
       <h3>阅读</h3>
-      <label class="row">阅读光带 <input type="checkbox" data-k="readingBand" ${settings.readingBand ? "checked" : ""}></label>
-      <div class="hint">左侧栏「更多」上面进入整页聚光。周围用纸色压对比，光带贴当前句。拖右侧把手，点一句，F 跟随，↑↓ 换行，Esc 关。Alt+S 也能开。</div>
+      <label class="row">整页聚光 <input type="checkbox" data-k="readingBand" ${settings.readingBand ? "checked" : ""}></label>
+      <div class="hint">左侧栏「更多」上面进入。纸色压对比，光带贴当前句。浅色页和深色页各记一张纸。</div>
+      <div class="hint">纸色 · 1–7 换纸，按住 Shift 点色点可叠最多三种</div>
+      <div class="papers">${paperButtonsHtml()}</div>
+      <div class="hint">高度</div>
+      <label class="slide"><input type="range" data-k="spotHeight" min="56" max="260" value="${settings.spotHeight}"><b data-hv>${settings.spotHeight}px</b></label>
+      <label class="row">跟随鼠标 <input type="checkbox" data-k="spotFollow" ${settings.spotFollow ? "checked" : ""}></label>
+      <button type="button" class="link" data-spot-reset>恢复聚光默认</button>
+      <div class="hint">拖右侧把手，点一句，F 跟随，↑↓ 换行，Esc 关。Alt+S 也能开。</div>
       </div>
       <div class="bar">
         <button type="button" class="act pri" data-save>保存</button>
@@ -3021,11 +3252,34 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         mediaGrid: read("mediaGrid").checked,
         unmaskAge: read("unmaskAge").checked,
         readingBand: read("readingBand").checked,
+        spotHeight: read("spotHeight").value,
+        spotFollow: read("spotFollow").checked,
+        spotPaperLight: settings.spotPaperLight,
+        spotPaperDark: settings.spotPaperDark,
+        spotMix: settings.spotMix,
       });
+      if (spot.root) spot.bandH = settings.spotHeight;
       closeSettingsPanel();
       toast("设置已保存");
       if (!settings.readingBand) closeSpot();
+      else paintSpot();
       injectAll();
+    });
+    panel.querySelectorAll("[data-paper]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        setSpotPaper(btn.dataset.paper, e.shiftKey);
+      });
+    });
+    panel.querySelector('[data-k="spotHeight"]')?.addEventListener("input", (e) => {
+      setSpotHeight(e.target.value);
+    });
+    panel.querySelector('[data-k="spotFollow"]')?.addEventListener("change", (e) => {
+      setFollow(e.target.checked);
+    });
+    panel.querySelector("[data-spot-reset]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      resetSpotSettings();
     });
     panel.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", closeSettingsPanel));
     document.documentElement.appendChild(panel);

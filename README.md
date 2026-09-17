@@ -15,7 +15,7 @@
 - **一键下原图、视频、GIF。** 分享旁边那个下载按钮。多个文件打成 ZIP，文件名能写 `{handle} {id} {name} {date} {n}`。
 - **多图排成网格。**
 - **揭开年龄遮罩。** 帖里的成人内容提示、个人资料敏感页，只在当前页拿掉，不改你的 X 账号设置。片子还在。
-- **整页聚光。** 左侧栏「更多」上面进入，光带盖在时间线整页上。周围用纸色压对比，不遮、不虚化。拖右侧把手、点一句、F 跟随、↑↓ 换行。Alt+S 也能开。
+- **整页聚光。** 左侧栏「更多」上面进入，光带盖在时间线整页上。周围用纸色压对比，不遮、不虚化。七张纸、高度、跟随都能改，浅色深色分开记。拖右侧把手、点一句、F 跟随、1–7 换纸、↑↓ 换行。Alt+S 也能开。
 
 油猴菜单里有「设置」。
 
@@ -35,7 +35,7 @@ Also on the timeline:
 - **Download photos, videos, and GIFs.** ZIP when there's more than one file. Names can use `{handle} {id} {name} {date} {n}`.
 - **Photo grid** for multi-image posts.
 - **Lift age covers** and the sensitive-profile prompt on this page only. The video stays put.
-- **Whole-page spotlight.** Enter it above More in the left rail. A band over the live timeline; everything else drops to a paper veil — no cover, no blur. Drag the right handle, click a sentence, press F to follow, or use the arrow keys. Alt+S toggles it.
+- **Whole-page spotlight.** Enter it above More in the left rail. A band over the live timeline; everything else drops to a paper veil — no cover, no blur. Seven papers, band height, and follow are in Settings; light and dark are remembered separately. Drag the right handle, click a sentence, press F to follow, 1–7 to change paper, or use the arrow keys. Alt+S toggles it.
 
 Settings are in the userscript menu.
 
