@@ -3,10 +3,10 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.6.4
-// @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光阅读
-// @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers, whole-page reading spotlight
-// @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光阅读
+// @version      0.6.5
+// @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光跟帖
+// @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers, whole-page tweet spotlight
+// @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光跟帖
 // @author       Kale
 // @homepageURL  https://github.com/icekale/x-to-img
 // @supportURL   https://github.com/icekale/x-to-img/issues
@@ -142,7 +142,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     #x2img-spot{position:fixed;inset:0;z-index:2147483644;pointer-events:none;color:#8b98a5;--pf:0,0,0;--dim:.86;--f:130px;--band:rgba(255,255,255,.075);--snap:.18s;--x2img-gl:0px;--x2img-gr:10px;}
     #x2img-spot[data-light="1"]{color:#536471;}
     #x2img-spot .veil{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(to bottom,rgba(var(--pf),var(--dim)) 0,rgba(var(--pf),var(--dim)) max(0px,calc(var(--x2img-t) - var(--f))),rgba(var(--pf),0) var(--x2img-t),rgba(var(--pf),0) var(--x2img-b),rgba(var(--pf),var(--dim)) calc(var(--x2img-b) + var(--f)),rgba(var(--pf),var(--dim)) 100%);}
-    #x2img-spot .bandbox{position:absolute;left:var(--x2img-gl);right:var(--x2img-gr);top:var(--x2img-t);height:calc(var(--x2img-b) - var(--x2img-t));z-index:1;background:var(--band);border-radius:10px;pointer-events:none;-webkit-mask-image:linear-gradient(transparent 0,#000 15px,#000 calc(100% - 15px),transparent 100%);mask-image:linear-gradient(transparent 0,#000 15px,#000 calc(100% - 15px),transparent 100%);}
+    #x2img-spot .bandbox{position:absolute;left:var(--x2img-gl);right:var(--x2img-gr);top:var(--x2img-t);height:calc(var(--x2img-b) - var(--x2img-t));z-index:1;background:var(--band);border-radius:12px;pointer-events:none;-webkit-mask-image:linear-gradient(transparent 0,#000 8px,#000 calc(100% - 8px),transparent 100%);mask-image:linear-gradient(transparent 0,#000 8px,#000 calc(100% - 8px),transparent 100%);}
     #x2img-spot .grip{position:absolute;right:var(--x2img-gr);top:var(--x2img-t);height:calc(var(--x2img-b) - var(--x2img-t));width:30px;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:grab;touch-action:none;}
     #x2img-spot .grip::before{content:"";width:4px;height:34px;border-radius:99px;background:currentColor;opacity:.4;}
     #x2img-spot .grip:active{cursor:grabbing;}
@@ -151,9 +151,9 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     #x2img-spot.is-snap{transition:--x2img-t var(--snap) ease-out,--x2img-b var(--snap) ease-out;}
     #x2img-spot.is-snap .bandbox,#x2img-spot.is-snap .grip{transition:top var(--snap) ease-out,height var(--snap) ease-out,right var(--snap) ease-out;}
     #x2img-spot.is-drag,#x2img-spot.is-drag .bandbox,#x2img-spot.is-drag .grip{transition:none;}
-    #x2img-spot .dock{position:absolute;left:0;right:0;bottom:0;z-index:4;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px max(10px,env(safe-area-inset-bottom));pointer-events:auto;background:rgba(var(--pf),.94);color:inherit;border-top:1px solid rgba(255,255,255,.08);font:12px/1.3 TwitterChirp,"PingFang SC",sans-serif;}
+    #x2img-spot .dock{position:absolute;left:0;right:0;bottom:0;z-index:4;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 14px max(8px,env(safe-area-inset-bottom));pointer-events:auto;background:rgba(var(--pf),.92);color:inherit;border-top:1px solid rgba(255,255,255,.08);font:12px/1.3 TwitterChirp,"PingFang SC",sans-serif;}
     #x2img-spot[data-light="1"] .dock{border-top-color:rgba(15,20,25,.1);}
-    #x2img-spot .dock .hint{flex:1;min-width:140px;color:inherit;opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    #x2img-spot .dock .hint{flex:1;min-width:120px;color:inherit;opacity:.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     #x2img-spot .dock button.tbtn{border:0;border-radius:999px;padding:6px 11px;background:transparent;color:inherit;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(139,152,165,.45);font:650 12px/1 TwitterChirp,"PingFang SC",sans-serif;}
     #x2img-spot .dock button.tbtn[aria-pressed="true"]{background:currentColor;}
     #x2img-spot .dock button.tbtn[data-follow][aria-pressed="true"]{background:#1d9bf0;color:#fff;box-shadow:none;}
@@ -2380,7 +2380,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     wrap.dataset.tweetId = id;
     const colorSource = tools.querySelector("[data-x2img-action], [data-x2img-download]") || findShareButton(article);
     if (colorSource) wrap.style.color = getComputedStyle(colorSource).color;
-    wrap.innerHTML = `<button type="button" aria-label="阅读光带" title="阅读光带">${ICONS.band}</button>`;
+    wrap.innerHTML = `<button type="button" aria-label="对准这张帖" title="对准这张帖">${ICONS.band}</button>`;
     wrap.addEventListener(
       "click",
       (e) => {
@@ -2560,10 +2560,82 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     sourceEl: null,
     snapTimer: 0,
     lastLine: null,
+    scrollTick: 0,
+    windowed: false,
   };
 
   function isSpotChrome(node) {
     return Boolean(node?.closest?.("#x2img-spot, #x2img-panel, #x2img-toast, [data-x2img-tools], [data-x2img-nav-spot]"));
+  }
+
+  function isRootTweet(article) {
+    return Boolean(
+      article?.matches?.('article[data-testid="tweet"]') &&
+        !article.parentElement?.closest('article[data-testid="tweet"]')
+    );
+  }
+
+  function rootTweetFrom(node) {
+    const article = node?.closest?.('article[data-testid="tweet"]');
+    if (!article) return null;
+    return article.parentElement?.closest('article[data-testid="tweet"]') || article;
+  }
+
+  function ownTweetEl(article, selector) {
+    if (!article) return null;
+    return (
+      [...article.querySelectorAll(selector)].find((el) => el.closest('article[data-testid="tweet"]') === article) || null
+    );
+  }
+
+  function mainTweetText(article) {
+    return ownTweetEl(article, '[data-testid="tweetText"]');
+  }
+
+  function tweetActionTop(article) {
+    const reply = ownTweetEl(article, '[data-testid="reply"]');
+    const group = reply?.closest('[role="group"]') || reply?.closest(".bar");
+    const box = (group || reply)?.getBoundingClientRect();
+    return box && box.height ? box.top : 0;
+  }
+
+  function tweetContentRect(article) {
+    if (!article) return null;
+    const box = article.getBoundingClientRect();
+    if (box.width < 8 || box.height < 8) return null;
+    const actionTop = tweetActionTop(article);
+    const bottom = actionTop > box.top + 36 ? actionTop : box.bottom;
+    return { top: box.top, bottom, left: box.left, right: box.right };
+  }
+
+  function listRootTweets() {
+    return [...document.querySelectorAll('article[data-testid="tweet"]')].filter((article) => {
+      if (!isRootTweet(article)) return false;
+      const box = article.getBoundingClientRect();
+      return box.width > 8 && box.height > 8;
+    });
+  }
+
+  function tweetVisibleScore(article) {
+    const rect = tweetContentRect(article);
+    if (!rect) return 0;
+    const top = Math.max(rect.top, 48);
+    const bottom = Math.min(rect.bottom, window.innerHeight - 36);
+    return Math.max(0, bottom - top);
+  }
+
+  function tweetStillFocused(article) {
+    const rect = tweetContentRect(article);
+    if (!rect) return false;
+    const mid = window.innerHeight * 0.42;
+    return rect.top < mid + 40 && rect.bottom > mid - 40 && tweetVisibleScore(article) >= 48;
+  }
+
+  function isLongTweet(article) {
+    const textH = mainTweetText(article)?.getBoundingClientRect().height || 0;
+    const rect = tweetContentRect(article);
+    const h = rect ? rect.bottom - rect.top : 0;
+    return textH >= 160 || h > Math.min(window.innerHeight * 0.55, 380);
   }
 
   function caretFromPoint(x, y) {
@@ -2577,13 +2649,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
 
   function readingRootFrom(node) {
-    const el = node?.nodeType === 1 ? node : node?.parentElement;
-    if (!el) return null;
-    return (
-      el.closest('[data-testid="tweetText"]') ||
-      el.closest('article[data-testid="tweet"]')?.querySelector('[data-testid="tweetText"]') ||
-      null
-    );
+    return mainTweetText(rootTweetFrom(node));
   }
 
   function textNodesIn(root) {
@@ -2785,8 +2851,12 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 
   function setSpotHeight(value) {
     const next = clampSpotHeight(value);
-    if (spot.root) spot.bandH = next;
     persistSpot({ spotHeight: next });
+    if (spot.root) {
+      spot.windowed = true;
+      spot.bandH = next;
+      paintSpot();
+    }
   }
 
   function resetSpotSettings() {
@@ -2799,8 +2869,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     });
     if (spot.root) {
       spot.follow = false;
-      spot.bandH = settings.spotHeight;
-      paintSpot();
+      spot.windowed = false;
+      const tweet = spot.sourceEl || firstVisibleTweet();
+      if (tweet) applyTweetBand(tweet, { snap: true });
+      else paintSpot();
     }
   }
 
@@ -2816,7 +2888,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     const root = spot.root;
     if (!root) return;
     const h = window.innerHeight;
-    spot.bandH = Math.max(40, Math.min(spot.bandH, Math.round(h * 0.62)));
+    spot.bandH = Math.max(40, Math.min(spot.bandH, Math.round(h * 0.82)));
     spot.bandTop = Math.max(8, Math.min(spot.bandTop, h - spot.bandH - 8));
     const lane = spotLane();
     root.style.setProperty("--x2img-t", `${spot.bandTop}px`);
@@ -2838,36 +2910,107 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     paintSpot();
   }
 
-  function snapToArticle(article) {
-    if (!article || !spot.root) return;
-    const text = [...article.querySelectorAll('[data-testid="tweetText"]')].find(
-      (el) => el.closest('article[data-testid="tweet"]') === article
-    );
-    spot.sourceEl = article;
-    if (!text) {
-      const box = article.getBoundingClientRect();
-      placeBand({ top: box.top + 36, bottom: box.top + 148 }, false);
-      return;
-    }
-    const box = text.getBoundingClientRect();
-    if (box.top < 24 || box.top > window.innerHeight - 90) {
-      text.scrollIntoView({ block: "center", behavior: "instant" });
-    }
-    const next = text.getBoundingClientRect();
-    const hit = sentenceRectFromPoint(next.left + 24, Math.min(Math.max(next.top + 10, 40), window.innerHeight - 40));
-    placeBand(hit || next, false);
+  function spotPad() {
+    const dock = spot.root?.querySelector(".dock");
+    const dockH = dock ? Math.ceil(dock.getBoundingClientRect().height) : 0;
+    return { top: 56, bottom: Math.max(16, dockH + 4) };
   }
 
-  function placeBand(rect, hug) {
+  function ensureTweetInView(article) {
+    const rect = tweetContentRect(article);
     if (!rect) return;
-    if (hug) {
-      snapToRect(rect);
+    const pad = spotPad();
+    const viewH = window.innerHeight - pad.top - pad.bottom;
+    if (rect.top >= pad.top && rect.bottom <= window.innerHeight - pad.bottom) return;
+    if (rect.bottom - rect.top > viewH) {
+      (mainTweetText(article) || article).scrollIntoView({ block: "start", behavior: "instant" });
       return;
     }
-    spot.bandH = settings.spotHeight;
-    spot.bandTop = Math.round(rect.top) - 8;
-    pulseSpotSnap();
+    article.scrollIntoView({ block: "center", behavior: "instant" });
+  }
+
+  function applyTweetBand(article, { snap = true, scroll = false } = {}) {
+    if (!article || !spot.root) return;
+    if (scroll) ensureTweetInView(article);
+    const rect = tweetContentRect(article);
+    if (!rect) return;
+    spot.sourceEl = article;
+    const pad = spotPad();
+    const viewTop = pad.top;
+    const viewBot = window.innerHeight - pad.bottom;
+    const maxH = Math.round(window.innerHeight * 0.78);
+    if (spot.windowed) {
+      spot.bandH = clampSpotHeight(settings.spotHeight);
+      spot.bandTop = Math.round(Math.max(viewTop, Math.min(rect.top - 6, viewBot - spot.bandH)));
+      if (snap) pulseSpotSnap();
+      paintSpot();
+      return;
+    }
+    const rawH = rect.bottom - rect.top;
+    if (rawH <= maxH) {
+      spot.bandH = Math.max(56, Math.round(rawH + 10));
+      spot.bandTop = Math.round(rect.top) - 5;
+    } else {
+      const top = Math.max(rect.top, viewTop);
+      const bottom = Math.min(rect.bottom, viewBot);
+      if (bottom - top >= 56) {
+        spot.bandTop = Math.round(top) - 4;
+        spot.bandH = Math.round(bottom - top + 8);
+      } else {
+        spot.bandH = maxH;
+        spot.bandTop = Math.round(rect.top) - 5;
+      }
+    }
+    if (snap) pulseSpotSnap();
     paintSpot();
+  }
+
+  function snapToArticle(article) {
+    if (!article || !spot.root) return;
+    spot.windowed = false;
+    applyTweetBand(article, { snap: true, scroll: true });
+  }
+
+  function pickFocusedTweet() {
+    const tweets = listRootTweets();
+    if (!tweets.length) return null;
+    if (spot.sourceEl?.isConnected && tweets.includes(spot.sourceEl) && tweetStillFocused(spot.sourceEl)) {
+      return spot.sourceEl;
+    }
+    const bandMid = spot.bandTop + spot.bandH / 2;
+    let best = null;
+    let bestScore = -Infinity;
+    for (const tweet of tweets) {
+      const rect = tweetContentRect(tweet);
+      if (!rect) continue;
+      const visible = tweetVisibleScore(tweet);
+      if (visible < 24) continue;
+      const mid = (rect.top + rect.bottom) / 2;
+      const score = visible - Math.abs(mid - bandMid) * 0.2;
+      if (score > bestScore) {
+        bestScore = score;
+        best = tweet;
+      }
+    }
+    return best || tweets[0];
+  }
+
+  function tweetOverlappingBand() {
+    const tweets = listRootTweets();
+    const top = spot.bandTop;
+    const bottom = spot.bandTop + spot.bandH;
+    let best = null;
+    let bestOverlap = 0;
+    for (const tweet of tweets) {
+      const rect = tweetContentRect(tweet);
+      if (!rect) continue;
+      const overlap = Math.min(rect.bottom, bottom) - Math.max(rect.top, top);
+      if (overlap > bestOverlap) {
+        bestOverlap = overlap;
+        best = tweet;
+      }
+    }
+    return best;
   }
 
   function syncSpotChrome() {
@@ -2922,50 +3065,44 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     return document.scrollingElement || document.documentElement;
   }
 
-  function spotLineHeight() {
-    const text = document.querySelector('[data-testid="tweetText"]');
-    const lh = text ? parseFloat(getComputedStyle(text).lineHeight) : 0;
-    return Math.max(20, Math.round(lh || 24));
-  }
-
-  function listSpotLines() {
-    const out = [];
-    for (const el of document.querySelectorAll('[data-testid="tweetText"]')) {
-      if (!el.getClientRects().length) continue;
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      for (const box of range.getClientRects()) {
-        if (box.width > 8 && box.height > 8) out.push(box);
-      }
+  function stepTweet(dir) {
+    spot.windowed = false;
+    const tweets = listRootTweets();
+    if (!tweets.length) return;
+    let idx = spot.sourceEl ? tweets.indexOf(spot.sourceEl) : -1;
+    if (idx < 0) {
+      const current = pickFocusedTweet();
+      idx = current ? tweets.indexOf(current) : 0;
     }
-    out.sort((a, b) => a.top - b.top || a.bottom - b.bottom);
-    return out;
-  }
-
-  function stepSpot(dir) {
-    const lines = listSpotLines();
-    const cur = lines.findIndex((box) => box.bottom > spot.bandTop + 4);
-    const next = cur < 0 ? null : lines[cur + dir];
-    if (next) {
-      if (next.top < 8 || next.bottom > window.innerHeight - 8) {
-        spotScroller().scrollBy({ top: dir * (next.bottom - next.top + 8), left: 0, behavior: "instant" });
-      }
-      if (spot.follow) snapToRect(next);
-      else {
-        spot.bandTop = Math.round(next.top) - 8;
-        pulseSpotSnap();
-        paintSpot();
-      }
+    const next = tweets[idx + dir];
+    if (!next) {
+      spotScroller().scrollBy({ top: dir * Math.round(window.innerHeight * 0.55), left: 0, behavior: "instant" });
+      const again = listRootTweets();
+      const fallback = again[Math.max(0, Math.min(again.length - 1, idx + dir))] || pickFocusedTweet();
+      if (fallback) applyTweetBand(fallback, { snap: true, scroll: true });
       return;
     }
-    const step = spotLineHeight();
-    const nextTop = spot.bandTop + dir * step;
-    const maxTop = window.innerHeight - spot.bandH - 8;
-    if (nextTop < 8 || nextTop > maxTop) spotScroller().scrollBy({ top: dir * step, left: 0, behavior: "instant" });
-    else {
-      spot.bandTop = nextTop;
-      paintSpot();
+    applyTweetBand(next, { snap: true, scroll: true });
+  }
+
+  function syncSpotToTimeline() {
+    if (!spot.root || spot.drag || spot.follow) {
+      if (spot.root && !spot.drag) paintSpot();
+      return;
     }
+    const tweet = pickFocusedTweet();
+    if (tweet !== spot.sourceEl) spot.windowed = false;
+    if (tweet) applyTweetBand(tweet, { snap: false });
+    else paintSpot();
+  }
+
+  function onSpotScroll() {
+    if (!spot.root) return;
+    if (spot.scrollTick) return;
+    spot.scrollTick = requestAnimationFrame(() => {
+      spot.scrollTick = 0;
+      syncSpotToTimeline();
+    });
   }
 
   function onSpotPointerMove(e) {
@@ -2976,38 +3113,41 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     }
     if (!spot.follow || !spot.root || e.pointerType !== "mouse") return;
     if (e.target.closest?.(".dock,.tune,.grip")) return;
-    const rect = sentenceRectFromPoint(e.clientX, e.clientY);
-    if (!rect) return;
-    const key = `${Math.round(rect.top)}:${Math.round(rect.bottom)}`;
-    if (key === spot.lastLine) return;
-    spot.lastLine = key;
-    snapToRect(rect);
+    const article = rootTweetFrom(document.elementFromPoint(e.clientX, e.clientY));
+    if (!article || isSpotChrome(article)) return;
+    if (article === spot.sourceEl) return;
+    spot.windowed = false;
+    applyTweetBand(article, { snap: true });
   }
 
   function onSpotPointerUp() {
     if (!spot.drag) return;
     spot.drag = null;
-    paintSpot();
+    spot.windowed = false;
+    const tweet = tweetOverlappingBand() || pickFocusedTweet();
+    if (tweet) applyTweetBand(tweet, { snap: true });
+    else paintSpot();
   }
 
   function onSpotClick(e) {
     if (!spot.root || spot.drag || spot.follow) return;
-    if (e.button !== 0) return;
+    if (e.button !== 0 || !e.shiftKey) return;
     if (isSpotChrome(e.target)) return;
-    const sel = window.getSelection();
-    if (sel && !sel.isCollapsed) return;
-    if (
-      e.target.closest?.(
-        'a,button,[role="button"],[role="link"],input,textarea,select,[data-testid="tweetPhoto"],[data-testid="videoPlayer"],[data-testid="card.wrapper"]'
-      )
-    ) {
-      return;
-    }
-    const rect = sentenceRectFromPoint(e.clientX, e.clientY);
-    if (!rect) return;
+    const article = rootTweetFrom(e.target);
+    if (!article) return;
     e.preventDefault();
     e.stopPropagation();
-    snapToRect(rect);
+    if (isLongTweet(article) && e.target.closest?.('[data-testid="tweetText"]')) {
+      const rect = sentenceRectFromPoint(e.clientX, e.clientY);
+      if (rect) {
+        spot.sourceEl = article;
+        spot.windowed = true;
+        snapToRect(rect);
+        return;
+      }
+    }
+    spot.windowed = false;
+    applyTweetBand(article, { snap: true });
   }
 
   function onSpotKey(e) {
@@ -3031,9 +3171,14 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       setFollow(!spot.follow);
       return;
     }
-    if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " ") {
+    if (e.key === "j" || e.key === "J" || e.key === "ArrowDown") {
       e.preventDefault();
-      stepSpot(e.key === "ArrowUp" ? -1 : 1);
+      stepTweet(1);
+      return;
+    }
+    if (e.key === "k" || e.key === "K" || e.key === "ArrowUp") {
+      e.preventDefault();
+      stepTweet(-1);
       return;
     }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -3112,7 +3257,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         <div class="papers">${paperButtonsHtml()}</div>
         <button type="button" class="tbtn" data-tune>高度</button>
         <button type="button" class="tbtn" data-follow aria-pressed="false">跟随鼠标</button>
-        <span class="hint">拖右侧把手 · 点一句 · ↑↓ · F 跟随 · 1–7 换纸 · Shift 叠色 · Esc 关</span>
+        <span class="hint">j/k 换帖 · Shift 点帖对准 · F 跟随 · Esc 关</span>
         <button type="button" class="tbtn" data-close>退出</button>
       </div>
     `;
@@ -3121,6 +3266,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     spot.drag = null;
     spot.sourceEl = null;
     spot.lastLine = null;
+    spot.windowed = false;
     document.documentElement.appendChild(root);
     bindSpotChrome(root);
     spot.bandH = settings.spotHeight;
@@ -3130,9 +3276,9 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     window.addEventListener("pointermove", onSpotPointerMove);
     window.addEventListener("pointerup", onSpotPointerUp);
     window.addEventListener("pointercancel", onSpotPointerUp);
-    window.addEventListener("keydown", onSpotKey);
+    window.addEventListener("keydown", onSpotKey, true);
     window.addEventListener("resize", paintSpot);
-    window.addEventListener("scroll", paintSpot, true);
+    window.addEventListener("scroll", onSpotScroll, true);
     document.addEventListener("click", onSpotClick, true);
     syncNavSpot();
   }
@@ -3142,10 +3288,11 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     window.removeEventListener("pointermove", onSpotPointerMove);
     window.removeEventListener("pointerup", onSpotPointerUp);
     window.removeEventListener("pointercancel", onSpotPointerUp);
-    window.removeEventListener("keydown", onSpotKey);
+    window.removeEventListener("keydown", onSpotKey, true);
     window.removeEventListener("resize", paintSpot);
-    window.removeEventListener("scroll", paintSpot, true);
+    window.removeEventListener("scroll", onSpotScroll, true);
     document.removeEventListener("click", onSpotClick, true);
+    if (spot.scrollTick) cancelAnimationFrame(spot.scrollTick);
     clearTimeout(spot.snapTimer);
     spot.root.remove();
     spot.root = null;
@@ -3153,24 +3300,27 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     spot.drag = null;
     spot.sourceEl = null;
     spot.lastLine = null;
+    spot.scrollTick = 0;
+    spot.windowed = false;
     syncNavSpot();
   }
 
   function firstVisibleTweet() {
-    const articles = [...document.querySelectorAll('article[data-testid="tweet"]')].filter((article) => {
-      if (article.parentElement?.closest('article[data-testid="tweet"]')) return false;
-      const text = article.querySelector('[data-testid="tweetText"]');
-      const box = (text || article).getBoundingClientRect();
-      return box.bottom > 80 && box.top < window.innerHeight - 80;
-    });
-    return (
-      articles.find((article) => {
-        const text = article.querySelector('[data-testid="tweetText"]');
-        return text && text.getBoundingClientRect().height >= 48;
-      }) ||
-      articles[0] ||
-      null
-    );
+    const tweets = listRootTweets();
+    const mid = window.innerHeight * 0.42;
+    let best = null;
+    let bestDist = Infinity;
+    for (const article of tweets) {
+      const rect = tweetContentRect(article);
+      if (!rect) continue;
+      if (rect.bottom < 72 || rect.top > window.innerHeight - 72) continue;
+      const dist = Math.abs((rect.top + rect.bottom) / 2 - mid);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = article;
+      }
+    }
+    return best || tweets[0] || null;
   }
 
   function toggleSpot() {
@@ -3223,14 +3373,14 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <div class="hint">帖内年龄遮罩，以及个人资料敏感提示。只作用于当前页，不改 X 账号设置。</div>
       <h3>阅读</h3>
       <label class="row">整页聚光 <input type="checkbox" data-k="readingBand" ${settings.readingBand ? "checked" : ""}></label>
-      <div class="hint">左侧栏「更多」上面进入。纸色压对比，光带贴当前句。浅色页和深色页各记一张纸。</div>
+      <div class="hint">左侧栏「更多」上面进入。光带跟当前帖走，周围纸色降对比。点赞、进帖都还能用。浅色页和深色页各记一张纸。</div>
       <div class="hint">纸色 · 1–7 换纸，按住 Shift 点色点可叠最多三种</div>
       <div class="papers">${paperButtonsHtml()}</div>
-      <div class="hint">高度</div>
+      <div class="hint">长帖开窗高度。短帖跟帖走，不按这个裁。</div>
       <label class="slide"><input type="range" data-k="spotHeight" min="56" max="260" value="${settings.spotHeight}"><b data-hv>${settings.spotHeight}px</b></label>
       <label class="row">跟随鼠标 <input type="checkbox" data-k="spotFollow" ${settings.spotFollow ? "checked" : ""}></label>
       <button type="button" class="link" data-spot-reset>恢复聚光默认</button>
-      <div class="hint">拖右侧把手，点一句，F 跟随，↑↓ 换行，Esc 关。Alt+S 也能开。</div>
+      <div class="hint">j/k 换帖，Shift 点帖对准，长帖 Shift 点句开窗，F 跟随，Esc 关。Alt+S 也能开。</div>
       </div>
       <div class="bar">
         <button type="button" class="act pri" data-save>保存</button>
@@ -3310,7 +3460,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     });
     if (typeof GM_registerMenuCommand === "function") {
       GM_registerMenuCommand("设置", openSettingsPanel);
-      GM_registerMenuCommand("阅读光带", toggleSpot);
+      GM_registerMenuCommand("聚光", toggleSpot);
       GM_registerMenuCommand("将当前贴文转成图卡", () => {
         const article = document.querySelector('article[data-testid="tweet"]');
         if (!article) {
