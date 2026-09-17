@@ -3,10 +3,10 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.4.8
-// @description  分享旁边点一下，把帖做成图，拿去微信粘
-// @description:en Click next to Share and get a picture of the post you can paste
-// @description:zh-CN 分享旁边点一下，把帖做成图，拿去微信粘
+// @version      0.5.0
+// @description  分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
+// @description:en Click next to Share for a card. Also hide adult spam/ads, download media, and lift age covers
+// @description:zh-CN 分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
 // @author       Kale
 // @homepageURL  https://github.com/icekale/x-to-img
 // @supportURL   https://github.com/icekale/x-to-img/issues
@@ -20,6 +20,8 @@
 // @match        https://mobile.twitter.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=x.com
 // @grant        GM_addStyle
+// @grant        GM_getValue
+// @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
 // @grant        GM_registerMenuCommand
 // @grant        unsafeWindow
@@ -68,6 +70,7 @@
     views: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 18.2V13h2.4v5.2H4.5zm6.3 0V6h2.4v12.2h-2.4zm6.3 0v-8h2.4v8h-2.4z" fill="currentColor"/></svg>`,
     verified: `<svg viewBox="0 0 22 22" aria-hidden="true"><path d="M11 1.6l2.1 1.5 2.5-.4 1.2 2.3 2.3 1.2-.4 2.5L20.2 11l-1.5 2.1.4 2.5-2.3 1.2-1.2 2.3-2.5-.4L11 20.4l-2.1-1.5-2.5.4-1.2-2.3-2.3-1.2.4-2.5L1.8 11l1.5-2.1L2.9 6.4l2.3-1.2 1.2-2.3 2.5.4L11 1.6z" fill="#60a5fa"/><path d="M9.4 11.6l-1.5-1.5-1.1 1.1 2.6 2.6 5.1-5.1-1.1-1.1-4 4z" fill="#fff"/></svg>`,
     xlogo: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 10.3L22 2h-2.2l-6 6.9L8.8 2H2l7.7 10.9L2 22h2.2l6.6-7.6L15.2 22H22l-7.3-11.7zm-2.3 2.7l-.8-1.1L4.8 3.5h2.6l5.1 7.3.8 1.1 6.7 9.6h-2.6l-5.4-7.5z" fill="currentColor"/></svg>`,
+    download: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.2v11.2l3.7-3.7 1.4 1.4L12 18.2l-5.1-5.1 1.4-1.4L11 14.4V3.2h1zM4.4 19.4h15.2V21H4.4v-1.6z"/></svg>`,
   };
 
   const PAGE_CSS = `
@@ -82,6 +85,35 @@
     #x2img-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,12px);z-index:2147483647;padding:10px 14px;border-radius:999px;background:#0f1419;color:#fff;font:650 13px/1.2 TwitterChirp,-apple-system,"PingFang SC",sans-serif;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;}
     #x2img-toast[data-show="1"]{opacity:1;transform:translate(-50%,0);}
     #x2img-toast[data-kind="err"]{background:#9f1239;}
+    [data-x2img-hide="1"]{display:none !important;}
+    [data-x2img-download]{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:2px;}
+    [data-x2img-download] button{width:34.75px;height:34.75px;border:0;padding:0;background:transparent;border-radius:999px;color:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;}
+    [data-x2img-download] button svg{width:18.75px;height:18.75px;display:block;}
+    [data-x2img-download] button:hover{background:rgba(29,155,240,.1);color:rgb(29,155,240);}
+    [data-x2img-download] button:focus-visible{outline:2px solid rgba(29,155,240,.6);outline-offset:0;}
+    [data-x2img-download] button[data-busy="1"]{cursor:wait;opacity:.75;}
+    html[data-x2img-grid="1"] article[data-x2img-grid] nav[role="navigation"]{overflow:visible !important;}
+    html[data-x2img-grid="1"] article[data-x2img-grid] [data-testid="ScrollSnap-List"]{display:grid !important;gap:2px;transform:none !important;width:100% !important;}
+    html[data-x2img-grid="1"] article[data-x2img-grid="2"] [data-testid="ScrollSnap-List"]{grid-template-columns:1fr 1fr;}
+    html[data-x2img-grid="1"] article[data-x2img-grid="3"] [data-testid="ScrollSnap-List"]{grid-template-columns:1.15fr 1fr;grid-template-rows:1fr 1fr;}
+    html[data-x2img-grid="1"] article[data-x2img-grid="3"] [data-testid="ScrollSnap-List"] > :first-child{grid-row:1 / span 2;}
+    html[data-x2img-grid="1"] article[data-x2img-grid="4"] [data-testid="ScrollSnap-List"]{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;}
+    html[data-x2img-grid="1"] article[data-x2img-grid] [data-testid="ScrollSnap-List"] > [role="presentation"]{width:auto !important;min-width:0 !important;}
+    html[data-x2img-unmask="1"] .x2img-age-cover{display:none !important;}
+    html[data-x2img-unmask="1"] [data-testid="previewInterstitial"] [style*="blur"]{filter:none !important;}
+    #x2img-panel{position:fixed;right:18px;bottom:18px;z-index:2147483646;width:min(380px,calc(100vw - 24px));max-height:min(84vh,720px);overflow:auto;padding:16px 16px 14px;border-radius:16px;background:#15202b;color:#e7e9ea;box-shadow:0 16px 48px rgba(0,0,0,.38);font:13px/1.45 TwitterChirp,-apple-system,"PingFang SC",sans-serif;}
+    #x2img-panel[data-light="1"]{background:#fff;color:#0f1419;box-shadow:0 16px 48px rgba(15,20,25,.16);}
+    #x2img-panel h2{margin:0 0 12px;font-size:17px;font-weight:700;}
+    #x2img-panel h3{margin:16px 0 8px;font-size:13px;font-weight:700;color:#8b98a5;}
+    #x2img-panel label.row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0;}
+    #x2img-panel select,#x2img-panel input[type="text"],#x2img-panel textarea{width:100%;margin:4px 0 8px;padding:8px 10px;border:1px solid #38444d;border-radius:10px;background:#0f1419;color:#e7e9ea;font:inherit;}
+    #x2img-panel[data-light="1"] select,#x2img-panel[data-light="1"] input[type="text"],#x2img-panel[data-light="1"] textarea{background:#f7f9f9;border-color:#cfd9de;color:#0f1419;}
+    #x2img-panel textarea{min-height:72px;resize:vertical;}
+    #x2img-panel .hint{color:#8b98a5;font-size:12px;margin:0 0 8px;}
+    #x2img-panel .bar{display:flex;gap:8px;margin-top:12px;}
+    #x2img-panel button.act{flex:1;border:0;border-radius:999px;padding:9px 12px;font:700 13px/1 TwitterChirp,sans-serif;cursor:pointer;}
+    #x2img-panel button.pri{background:#1d9bf0;color:#fff;}
+    #x2img-panel button.ghost{background:transparent;color:#1d9bf0;box-shadow:inset 0 0 0 1px #38444d;}
   `;
 
   const CARD_CSS = `
@@ -1403,10 +1435,640 @@
   }
 
   function injectAll() {
-    document.querySelectorAll('article[data-testid="tweet"]').forEach(mountButton);
+    applyTimelineExtras();
+    document.querySelectorAll('article[data-testid="tweet"]').forEach((article) => {
+      mountButton(article);
+      mountDownload(article);
+    });
+  }
+
+  const SETTINGS_KEY = "x2img-settings-v1";
+  const MEDIA_FETCH_MAX = 80 * 1024 * 1024;
+  const DEFAULT_SETTINGS = {
+    hideAdult: true,
+    hideAds: true,
+    adultLevel: "balanced",
+    skipFollowing: true,
+    customWords: [],
+    whitelist: [],
+    mediaDownload: true,
+    zipMulti: true,
+    fileName: "{handle}_{id}",
+    mediaGrid: true,
+    unmaskAge: true,
+  };
+  const ADULT_STRONG = [
+    "onlyfans", "fansly", "fanvue", "justforfans", "porn", "nudes", "nudeleak",
+    "约炮", "约啪", "援交", "裸聊", "福利姬", "黄片", "外围", "包夜", "无套",
+    "裸照", "成人视频", "成人影片", "sex video",
+  ];
+  const ADULT_BAIT = ["看置顶", "看主页", "进裙", "加我", "私信看", "免费看", "福利来了", "dm me", "link in bio"];
+  const ADULT_CONTACT = ["telegram", "t.me/", "whatsapp", "飞机号", "vx:", "微信", "wechat"];
+  const ADULT_SOFT = ["反差", "黑丝", "白丝", "巨乳", "少妇", "学生妹", "涩涩", "纯欲", "调教", "炮友"];
+  const AD_LABELS = new Set(["推荐", "廣告", "广告", "Promoted", "Ad", "プロモーション", "Promoted by"]);
+  const AGE_WARN_RE =
+    /年龄限制|成人内容|敏感内容|敏感媒体|可能不适合|验证.{0,6}年龄|age[- ]?restricted|adult content|sensitive (?:media|content)|might not be suitable|verify your age/i;
+  let settings = { ...DEFAULT_SETTINGS };
+
+  function readStore(key, fallback) {
+    try {
+      if (typeof GM_getValue === "function") {
+        const value = GM_getValue(key, null);
+        if (value != null) return value;
+      }
+    } catch {
+      /* grant missing */
+    }
+    try {
+      const raw = localStorage.getItem(key);
+      return raw == null ? fallback : raw;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function writeStore(key, value) {
+    try {
+      if (typeof GM_setValue === "function") GM_setValue(key, value);
+    } catch {
+      /* grant missing */
+    }
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      /* private mode */
+    }
+  }
+
+  function normalizeList(value) {
+    return unique(
+      (Array.isArray(value) ? value : String(value || "").split(/[\n,]+/))
+        .map((item) => String(item || "").replace(/^@/, "").trim())
+        .filter(Boolean)
+    ).slice(0, 80);
+  }
+
+  function loadSettings() {
+    let parsed = {};
+    try {
+      parsed = JSON.parse(readStore(SETTINGS_KEY, "") || "{}") || {};
+    } catch {
+      parsed = {};
+    }
+    settings = {
+      ...DEFAULT_SETTINGS,
+      ...parsed,
+      adultLevel: parsed.adultLevel === "conservative" ? "conservative" : "balanced",
+      customWords: normalizeList(parsed.customWords),
+      whitelist: normalizeList(parsed.whitelist).map((item) => item.toLowerCase()),
+      fileName: String(parsed.fileName || DEFAULT_SETTINGS.fileName).slice(0, 180) || DEFAULT_SETTINGS.fileName,
+    };
+    return settings;
+  }
+
+  function saveSettings(next) {
+    settings = { ...loadSettings(), ...next };
+    settings.customWords = normalizeList(settings.customWords);
+    settings.whitelist = normalizeList(settings.whitelist).map((item) => item.toLowerCase());
+    writeStore(SETTINGS_KEY, JSON.stringify(settings));
+    applyTimelineExtras();
+    return settings;
+  }
+
+  function compactText(value) {
+    return String(value || "")
+      .toLowerCase()
+      .replace(/\s+/g, "");
+  }
+
+  function countTerms(hay, terms) {
+    return terms.reduce((sum, term) => (hay.includes(compactText(term)) ? sum + 1 : sum), 0);
+  }
+
+  function isFollowingTimeline() {
+    return /\/home/.test(location.pathname) && /following/i.test(location.search + location.hash + document.title);
+  }
+
+  function fiberFollowing(article, handle) {
+    const want = String(handle || "").toLowerCase();
+    if (!want || !article) return false;
+    function fiberOf(node) {
+      if (!node) return null;
+      try {
+        for (const key in node) {
+          if (key.startsWith("__reactFiber$") || key.startsWith("__reactInternalInstance$")) return node[key];
+        }
+      } catch {
+        /* xray */
+      }
+      return null;
+    }
+    function hunt(value, depth, seen) {
+      if (!value || typeof value !== "object" || depth > 5 || seen.has(value)) return false;
+      seen.add(value);
+      try {
+        const screen = String(value.screen_name || value.screenName || value.username || "").toLowerCase();
+        if (screen === want && (value.following === true || value.legacy?.following === true)) return true;
+        const kids = Array.isArray(value) ? value.slice(0, 20) : Object.values(value).slice(0, 24);
+        return kids.some((kid) => hunt(kid, depth + 1, seen));
+      } catch {
+        return false;
+      }
+    }
+    let fiber = fiberOf(article);
+    for (let hop = 0; hop < 40 && fiber; hop += 1) {
+      if (hunt(fiber.memoizedProps || fiber.pendingProps, 0, new Set())) return true;
+      fiber = fiber.return;
+    }
+    return false;
+  }
+
+  function scoreAdult(article, tweet) {
+    const handle = String(tweet.handle || "").toLowerCase();
+    if (handle && settings.whitelist.includes(handle)) return { hide: false, reason: "whitelist" };
+    const text = [tweet.name, tweet.handle, tweet.text, article.innerText].filter(Boolean).join("\n");
+    const compact = compactText(text);
+    const customHit = settings.customWords.find((word) => compact.includes(compactText(word)));
+    if (customHit) return { hide: true, reason: "custom" };
+    if (!settings.hideAdult) return { hide: false, reason: "" };
+    if (settings.skipFollowing && (fiberFollowing(article, handle) || isFollowingTimeline())) {
+      return { hide: false, reason: "following" };
+    }
+    const strong = countTerms(compact, ADULT_STRONG);
+    const bait = countTerms(compact, ADULT_BAIT);
+    const contact = countTerms(compact, ADULT_CONTACT);
+    const soft = countTerms(compact, ADULT_SOFT);
+    const emoji = (text.match(/[🔞💦🍑👅]/gu) || []).length;
+    let score = strong * 8 + bait * 3 + contact * 3 + soft * 2 + (emoji >= 2 ? 3 : 0);
+    if (strong) score += 4;
+    if (bait && contact) score += 6;
+    const threshold = settings.adultLevel === "conservative" ? 10 : 7;
+    const anchored = strong > 0 || (bait > 0 && contact > 0) || (settings.adultLevel === "balanced" && soft >= 2 && (bait || contact));
+    return { hide: anchored && score >= threshold, reason: anchored ? "adult" : "" };
+  }
+
+  function isAdArticle(article) {
+    const cell = article.closest('[data-testid="cellInnerDiv"]') || article;
+    if (cell.querySelector?.('[data-testid$="impression-pixel"], [data-testid="placementTracking"]')) return true;
+    for (const el of article.querySelectorAll("span, div[dir='ltr']")) {
+      if (el.closest('[data-testid="tweetText"]')) continue;
+      const label = (el.textContent || "").trim();
+      if (label && label.length <= 14 && AD_LABELS.has(label)) return true;
+    }
+    return false;
+  }
+
+  function hideNode(el, on) {
+    if (!el) return;
+    if (on) el.setAttribute("data-x2img-hide", "1");
+    else el.removeAttribute("data-x2img-hide");
+  }
+
+  function sweepAds() {
+    document.querySelectorAll('[data-testid="placementTracking"], aside[role="complementary"]').forEach((node) => {
+      if (!settings.hideAds) {
+        hideNode(node, false);
+        return;
+      }
+      if (node.matches("aside") && !node.querySelector('a[href*="/i/premium_sign_up"]')) return;
+      hideNode(node, true);
+    });
+  }
+
+  function hideArticle(article) {
+    const cell = article.closest('[data-testid="cellInnerDiv"]') || article;
+    const tweet = parseTweet(article);
+    const adult = scoreAdult(article, tweet);
+    const ad = settings.hideAds && isAdArticle(article);
+    hideNode(cell, Boolean(adult.hide || ad));
+    return { adult, ad };
+  }
+
+  function collectFiberMedia(article, wantId) {
+    const found = { photos: [], videos: [], gifs: [] };
+    function fiberOf(node) {
+      if (!node) return null;
+      try {
+        for (const key in node) {
+          if (key.startsWith("__reactFiber$") || key.startsWith("__reactInternalInstance$")) return node[key];
+        }
+      } catch {
+        /* xray */
+      }
+      return null;
+    }
+    function tweetIdOf(value) {
+      if (!value || typeof value !== "object") return "";
+      return String(value.rest_id || value.restId || value.legacy?.id_str || value.legacy?.idStr || "");
+    }
+    function unwrap(value, depth) {
+      if (!value || typeof value !== "object" || depth > 6) return null;
+      if (value.legacy?.extended_entities?.media || value.legacy?.extendedEntities?.media || value.legacy?.entities?.media) {
+        return value;
+      }
+      return unwrap(value.result, depth + 1) || unwrap(value.tweet, depth + 1) || unwrap(value.tweetResult, depth + 1);
+    }
+    function take(value) {
+      const tweet = unwrap(value, 0);
+      if (!tweet) return;
+      const id = tweetIdOf(tweet);
+      if (wantId && id && id !== String(wantId)) return;
+      const media = tweet.legacy?.extended_entities?.media || tweet.legacy?.extendedEntities?.media || tweet.legacy?.entities?.media || [];
+      for (const item of media) {
+        const type = String(item.type || item.media_type || "");
+        const variants = item.video_info?.variants || item.videoInfo?.variants || [];
+        const mp4s = variants
+          .filter((row) => /mp4/i.test(row.content_type || row.contentType || "") && row.url)
+          .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
+        if (type === "animated_gif" && mp4s[0]?.url) found.gifs.push(mp4s[0].url);
+        else if ((type === "video" || mp4s.length) && mp4s[0]?.url) found.videos.push(mp4s[0].url);
+        else if (item.media_url_https || item.mediaUrlHttps || item.media_url) {
+          found.photos.push(upgradePbsUrl(item.media_url_https || item.mediaUrlHttps || item.media_url));
+        }
+      }
+    }
+    function search(root) {
+      const seen = new Set();
+      const queue = [[root, 0]];
+      let steps = 0;
+      while (queue.length && steps < 80) {
+        const [value, depth] = queue.shift();
+        steps += 1;
+        if (!value || typeof value !== "object" || seen.has(value)) continue;
+        seen.add(value);
+        take(value);
+        if (depth >= 5) continue;
+        const kids = Array.isArray(value) ? value.slice(0, 16) : Object.values(value).slice(0, 24);
+        for (const kid of kids) queue.push([kid, depth + 1]);
+      }
+    }
+    let fiber = fiberOf(article);
+    for (let hop = 0; hop < 50 && fiber; hop += 1) {
+      search(fiber.memoizedProps || fiber.pendingProps);
+      fiber = fiber.return;
+    }
+    return found;
+  }
+
+  function collectDownloadMedia(article) {
+    const tweet = parseTweet(article);
+    const fiber = collectFiberMedia(article, tweet.id);
+    const photos = unique([...(tweet.photos || []), ...fiber.photos].filter((url) => isAllowedImageUrl(url)));
+    const videos = unique(
+      [
+        ...fiber.videos,
+        ...[...article.querySelectorAll("video")].map((video) => video.currentSrc || video.src).filter((src) => /video\.twimg\.com\/(?:ext_tw_video|amplify)/i.test(src)),
+      ].filter((url) => isAllowedImageUrl(url))
+    );
+    const gifs = unique(
+      [
+        ...fiber.gifs,
+        ...[...article.querySelectorAll("video[poster]")].flatMap((video) => {
+          const match = String(video.getAttribute("poster") || "").match(/tweet_video_thumb\/([A-Za-z0-9_-]+)/);
+          return match ? [`https://video.twimg.com/tweet_video/${match[1]}.mp4`] : [];
+        }),
+        ...[...article.querySelectorAll("video")].map((video) => video.currentSrc || video.src).filter((src) => /video\.twimg\.com\/tweet_video\//i.test(src)),
+      ].filter((url) => isAllowedImageUrl(url))
+    );
+    return {
+      tweet,
+      items: [
+        ...photos.map((url) => ({ url, kind: "photo", ext: "jpg" })),
+        ...gifs.map((url) => ({ url, kind: "gif", ext: "mp4" })),
+        ...videos.map((url) => ({ url, kind: "video", ext: "mp4" })),
+      ],
+    };
+  }
+
+  function expandFileName(template, tweet, index, total) {
+    const date = (tweet.createdAt || "").slice(0, 10) || "date";
+    let name = String(template || DEFAULT_SETTINGS.fileName)
+      .replace(/\{handle\}/gi, tweet.handle || "x")
+      .replace(/\{id\}/gi, tweet.id || "card")
+      .replace(/\{name\}/gi, tweet.name || "user")
+      .replace(/\{date\}/gi, date)
+      .replace(/\{n\}/gi, String(index + 1));
+    if (total > 1 && !/\{n\}/i.test(template || "")) name += `_${index + 1}`;
+    return name.replace(/[\\/:*?"<>|]+/g, "_").replace(/\s+/g, " ").trim() || "media";
+  }
+
+  function crc32Of(bytes) {
+    let crc = 0xffffffff;
+    for (let i = 0; i < bytes.length; i += 1) {
+      crc ^= bytes[i];
+      for (let j = 0; j < 8; j += 1) crc = crc & 1 ? (crc >>> 1) ^ 0xedb88320 : crc >>> 1;
+    }
+    return (crc ^ 0xffffffff) >>> 0;
+  }
+
+  function u16(value) {
+    return Uint8Array.of(value & 255, (value >>> 8) & 255);
+  }
+
+  function u32(value) {
+    return Uint8Array.of(value & 255, (value >>> 8) & 255, (value >>> 16) & 255, (value >>> 24) & 255);
+  }
+
+  function zipStore(files) {
+    const chunks = [];
+    const centrals = [];
+    let offset = 0;
+    for (const file of files) {
+      const nameBytes = new TextEncoder().encode(file.name);
+      const data = file.data;
+      const crc = crc32Of(data);
+      const local = new Uint8Array([
+        ...Uint8Array.of(0x50, 0x4b, 0x03, 0x04),
+        ...u16(20),
+        ...u16(0),
+        ...u16(0),
+        ...u16(0),
+        ...u16(0),
+        ...u32(crc),
+        ...u32(data.length),
+        ...u32(data.length),
+        ...u16(nameBytes.length),
+        ...u16(0),
+      ]);
+      chunks.push(local, nameBytes, data);
+      const central = new Uint8Array([
+        ...Uint8Array.of(0x50, 0x4b, 0x01, 0x02),
+        ...u16(20),
+        ...u16(20),
+        ...u16(0),
+        ...u16(0),
+        ...u16(0),
+        ...u16(0),
+        ...u32(crc),
+        ...u32(data.length),
+        ...u32(data.length),
+        ...u16(nameBytes.length),
+        ...u16(0),
+        ...u16(0),
+        ...u16(0),
+        ...u16(0),
+        ...u32(0),
+        ...u32(offset),
+      ]);
+      centrals.push(central, nameBytes);
+      offset += local.length + nameBytes.length + data.length;
+    }
+    const centralSize = centrals.reduce((sum, part) => sum + part.length, 0);
+    const end = new Uint8Array([
+      ...Uint8Array.of(0x50, 0x4b, 0x05, 0x06),
+      ...u16(0),
+      ...u16(0),
+      ...u16(files.length),
+      ...u16(files.length),
+      ...u32(centralSize),
+      ...u32(offset),
+      ...u16(0),
+    ]);
+    return new Blob([...chunks, ...centrals, end], { type: "application/zip" });
+  }
+
+  async function fetchMediaBlob(url) {
+    if (!isAllowedImageUrl(url)) throw new Error("媒体地址不可用");
+    if (typeof GM_xmlhttpRequest === "function") {
+      const blob = await new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+          method: "GET",
+          url,
+          responseType: "blob",
+          anonymous: true,
+          timeout: 60000,
+          onload: (res) => {
+            if (res.status < 200 || res.status >= 300 || !res.response) {
+              reject(new Error(String(res.status)));
+              return;
+            }
+            if (res.response.size > MEDIA_FETCH_MAX) {
+              reject(new Error("too-large"));
+              return;
+            }
+            resolve(res.response);
+          },
+          onerror: () => reject(new Error("network")),
+          ontimeout: () => reject(new Error("timeout")),
+        });
+      });
+      return blob;
+    }
+    const res = await fetch(url, { mode: "cors", credentials: "omit" });
+    if (!res.ok) throw new Error(String(res.status));
+    const blob = await res.blob();
+    if (blob.size > MEDIA_FETCH_MAX) throw new Error("too-large");
+    return blob;
+  }
+
+  async function downloadTweetMedia(article) {
+    const { tweet, items } = collectDownloadMedia(article);
+    if (!items.length) throw new Error("没有可下载的图片或视频");
+    const files = [];
+    for (let i = 0; i < items.length; i += 1) {
+      const item = items[i];
+      const blob = await fetchMediaBlob(item.url);
+      const name = `${expandFileName(settings.fileName, tweet, i, items.length)}.${item.ext}`;
+      files.push({ name, data: new Uint8Array(await blob.arrayBuffer()), blob });
+    }
+    if (settings.zipMulti && files.length > 1) {
+      const zip = zipStore(files);
+      downloadBlob(zip, `${expandFileName(settings.fileName, tweet, 0, 1)}.zip`);
+      toast(`已打包 ${files.length} 个文件`);
+      return;
+    }
+    files.forEach((file) => downloadBlob(file.blob, file.name));
+    toast(files.length > 1 ? `已下载 ${files.length} 个文件` : "已开始下载");
+  }
+
+  function mountDownload(article) {
+    if (!settings.mediaDownload) {
+      article.querySelector("[data-x2img-download]")?.remove();
+      return;
+    }
+    if (article.parentElement?.closest('article[data-testid="tweet"]')) return;
+    const id =
+      tweetIdFromHref(article.querySelector('a[href*="/status/"]')?.href || "") ||
+      article.querySelector("time")?.dateTime ||
+      "x";
+    const card = article.querySelector("[data-x2img-action]");
+    const anchor = card || findMountAnchor(article);
+    if (!anchor) return;
+    let wrap = article.querySelector("[data-x2img-download]");
+    if (wrap && wrap.dataset.tweetId === id && wrap.previousElementSibling === (card || findMountAnchor(article))) return;
+    wrap?.remove();
+    wrap = document.createElement("div");
+    wrap.dataset.x2imgDownload = "1";
+    wrap.dataset.tweetId = id;
+    const colorSource = article.querySelector("[data-x2img-action]") || findShareButton(article);
+    if (colorSource) wrap.style.color = getComputedStyle(colorSource).color;
+    wrap.innerHTML = `<button type="button" aria-label="下载媒体" title="下载媒体">${ICONS.download}</button>`;
+    wrap.addEventListener(
+      "click",
+      (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const button = wrap.querySelector("button");
+        if (button.dataset.busy === "1") return;
+        button.dataset.busy = "1";
+        button.innerHTML = ICONS.spin;
+        downloadTweetMedia(article)
+          .catch((err) => toast(err.message || "下载失败", "err"))
+          .finally(() => {
+            button.dataset.busy = "0";
+            button.innerHTML = ICONS.download;
+          });
+      },
+      true
+    );
+    if (card) card.after(wrap);
+    else if (anchor.matches?.('[role="group"]') && !findShareButton(article)) anchor.appendChild(wrap);
+    else anchor.after(wrap);
+  }
+
+  function applyMediaGrid(article) {
+    if (!settings.mediaGrid) {
+      article.removeAttribute("data-x2img-grid");
+      return;
+    }
+    const list = article.querySelector('[data-testid="ScrollSnap-List"]');
+    const items = list ? [...list.children].filter((child) => child.getAttribute("role") === "presentation") : [];
+    if (items.length >= 2) article.setAttribute("data-x2img-grid", String(Math.min(items.length, 4)));
+    else article.removeAttribute("data-x2img-grid");
+  }
+
+  function applyAgeUnmask(article) {
+    if (!settings.unmaskAge) return;
+    const nodes = [...article.querySelectorAll("span, div")];
+    const warn = nodes.find((el) => {
+      if (el.closest('[data-testid="tweetText"]') || el.querySelector('[data-testid="tweetText"]')) return false;
+      const text = (el.textContent || "").trim();
+      return text && text.length <= 180 && AGE_WARN_RE.test(text);
+    });
+    if (!warn) return;
+    let cover = warn;
+    for (let i = 0; i < 10 && cover.parentElement && cover.parentElement !== article; i += 1) {
+      const parent = cover.parentElement;
+      if (parent.querySelector('[data-testid="tweetText"], video, [data-testid="tweetPhoto"] img')) break;
+      cover = parent;
+    }
+    cover.classList.add("x2img-age-cover");
+    if (article.querySelector("[data-x2img-unlocked]")) return;
+    const alreadyShown = [...article.querySelectorAll('[data-testid="tweetPhoto"] img, video')].some((el) => {
+      const src = el.currentSrc || el.src || "";
+      return src && !/abs\.twimg\.com|placeholder/i.test(src);
+    });
+    if (alreadyShown) return;
+    const { items } = collectDownloadMedia(article);
+    if (!items.length) {
+      const view = [...article.querySelectorAll("button, [role='button']")].find((el) =>
+        /查看|View|Show/i.test((el.textContent || "").trim())
+      );
+      view?.click();
+      return;
+    }
+    const box = document.createElement("div");
+    box.dataset.x2imgUnlocked = "1";
+    box.style.cssText = "display:grid;gap:2px;border-radius:12px;overflow:hidden;margin-top:8px;";
+    if (items.length === 2) box.style.gridTemplateColumns = "1fr 1fr";
+    if (items.length === 3) box.style.gridTemplateColumns = "1.15fr 1fr";
+    if (items.length >= 4) box.style.gridTemplateColumns = "1fr 1fr";
+    items.slice(0, 4).forEach((item, index) => {
+      if (item.kind === "photo") {
+        const img = document.createElement("img");
+        img.src = item.url;
+        img.alt = "";
+        img.style.cssText = `width:100%;height:100%;object-fit:cover;${items.length === 3 && index === 0 ? "grid-row:1 / span 2;" : ""}`;
+        box.appendChild(img);
+      } else {
+        const video = document.createElement("video");
+        video.src = item.url;
+        video.controls = item.kind === "video";
+        video.autoplay = item.kind === "gif";
+        video.loop = item.kind === "gif";
+        video.muted = true;
+        video.playsInline = true;
+        video.style.cssText = "width:100%;display:block;";
+        box.appendChild(video);
+      }
+    });
+    cover.after(box);
+  }
+
+  function applyTimelineExtras() {
+    loadSettings();
+    document.documentElement.dataset.x2imgGrid = settings.mediaGrid ? "1" : "0";
+    document.documentElement.dataset.x2imgUnmask = settings.unmaskAge ? "1" : "0";
+    sweepAds();
+    document.querySelectorAll('article[data-testid="tweet"]').forEach((article) => {
+      hideArticle(article);
+      applyMediaGrid(article);
+      applyAgeUnmask(article);
+    });
+  }
+
+  function closeSettingsPanel() {
+    document.getElementById("x2img-panel")?.remove();
+  }
+
+  function openSettingsPanel() {
+    loadSettings();
+    closeSettingsPanel();
+    const panel = document.createElement("div");
+    panel.id = "x2img-panel";
+    if (!pageIsDark()) panel.dataset.light = "1";
+    panel.innerHTML = `
+      <h2>图卡设置</h2>
+      <h3>内容净化</h3>
+      <label class="row">隐藏黄推 / 引流机器人 <input type="checkbox" data-k="hideAdult" ${settings.hideAdult ? "checked" : ""}></label>
+      <label class="row">隐藏广告 / Premium 推销 <input type="checkbox" data-k="hideAds" ${settings.hideAds ? "checked" : ""}></label>
+      <label class="row">已关注的不藏 <input type="checkbox" data-k="skipFollowing" ${settings.skipFollowing ? "checked" : ""}></label>
+      <div class="hint">强度</div>
+      <select data-k="adultLevel">
+        <option value="balanced" ${settings.adultLevel === "balanced" ? "selected" : ""}>均衡</option>
+        <option value="conservative" ${settings.adultLevel === "conservative" ? "selected" : ""}>保守</option>
+      </select>
+      <div class="hint">自定义屏蔽词，一行一个</div>
+      <textarea data-k="customWords">${escapeHtml(settings.customWords.join("\n"))}</textarea>
+      <div class="hint">账号白名单，一行一个，如 business</div>
+      <textarea data-k="whitelist">${escapeHtml(settings.whitelist.join("\n"))}</textarea>
+      <h3>媒体</h3>
+      <label class="row">一键下载图片 / 视频 / GIF <input type="checkbox" data-k="mediaDownload" ${settings.mediaDownload ? "checked" : ""}></label>
+      <label class="row">多个媒体打成 ZIP <input type="checkbox" data-k="zipMulti" ${settings.zipMulti ? "checked" : ""}></label>
+      <div class="hint">文件名，可用 {handle} {id} {name} {date} {n}</div>
+      <input type="text" data-k="fileName" value="${escapeHtml(settings.fileName)}">
+      <label class="row">多媒体网格视图 <input type="checkbox" data-k="mediaGrid" ${settings.mediaGrid ? "checked" : ""}></label>
+      <label class="row">本地去掉年龄遮罩 <input type="checkbox" data-k="unmaskAge" ${settings.unmaskAge ? "checked" : ""}></label>
+      <div class="bar">
+        <button type="button" class="act pri" data-save>保存</button>
+        <button type="button" class="act ghost" data-close>关闭</button>
+      </div>
+    `;
+    panel.querySelector("[data-save]").addEventListener("click", () => {
+      const read = (key) => panel.querySelector(`[data-k="${key}"]`);
+      saveSettings({
+        hideAdult: read("hideAdult").checked,
+        hideAds: read("hideAds").checked,
+        skipFollowing: read("skipFollowing").checked,
+        adultLevel: read("adultLevel").value,
+        customWords: read("customWords").value,
+        whitelist: read("whitelist").value,
+        mediaDownload: read("mediaDownload").checked,
+        zipMulti: read("zipMulti").checked,
+        fileName: read("fileName").value,
+        mediaGrid: read("mediaGrid").checked,
+        unmaskAge: read("unmaskAge").checked,
+      });
+      closeSettingsPanel();
+      toast("设置已保存");
+      injectAll();
+    });
+    panel.querySelector("[data-close]").addEventListener("click", closeSettingsPanel);
+    document.documentElement.appendChild(panel);
   }
 
   function boot() {
+    loadSettings();
     injectPageStyle(PAGE_CSS, "x2img-page-style");
     let timer = 0;
     const schedule = () => {
@@ -1418,6 +2080,7 @@
     }
     injectAll();
     if (typeof GM_registerMenuCommand === "function") {
+      GM_registerMenuCommand("图卡设置", openSettingsPanel);
       GM_registerMenuCommand("将当前贴文转成图卡", () => {
         const article = document.querySelector('article[data-testid="tweet"]');
         if (!article) {
@@ -1438,5 +2101,25 @@
   const onX = /(?:^|\.)(?:x|twitter)\.com$/i.test(location.hostname);
   const preview = document.documentElement.dataset.x2imgPreview === "1";
   if (onX || preview) boot();
-  if (preview) window.X2IMG = { generateCard, parseTweet, sampleTweet, renderCard, injectAll, renderCanvas, hydrateTweet, completeTweet };
+  if (preview) {
+    window.X2IMG = {
+      generateCard,
+      parseTweet,
+      sampleTweet,
+      renderCard,
+      injectAll,
+      renderCanvas,
+      hydrateTweet,
+      completeTweet,
+      loadSettings,
+      saveSettings,
+      scoreAdult,
+      isAdArticle,
+      collectDownloadMedia,
+      expandFileName,
+      zipStore,
+      applyTimelineExtras,
+      openSettingsPanel,
+    };
+  }
 })();
