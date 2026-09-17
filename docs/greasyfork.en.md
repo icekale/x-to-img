@@ -4,7 +4,7 @@ I made this because dropping an x.com link in a group chat usually does nothing 
 
 ![Dark card](https://raw.githubusercontent.com/icekale/x-to-img/main/docs/demo-dark.jpg)
 
-It picks up the usual stuff — who posted, the text, photos, quotes, polls, link cards. Videos are just the thumbnail on the card. I left the gradient frame and QR code off on purpose.
+It picks up the usual stuff — who posted, the text, photos, quotes, polls, link cards. Videos are just the thumbnail on the card. No gradient frame. The corner QR is this post's link.
 
 If the timeline collapsed the text, it tries to expand first and tells you to open the post when it can't. Locked posts work if you can already see them. It just reads the page you're on.
 

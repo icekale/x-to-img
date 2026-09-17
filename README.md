@@ -5,7 +5,7 @@
 <img src="docs/demo-light.jpg" width="280" alt="浅色图卡">
 <img src="docs/demo-dark.jpg" width="280" alt="深色图卡">
 
-图上是帖子本身：谁发的、写了什么、配图、引用、投票、链接卡片。视频在图卡上是封面。没有渐变框，也没有二维码。
+图上是帖子本身：谁发的、写了什么、配图、引用、投票、链接卡片。视频在图卡上是封面。没有渐变框。右下角是这条帖的二维码。
 
 时间线上折叠的正文会先试着展开；展不开会提醒你点进帖再出，不会默默出半截。私密帖只要你自己看得见就能出。脚本只读当前页。
 
@@ -24,7 +24,7 @@
 
 I got tired of pasting x.com links into chats that don't unfurl them. There's a small icon next to Share. Click it and you get a card on the clipboard, light or dark depending on the site. If the clipboard is blocked, it downloads a PNG.
 
-It picks up who posted, the text, photos, quotes, polls, and link cards. Videos are just the thumbnail on the card. No gradient frame, no QR.
+It picks up who posted, the text, photos, quotes, polls, and link cards. Videos are just the thumbnail on the card. No gradient frame. The corner QR is this post's link.
 
 Collapsed timeline text is expanded when possible; otherwise it asks you to open the post. Locked posts work if you can already see them. It just reads the page you're on.
 
