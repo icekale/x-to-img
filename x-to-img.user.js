@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.5.10
+// @version      0.5.11
 // @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩
 // @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers
 // @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩
@@ -191,14 +191,14 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     .stat{display:flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;}
     .stat svg{width:20px;height:20px;display:block;}
     .stat b{font-size:14px;line-height:20px;font-weight:500;white-space:nowrap;word-break:keep-all;}
-    .qr{width:48px;height:48px;flex-shrink:0;margin-left:auto;background:#fff;border-radius:4px;overflow:hidden;}
-    .qr img{width:48px;height:48px;display:block;}
+    .qr{width:60px;height:60px;padding:5px;box-sizing:border-box;flex-shrink:0;margin-left:auto;background:#fff;border:1px solid #e2e8f0;border-radius:10px;}
+    .qr svg,.qr img{width:100%;height:100%;display:block;shape-rendering:crispEdges;}
     .card.is-dark .name,.card.is-dark .quote-name,.card.is-dark .linkcard-title,.card.is-dark .poll-pct{color:#e7e9ea;}
     .card.is-dark .text,.card.is-dark .poll-inner{color:#e7e9ea;}
     .card.is-dark .handle,.card.is-dark .time{color:#8b98a5;}
     .card.is-dark .stats,.card.is-dark .xmark{color:#8b98a5;}
     .card.is-dark .media,.card.is-dark .media img,.card.is-dark .media .poster,.card.is-dark .quote-media,.card.is-dark .linkcard-img{background:#273340;}
-    .card.is-dark .quote,.card.is-dark .linkcard,.card.is-dark .poll-row{border-color:#38444d;}
+    .card.is-dark .quote,.card.is-dark .linkcard,.card.is-dark .poll-row,.card.is-dark .qr{border-color:#38444d;}
     .card.is-dark .quote-text{color:#c8d0d8;}
     .card.is-dark .linkcard-domain,.card.is-dark .poll-foot{color:#8b98a5;}
     .card.is-dark .poll-bar{background:#1e3a4c;}
@@ -305,7 +305,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       const qr = globalThis.qrcode(0, "M");
       qr.addData(text);
       qr.make();
-      return qr.createDataURL(3, 0);
+      return qr.createSvgTag({ cellSize: 2, margin: 0, scalable: true });
     } catch {
       return "";
     }
@@ -313,9 +313,9 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 
   function qrHtml(tweet) {
     const url = tweetPermalink(tweet);
-    const src = makeQr(url);
-    if (!url || !src) return "";
-    return `<div class="qr"><img alt="" src="${escapeHtml(src)}"></div>`;
+    const svg = makeQr(url);
+    if (!url || !svg.startsWith("<svg")) return "";
+    return `<div class="qr">${svg}</div>`;
   }
 
   async function ensureLibs() {
