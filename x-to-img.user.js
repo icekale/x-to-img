@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.5.0
+// @version      0.5.1
 // @description  分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
 // @description:en Click next to Share for a card. Also hide adult spam/ads, download media, and lift age covers
 // @description:zh-CN 分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
@@ -101,16 +101,23 @@
     html[data-x2img-grid="1"] article[data-x2img-grid] [data-testid="ScrollSnap-List"] > [role="presentation"]{width:auto !important;min-width:0 !important;}
     html[data-x2img-unmask="1"] .x2img-age-cover{display:none !important;}
     html[data-x2img-unmask="1"] [data-testid="previewInterstitial"] [style*="blur"]{filter:none !important;}
-    #x2img-panel{position:fixed;right:18px;bottom:18px;z-index:2147483646;width:min(380px,calc(100vw - 24px));max-height:min(84vh,720px);overflow:auto;padding:16px 16px 14px;border-radius:16px;background:#15202b;color:#e7e9ea;box-shadow:0 16px 48px rgba(0,0,0,.38);font:13px/1.45 TwitterChirp,-apple-system,"PingFang SC",sans-serif;}
+    #x2img-panel{position:fixed;right:18px;bottom:18px;z-index:2147483646;width:min(380px,calc(100vw - 24px));max-height:min(84vh,720px);display:flex;flex-direction:column;overflow:hidden;padding:0;border-radius:16px;background:#15202b;color:#e7e9ea;box-shadow:0 16px 48px rgba(0,0,0,.38);font:13px/1.45 TwitterChirp,-apple-system,"PingFang SC",sans-serif;}
     #x2img-panel[data-light="1"]{background:#fff;color:#0f1419;box-shadow:0 16px 48px rgba(15,20,25,.16);}
-    #x2img-panel h2{margin:0 0 12px;font-size:17px;font-weight:700;}
+    #x2img-panel .head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px 10px;flex-shrink:0;}
+    #x2img-panel h2{margin:0;font-size:17px;font-weight:700;}
+    #x2img-panel .x{width:32px;height:32px;border:0;border-radius:999px;background:transparent;color:inherit;cursor:pointer;font:700 20px/1 TwitterChirp,sans-serif;}
+    #x2img-panel .x:hover{background:rgba(239,243,244,.1);}
+    #x2img-panel[data-light="1"] .x:hover{background:rgba(15,20,25,.08);}
+    #x2img-panel .body{flex:1;min-height:0;overflow:auto;padding:0 16px 8px;}
     #x2img-panel h3{margin:16px 0 8px;font-size:13px;font-weight:700;color:#8b98a5;}
+    #x2img-panel .body h3:first-child{margin-top:4px;}
     #x2img-panel label.row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0;}
     #x2img-panel select,#x2img-panel input[type="text"],#x2img-panel textarea{width:100%;margin:4px 0 8px;padding:8px 10px;border:1px solid #38444d;border-radius:10px;background:#0f1419;color:#e7e9ea;font:inherit;}
     #x2img-panel[data-light="1"] select,#x2img-panel[data-light="1"] input[type="text"],#x2img-panel[data-light="1"] textarea{background:#f7f9f9;border-color:#cfd9de;color:#0f1419;}
     #x2img-panel textarea{min-height:72px;resize:vertical;}
     #x2img-panel .hint{color:#8b98a5;font-size:12px;margin:0 0 8px;}
-    #x2img-panel .bar{display:flex;gap:8px;margin-top:12px;}
+    #x2img-panel .bar{display:flex;gap:8px;margin:0;padding:12px 16px 14px;flex-shrink:0;border-top:1px solid #38444d;background:inherit;}
+    #x2img-panel[data-light="1"] .bar{border-top-color:#eff3f4;}
     #x2img-panel button.act{flex:1;border:0;border-radius:999px;padding:9px 12px;font:700 13px/1 TwitterChirp,sans-serif;cursor:pointer;}
     #x2img-panel button.pri{background:#1d9bf0;color:#fff;}
     #x2img-panel button.ghost{background:transparent;color:#1d9bf0;box-shadow:inset 0 0 0 1px #38444d;}
@@ -2018,7 +2025,11 @@
     panel.id = "x2img-panel";
     if (!pageIsDark()) panel.dataset.light = "1";
     panel.innerHTML = `
-      <h2>图卡设置</h2>
+      <div class="head">
+        <h2>设置</h2>
+        <button type="button" class="x" data-close aria-label="关闭" title="关闭">×</button>
+      </div>
+      <div class="body">
       <h3>内容净化</h3>
       <label class="row">隐藏黄推 / 引流机器人 <input type="checkbox" data-k="hideAdult" ${settings.hideAdult ? "checked" : ""}></label>
       <label class="row">隐藏广告 / Premium 推销 <input type="checkbox" data-k="hideAds" ${settings.hideAds ? "checked" : ""}></label>
@@ -2039,6 +2050,7 @@
       <input type="text" data-k="fileName" value="${escapeHtml(settings.fileName)}">
       <label class="row">多媒体网格视图 <input type="checkbox" data-k="mediaGrid" ${settings.mediaGrid ? "checked" : ""}></label>
       <label class="row">本地去掉年龄遮罩 <input type="checkbox" data-k="unmaskAge" ${settings.unmaskAge ? "checked" : ""}></label>
+      </div>
       <div class="bar">
         <button type="button" class="act pri" data-save>保存</button>
         <button type="button" class="act ghost" data-close>关闭</button>
@@ -2063,7 +2075,7 @@
       toast("设置已保存");
       injectAll();
     });
-    panel.querySelector("[data-close]").addEventListener("click", closeSettingsPanel);
+    panel.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", closeSettingsPanel));
     document.documentElement.appendChild(panel);
   }
 
@@ -2080,7 +2092,7 @@
     }
     injectAll();
     if (typeof GM_registerMenuCommand === "function") {
-      GM_registerMenuCommand("图卡设置", openSettingsPanel);
+      GM_registerMenuCommand("设置", openSettingsPanel);
       GM_registerMenuCommand("将当前贴文转成图卡", () => {
         const article = document.querySelector('article[data-testid="tweet"]');
         if (!article) {
