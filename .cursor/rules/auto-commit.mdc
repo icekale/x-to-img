@@ -1,0 +1,14 @@
+---
+description: Commit locally after finishing a change
+alwaysApply: true
+---
+
+# Auto-commit
+
+After a user-requested change is finished and the working tree has real edits, create a git commit. Do not wait to be asked.
+
+- Follow the existing commit protocol: status, diff, log style, HEREDOC message, no `--no-verify`, no config edits, no secrets
+- Message is 1–2 sentences on why
+- Do not push, force-push, or open a PR unless the user asks
+- Skip empty commits
+- This repo rule overrides the global “only commit when asked”
