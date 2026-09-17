@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.5.5
+// @version      0.5.6
 // @description  分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
 // @description:en Click next to Share for a card. Also hide adult spam/ads, download media, and lift age covers
 // @description:zh-CN 分享旁边点一下出图卡。还能藏黄推广告、下图片视频、解开年龄遮罩
@@ -1497,7 +1497,9 @@
     /年龄限制|年齡限制|成人内容|成人內容|敏感内容|敏感內容|敏感媒体|敏感媒體|可能不适合|可能不適合|验证.{0,6}年龄|驗證.{0,6}年齡|age[- ]?restricted|adult content|sensitive (?:media|content)|might not be suitable|verify your age|潛在的敏感/i;
   const PROFILE_GATE_BTN_RE =
     /^(?:是[，,]\s*查看(?:個人|个人)(?:資料|资料)|Yes,?\s*view profile|はい[、,]?\s*プロフィールを(?:表示|見る))$/i;
-  const AGE_VIEW_BTN_RE = /^(?:查看|查看内容|查看圖片|查看图片|View|View media|View image|View photo|Show)$/i;
+  const AGE_VIEW_BTN_RE =
+    /^(?:查看|查看内容|查看內容|查看媒體|查看媒体|查看圖片|查看图片|显示|顯示|View|View media|View image|View photo|View content|Show|Show media)$/i;
+  const AGE_MEDIA_RE = '[data-testid="videoPlayer"], [data-testid="videoComponent"], [data-testid="tweetPhoto"], video';
   let settings = { ...DEFAULT_SETTINGS };
 
   function readStore(key, fallback) {
@@ -1615,9 +1617,14 @@
     return [tweet.name, tweet.handle, tweet.text, ownedText?.innerText, ownedName?.innerText].filter(Boolean).join("\n");
   }
 
+  function isWhitelistedHandle(handle) {
+    const want = String(handle || "").toLowerCase();
+    return Boolean(want && settings.whitelist.includes(want));
+  }
+
   function scoreAdult(article, tweet) {
     const handle = String(tweet.handle || "").toLowerCase();
-    if (handle && settings.whitelist.includes(handle)) return { hide: false, reason: "whitelist" };
+    if (isWhitelistedHandle(handle)) return { hide: false, reason: "whitelist" };
     const text = adultCorpus(article, tweet);
     const compact = compactText(text);
     const customHit = settings.customWords.find((word) => compact.includes(compactText(word)));
@@ -2040,21 +2047,32 @@
     button.click();
   }
 
-  function applyAgeUnmask(article) {
-    if (!settings.unmaskAge) return;
-    const nodes = [...article.querySelectorAll("span, div")];
-    const warn = nodes.find((el) => {
-      if (el.closest('[data-testid="tweetText"]') || el.querySelector('[data-testid="tweetText"]')) return false;
+  function findAgeWarnNode(article) {
+    const candidates = [...article.querySelectorAll("span, div")].filter((el) => {
+      if (el.closest('[data-testid="tweetText"]')) return false;
+      if (el.querySelector(AGE_MEDIA_RE)) return false;
       const text = (el.textContent || "").trim();
       return text && text.length <= 180 && AGE_WARN_RE.test(text);
     });
+    if (!candidates.length) return null;
+    return candidates.reduce((best, el) => {
+      const len = (el.textContent || "").trim().length;
+      return !best || len < (best.textContent || "").trim().length ? el : best;
+    }, null);
+  }
+
+  function applyAgeUnmask(article) {
+    const tweet = parseTweet(article);
+    if (!settings.unmaskAge && !isWhitelistedHandle(tweet.handle)) return;
+    const warn = findAgeWarnNode(article);
     if (!warn) return;
     let cover = warn;
     for (let i = 0; i < 10 && cover.parentElement && cover.parentElement !== article; i += 1) {
       const parent = cover.parentElement;
-      if (parent.querySelector('[data-testid="tweetText"], video, [data-testid="tweetPhoto"] img')) break;
+      if (parent.querySelector(`[data-testid="tweetText"], ${AGE_MEDIA_RE}`)) break;
       cover = parent;
     }
+    if (cover.querySelector(AGE_MEDIA_RE)) cover = warn;
     cover.classList.add("x2img-age-cover");
     if (article.querySelector("[data-x2img-unlocked]") || article.dataset.x2imgUnmaskPending === "1") return;
     const nativeMedia = [...article.querySelectorAll('[data-testid="tweetPhoto"] img, [data-testid="videoPlayer"] video, video')].filter(
@@ -2105,7 +2123,7 @@
   function applyTimelineExtras() {
     loadSettings();
     document.documentElement.dataset.x2imgGrid = settings.mediaGrid ? "1" : "0";
-    document.documentElement.dataset.x2imgUnmask = settings.unmaskAge ? "1" : "0";
+    document.documentElement.dataset.x2imgUnmask = settings.unmaskAge || settings.whitelist.length ? "1" : "0";
     dismissSensitiveProfileGate();
     sweepAds();
     document.querySelectorAll('article[data-testid="tweet"]').forEach((article) => {
@@ -2143,7 +2161,7 @@
       </select>
       <div class="hint">自定义屏蔽词，一行一个</div>
       <textarea data-k="customWords">${escapeHtml(settings.customWords.join("\n"))}</textarea>
-      <div class="hint">账号白名单，一行一个，如 business</div>
+      <div class="hint">账号白名单，一行一个，如 swa2880。不当黄推藏，成人内容提示也会揭开</div>
       <textarea data-k="whitelist">${escapeHtml(settings.whitelist.join("\n"))}</textarea>
       <h3>媒体</h3>
       <label class="row">一键下载图片 / 视频 / GIF <input type="checkbox" data-k="mediaDownload" ${settings.mediaDownload ? "checked" : ""}></label>

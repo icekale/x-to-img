@@ -525,6 +525,39 @@
           </div>
         </div>
       </article>
+      <article data-testid="tweet" id="x2img-adult-video">
+        <div class="row">
+          <div data-testid="Tweet-User-Avatar">
+            <img class="ava" alt="" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop" />
+          </div>
+          <div style="flex:1;min-width:0">
+            <div data-testid="User-Name">
+              <a role="link" href="/SWa2880"><span>Swang</span></a>
+              <span class="handle">@SWa2880</span>
+              ·
+              <a href="/SWa2880/status/2016"><time datetime="2026-09-17T18:00:00">Sep 17</time></a>
+            </div>
+            <div data-x2img-content-warn>
+              <div>Content warning: Adult Content</div>
+              <div>X labeled this post as containing Adult Content.</div>
+              <button type="button" id="x2img-adult-show">Show</button>
+            </div>
+            <div data-testid="placementTracking">
+              <div data-testid="videoPlayer">
+                <video poster="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&auto=format&fit=crop" src="https://video.twimg.com/amplify_video/2016/vid/1280x720/demo.mp4"></video>
+              </div>
+            </div>
+            <div class="bar">
+              <span data-testid="reply" aria-label="15 replies">15</span>
+              <span data-testid="retweet" aria-label="1304 reposts">1.3K</span>
+              <span data-testid="like" aria-label="10490 likes">10K</span>
+              <button type="button" data-testid="share" aria-label="Share post" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
       <article data-testid="tweet" id="x2img-age-click">
         <div class="row">
           <div data-testid="Tweet-User-Avatar">
@@ -566,7 +599,7 @@
         true
       );
     </script>
-    <script src="x-to-img.user.js?v=0.5.5"></script>
+    <script src="x-to-img.user.js?v=0.5.6"></script>
     <script>
       (function () {
         const article = document.getElementById("x2img-fiber-tweet");
