@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.5.8
+// @version      0.5.9
 // @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩
 // @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers
 // @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩
@@ -176,10 +176,10 @@
     .poll-inner{position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 12px;font-size:14px;line-height:20px;color:#0f172a;}
     .poll-pct{font-weight:700;color:#0e1c71;flex-shrink:0;}
     .poll-foot{font-size:13px;line-height:18px;color:#94a3b8;}
-    .stats{margin-top:20px;display:flex;align-items:center;gap:24px;color:#64748b;}
-    .stat{display:flex;align-items:center;gap:6px;}
+    .stats{margin-top:20px;display:flex;align-items:center;flex-wrap:wrap;gap:24px;color:#64748b;}
+    .stat{display:flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap;}
     .stat svg{width:20px;height:20px;display:block;}
-    .stat b{font-size:14px;line-height:20px;font-weight:500;}
+    .stat b{font-size:14px;line-height:20px;font-weight:500;white-space:nowrap;word-break:keep-all;}
     .card.is-dark .name,.card.is-dark .quote-name,.card.is-dark .linkcard-title,.card.is-dark .poll-pct{color:#e7e9ea;}
     .card.is-dark .text,.card.is-dark .poll-inner{color:#e7e9ea;}
     .card.is-dark .handle,.card.is-dark .time{color:#8b98a5;}
