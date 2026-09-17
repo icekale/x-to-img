@@ -14,6 +14,7 @@ The timeline extras, if you want them:
 - **Download photos, videos, and GIFs.** Same toolbar as Share. Several files go into a ZIP. Name them with `{handle} {id} {name} {date} {n}`.
 - **Photo grid** when a post has more than one image.
 - **Lift age covers** on the post and the sensitive-profile prompt. This page only; it doesn't change your X account settings. The video stays put.
+- **Reading spotlight.** Long posts and threads open in a narrow column with a band on the current lines. Everything else just loses contrast — no cover, no blur. Drag it, click a sentence, or press F to follow the pointer. Alt+S toggles it.
 
 Open **Settings** from the userscript menu.
 

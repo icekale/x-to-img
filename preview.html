@@ -52,7 +52,7 @@
   <body>
     <div class="rail">
       <div class="head">Home</div>
-      <p class="hint">分享旁边出图卡。还能藏黄推广告、下媒体、解开年龄遮罩。<button type="button" id="x2img-open-settings">设置</button></p>
+      <p class="hint">分享旁边出图卡。还能藏黄推广告、下媒体、解开年龄遮罩、长帖阅读光带。<button type="button" id="x2img-open-settings">设置</button></p>
       <section id="x2img-profile-gate">
         <h2>警告：此個人資料可能包含潛在的敏感內容</h2>
         <p>你看到這則警告，因為其帖子涉嫌使用不良圖片或語言。是否仍要查看？</p>
@@ -136,6 +136,60 @@
               <span data-testid="reply" aria-label="4 replies">4</span>
               <span data-testid="retweet" aria-label="10 reposts">10</span>
               <span data-testid="like" aria-label="255000 likes">25.5万</span>
+              <button type="button" data-testid="share" aria-label="Share post" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article data-testid="tweet" id="x2img-read-tweet">
+        <div class="row">
+          <div data-testid="Tweet-User-Avatar">
+            <img class="ava" alt="" src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=200&auto=format&fit=crop" />
+          </div>
+          <div style="flex:1;min-width:0">
+            <div data-testid="User-Name">
+              <a role="link" href="/reread"><span>读长帖</span></a>
+              <span class="handle">@reread</span>
+              ·
+              <a href="/reread/status/20260018"><time datetime="2026-09-18T00:10:00">Sep 18</time></a>
+            </div>
+            <div data-testid="tweetText">读长文章时，读到第三行就不知道自己在读哪一行了。不是走神，注意力还在文章上，是“刚才读到哪”这件事本身丢了，得回去重新扫一遍找那句。一篇长文读下来，大概三分之一的时间花在找行上。
+
+把其它行整块遮住是错的。你会失去自己在这一页什么位置的空间感。光带以外的文字不该消失，只让对比度沿梯度连续衰减。轮廓还在，但不抢注意力。
+
+虚化比变暗更糟。人看到模糊的东西会下意识地努力辨认，这个本能关不掉。改成单纯降对比之后，那些字读起来像“现在不轮到你”，而不是“这里坏了”。
+
+真正起作用的大头往往不是光带，是排版。中文一行二十三个字左右，英文六十五个字符左右，行距拉到两倍上下。丢行主要发生在回扫那一瞬间：眼睛读完一行跳回下一行行首，行越长，落点误差越大。</div>
+            <div class="bar">
+              <span data-testid="reply" aria-label="6 replies">6</span>
+              <span data-testid="retweet" aria-label="18 reposts">18</span>
+              <span data-testid="like" aria-label="240 likes">240</span>
+              <button type="button" data-testid="share" aria-label="Share post" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article data-testid="tweet" id="x2img-read-tweet-2">
+        <div class="row">
+          <div data-testid="Tweet-User-Avatar">
+            <img class="ava" alt="" src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=200&auto=format&fit=crop" />
+          </div>
+          <div style="flex:1;min-width:0">
+            <div data-testid="User-Name">
+              <a role="link" href="/reread"><span>读长帖</span></a>
+              <span class="handle">@reread</span>
+              ·
+              <a href="/reread/status/20260019"><time datetime="2026-09-18T00:12:00">Sep 18</time></a>
+            </div>
+            <div data-testid="tweetText">所以同一条线程里的后续贴，也应该能接到同一条光带下面接着读。点一句跳一句，按 F 让它跟着鼠标走。</div>
+            <div class="bar">
+              <span data-testid="reply" aria-label="1 reply">1</span>
+              <span data-testid="retweet" aria-label="2 reposts">2</span>
+              <span data-testid="like" aria-label="33 likes">33</span>
               <button type="button" data-testid="share" aria-label="Share post" title="Share">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.59 17.7 8.3l-1.41 1.42L13 6.41V16h-2V6.41l-3.29 3.3-1.42-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
               </button>
@@ -629,7 +683,7 @@
         true
       );
     </script>
-    <script src="x-to-img.user.js?v=0.5.11"></script>
+    <script src="x-to-img.user.js?v=0.6.0"></script>
     <script>
       (function () {
         const article = document.getElementById("x2img-fiber-tweet");

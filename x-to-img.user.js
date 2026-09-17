@@ -3,10 +3,10 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.5.11
-// @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩
-// @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers
-// @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩
+// @version      0.6.0
+// @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、长帖阅读光带
+// @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers, read long posts with a spotlight band
+// @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、长帖阅读光带
 // @author       Kale
 // @homepageURL  https://github.com/icekale/x-to-img
 // @supportURL   https://github.com/icekale/x-to-img/issues
@@ -80,11 +80,12 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     verified: `<svg viewBox="0 0 22 22" aria-hidden="true"><path d="M11 1.6l2.1 1.5 2.5-.4 1.2 2.3 2.3 1.2-.4 2.5L20.2 11l-1.5 2.1.4 2.5-2.3 1.2-1.2 2.3-2.5-.4L11 20.4l-2.1-1.5-2.5.4-1.2-2.3-2.3-1.2.4-2.5L1.8 11l1.5-2.1L2.9 6.4l2.3-1.2 1.2-2.3 2.5.4L11 1.6z" fill="#60a5fa"/><path d="M9.4 11.6l-1.5-1.5-1.1 1.1 2.6 2.6 5.1-5.1-1.1-1.1-4 4z" fill="#fff"/></svg>`,
     xlogo: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 10.3L22 2h-2.2l-6 6.9L8.8 2H2l7.7 10.9L2 22h2.2l6.6-7.6L15.2 22H22l-7.3-11.7zm-2.3 2.7l-.8-1.1L4.8 3.5h2.6l5.1 7.3.8 1.1 6.7 9.6h-2.6l-5.4-7.5z" fill="currentColor"/></svg>`,
     download: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.41 6.3 15.7l1.41-1.42L11 17.59V8h2v9.59l3.29-3.3 1.42 1.42L12 21.41zM3 9l.02-3.51C3.02 4.11 4.14 3 5.52 3H18.5C19.88 3 21 4.12 21 5.5V9h-2V5.5c0-.28-.22-.5-.5-.5H5.52c-.28 0-.5.22-.5.5L5 9H3z"/></svg>`,
+    band: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" opacity=".38" d="M5 3.75h14c.69 0 1.25.56 1.25 1.25v2.25H3.75V5c0-.69.56-1.25 1.25-1.25zm-1.25 12.5H20.25V19c0 .69-.56 1.25-1.25 1.25H5c-.69 0-1.25-.56-1.25-1.25v-2.75z"/><path fill="currentColor" d="M3.75 8.75h16.5v6.5H3.75z"/></svg>`,
   };
 
   const PAGE_CSS = `
     [data-x2img-tools]{display:inline-flex;align-items:center;align-self:center;vertical-align:middle;flex:0 0 auto;line-height:0;}
-    [data-x2img-action],[data-x2img-download]{display:flex;align-items:center;justify-content:center;width:34.75px;height:34.75px;margin:0;line-height:0;flex:0 0 auto;}
+    [data-x2img-action],[data-x2img-download],[data-x2img-read]{display:flex;align-items:center;justify-content:center;width:34.75px;height:34.75px;margin:0;line-height:0;flex:0 0 auto;}
     [data-x2img-tools] button{width:34.75px;height:34.75px;border:0;padding:0;background:transparent;border-radius:999px;color:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;}
     [data-x2img-tools] button svg{width:18.75px;height:18.75px;display:block;}
     [data-x2img-tools] button:hover{background:rgba(29,155,240,.1);color:rgb(29,155,240);}
@@ -125,6 +126,55 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     #x2img-panel button.act{flex:1;border:0;border-radius:999px;padding:9px 12px;font:700 13px/1 TwitterChirp,sans-serif;cursor:pointer;}
     #x2img-panel button.pri{background:#1d9bf0;color:#fff;}
     #x2img-panel button.ghost{background:transparent;color:#1d9bf0;box-shadow:inset 0 0 0 1px #38444d;}
+    @property --x2img-bt{syntax:"<length>";inherits:true;initial-value:0px;}
+    @property --x2img-bb{syntax:"<length>";inherits:true;initial-value:120px;}
+    @property --x2img-bf{syntax:"<length>";inherits:true;initial-value:20px;}
+    #x2img-reader{position:fixed;inset:0;z-index:2147483645;display:flex;justify-content:center;background:rgba(0,0,0,.58);color:#e7e9ea;font:16px/2 TwitterChirp,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;}
+    #x2img-reader[data-light="1"]{background:rgba(15,20,25,.32);color:#0f1419;}
+    #x2img-reader .sheet{position:relative;width:min(560px,100%);height:100%;display:flex;flex-direction:column;background:#0f1419;box-shadow:0 0 0 1px #2f3336;}
+    #x2img-reader[data-light="1"] .sheet{background:#fff;box-shadow:0 0 0 1px #eff3f4;}
+    #x2img-reader .top,#x2img-reader .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;padding:10px 16px;background:inherit;}
+    #x2img-reader .top{border-bottom:1px solid #2f3336;}
+    #x2img-reader[data-light="1"] .top{border-bottom-color:#eff3f4;}
+    #x2img-reader .who{min-width:0;font:700 15px/1.3 TwitterChirp,"PingFang SC",sans-serif;}
+    #x2img-reader .who span{display:block;margin-top:2px;font:400 12px/1.2 TwitterChirp,sans-serif;color:#8b98a5;}
+    #x2img-reader .x,#x2img-reader .foot button{border:0;background:transparent;color:inherit;cursor:pointer;border-radius:999px;}
+    #x2img-reader .x{width:32px;height:32px;font:700 20px/1 TwitterChirp,sans-serif;}
+    #x2img-reader .x:hover,#x2img-reader .foot button:hover{background:rgba(239,243,244,.1);}
+    #x2img-reader[data-light="1"] .x:hover,#x2img-reader[data-light="1"] .foot button:hover{background:rgba(15,20,25,.08);}
+    #x2img-reader .stage{position:relative;flex:1;min-height:0;}
+    #x2img-reader .scroll{position:absolute;inset:0;overflow:auto;padding:38vh 28px 52vh;scrollbar-width:thin;}
+    #x2img-reader .prose{width:min(26em,100%);margin:0 auto;}
+    #x2img-reader .block{margin:0 0 2.2em;}
+    #x2img-reader .by{margin:0 0 .6em;font:650 13px/1.3 TwitterChirp,"PingFang SC",sans-serif;color:#8b98a5;}
+    #x2img-reader .body{margin:0;font-size:18px;line-height:2;}
+    #x2img-reader .body p{margin:0 0 1.4em;}
+    #x2img-reader .body p:last-child{margin:0;}
+    #x2img-reader .sent{cursor:pointer;border-radius:4px;}
+    #x2img-reader .sent:hover{background:rgba(29,155,240,.08);}
+    #x2img-reader .veil,#x2img-reader .glow,#x2img-reader .grip,#x2img-reader .edge{position:absolute;left:0;right:0;pointer-events:none;}
+    #x2img-reader .veil{inset:0;background:linear-gradient(to bottom,var(--dim) 0,var(--dim) var(--x2img-bt),transparent calc(var(--x2img-bt) + var(--x2img-bf)),transparent calc(var(--x2img-bb) - var(--x2img-bf)),var(--dim) var(--x2img-bb),var(--dim) 100%);--dim:rgba(0,0,0,.32);}
+    #x2img-reader[data-light="1"] .veil{--dim:rgba(15,20,25,.16);}
+    #x2img-reader .glow{top:var(--x2img-bt);height:calc(var(--x2img-bb) - var(--x2img-bt));background:rgba(29,155,240,.045);box-shadow:inset 3px 0 0 #1d9bf0;}
+    #x2img-reader[data-light="1"] .glow{background:rgba(29,155,240,.05);}
+    #x2img-reader .veil,#x2img-reader .glow,#x2img-reader .grip,#x2img-reader .edge{transition:--x2img-bt .2s ease,--x2img-bb .2s ease,top .2s ease,height .2s ease;}
+    #x2img-reader.is-drag .veil,#x2img-reader.is-drag .glow,#x2img-reader.is-drag .grip,#x2img-reader.is-drag .edge{transition:none;}
+    #x2img-reader.is-follow .veil,#x2img-reader.is-follow .glow,#x2img-reader.is-follow .grip,#x2img-reader.is-follow .edge{transition:--x2img-bt .08s linear,--x2img-bb .08s linear,top .08s linear,height .08s linear;}
+    #x2img-reader{user-select:none;}
+    #x2img-reader .scroll{user-select:text;}
+    #x2img-reader .grip{top:var(--x2img-bt);height:22px;pointer-events:auto;cursor:grab;touch-action:none;}
+    #x2img-reader .grip:active{cursor:grabbing;}
+    #x2img-reader .grip i{position:absolute;left:50%;top:8px;width:42px;height:4px;margin-left:-21px;border-radius:99px;background:currentColor;opacity:.34;}
+    #x2img-reader .edge{height:10px;pointer-events:auto;cursor:ns-resize;touch-action:none;}
+    #x2img-reader .edge.n{top:var(--x2img-bt);}
+    #x2img-reader .edge.s{top:calc(var(--x2img-bb) - 10px);}
+    #x2img-reader .foot{border-top:1px solid #2f3336;font:12px/1.35 TwitterChirp,"PingFang SC",sans-serif;color:#8b98a5;}
+    #x2img-reader[data-light="1"] .foot{border-top-color:#eff3f4;}
+    #x2img-reader .foot span{min-width:0;}
+    #x2img-reader .foot button{padding:6px 10px;color:#1d9bf0;font:700 12px/1 TwitterChirp,sans-serif;box-shadow:inset 0 0 0 1px #38444d;}
+    #x2img-reader[data-light="1"] .foot button{box-shadow:inset 0 0 0 1px #cfd9de;}
+    #x2img-reader .foot button[aria-pressed="true"]{background:#1d9bf0;color:#fff;box-shadow:none;}
+    html[data-x2img-reading="1"]{overflow:hidden !important;}
   `;
 
   const CARD_CSS = `
@@ -1398,11 +1448,13 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (tools && tools.previousElementSibling === anchor) return tools;
     const card = tools?.querySelector("[data-x2img-action]");
     const download = tools?.querySelector("[data-x2img-download]");
+    const read = tools?.querySelector("[data-x2img-read]");
     tools?.remove();
     tools = document.createElement("div");
     tools.dataset.x2imgTools = "1";
     if (card) tools.appendChild(card);
     if (download) tools.appendChild(download);
+    if (read) tools.appendChild(read);
     const shareCell = wrappingCell(findShareButton(article));
     if (shareCell) {
       const height = getComputedStyle(shareCell).height;
@@ -1516,6 +1568,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     document.querySelectorAll('article[data-testid="tweet"]').forEach((article) => {
       mountButton(article);
       mountDownload(article);
+      mountRead(article);
     });
   }
 
@@ -1533,6 +1586,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     fileName: "{handle}_{id}",
     mediaGrid: true,
     unmaskAge: true,
+    readingBand: true,
   };
   const ADULT_STRONG = [
     "onlyfans", "fansly", "fanvue", "justforfans", "porn", "nudes", "nudeleak",
@@ -2102,7 +2156,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (!settings.mediaDownload) {
       article.querySelector("[data-x2img-download]")?.remove();
       const tools = article.querySelector("[data-x2img-tools]");
-      if (tools && !tools.querySelector("[data-x2img-action]")) tools.remove();
+      if (tools && !tools.querySelector("[data-x2img-action], [data-x2img-read]")) tools.remove();
       return;
     }
     if (article.parentElement?.closest('article[data-testid="tweet"]')) return;
@@ -2136,6 +2190,55 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
           .finally(() => {
             button.dataset.busy = "0";
             button.innerHTML = ICONS.download;
+          });
+      },
+      true
+    );
+    tools.appendChild(wrap);
+  }
+
+  function mountRead(article) {
+    if (!settings.readingBand) {
+      article.querySelector("[data-x2img-read]")?.remove();
+      const tools = article.querySelector("[data-x2img-tools]");
+      if (tools && !tools.querySelector("[data-x2img-action], [data-x2img-download]")) tools.remove();
+      return;
+    }
+    if (article.parentElement?.closest('article[data-testid="tweet"]')) return;
+    const id =
+      tweetIdFromHref(article.querySelector('a[href*="/status/"]')?.href || "") ||
+      article.querySelector("time")?.dateTime ||
+      "x";
+    const anchor = findMountAnchor(article);
+    if (!anchor) return;
+    const tools = ensureToolsWrap(article, anchor);
+    let wrap = tools.querySelector("[data-x2img-read]");
+    if (wrap && wrap.dataset.tweetId === id) return;
+    wrap?.remove();
+    wrap = document.createElement("div");
+    wrap.dataset.x2imgRead = "1";
+    wrap.dataset.tweetId = id;
+    const colorSource = tools.querySelector("[data-x2img-action], [data-x2img-download]") || findShareButton(article);
+    if (colorSource) wrap.style.color = getComputedStyle(colorSource).color;
+    wrap.innerHTML = `<button type="button" aria-label="阅读光带" title="阅读光带">${ICONS.band}</button>`;
+    wrap.addEventListener(
+      "click",
+      (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const button = wrap.querySelector("button");
+        if (button.dataset.busy === "1") return;
+        if (reader.root && reader.sourceId === id) {
+          closeReader();
+          return;
+        }
+        button.dataset.busy = "1";
+        button.innerHTML = ICONS.spin;
+        openReader(article)
+          .catch((err) => toast(err.message || "打不开阅读光带", "err"))
+          .finally(() => {
+            button.dataset.busy = "0";
+            button.innerHTML = ICONS.band;
           });
       },
       true
@@ -2296,6 +2399,388 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     });
   }
 
+  const READ_POS_KEY = "x2img-read-pos-v1";
+  const reader = {
+    root: null,
+    follow: false,
+    drag: null,
+    bandTop: 0,
+    bandH: 120,
+    fp: "",
+    sourceId: "",
+    saveTimer: 0,
+    prevOverflow: "",
+  };
+
+  function splitSentences(text) {
+    const src = String(text || "").replace(/\r\n/g, "\n").trim();
+    if (!src) return [];
+    const out = [];
+    for (const part of src.split(/\n{2,}/)) {
+      const chunk = part.trim();
+      if (!chunk) continue;
+      const segs = chunk.split(
+        /(?<=[。！？!?…])\s+|(?<=[。！？!?…])(?=\S)|(?<=[.!?]["”’)]*)\s+(?=[A-Z“"‘\u4e00-\u9fff])/
+      );
+      for (const seg of segs) {
+        const piece = seg.replace(/[ \t]+\n/g, "\n").trim();
+        if (piece) out.push(piece);
+      }
+    }
+    return out.length ? out : [src];
+  }
+
+  function readingArticles() {
+    return [...document.querySelectorAll('article[data-testid="tweet"]')].filter(
+      (el) => !el.parentElement?.closest('article[data-testid="tweet"]') && el.offsetParent
+    );
+  }
+
+  async function collectReadingItems(article) {
+    const articles = readingArticles();
+    const startTweet = hydrateTweet(article);
+    const handle = String(startTweet.handle || "").toLowerCase();
+    const statusId = tweetIdFromHref(location.href);
+    let run = [article];
+    if (handle && (statusId || preview)) {
+      const from = articles.indexOf(article);
+      const start = from < 0 ? 0 : from;
+      run = [];
+      for (let i = start; i < articles.length; i += 1) {
+        const tweet = hydrateTweet(articles[i]);
+        if (String(tweet.handle || "").toLowerCase() !== handle) {
+          if (run.length) break;
+          continue;
+        }
+        run.push(articles[i]);
+        if (run.length >= 20) break;
+      }
+      if (!run.length) run = [article];
+    }
+    const items = [];
+    for (const el of run) {
+      const tweet = await completeTweet(el);
+      if (String(tweet.text || "").trim()) items.push({ tweet });
+    }
+    return items;
+  }
+
+  function readPosMap() {
+    try {
+      return JSON.parse(readStore(READ_POS_KEY, "") || "{}") || {};
+    } catch {
+      return {};
+    }
+  }
+
+  function rememberReadPos(fp, index) {
+    const map = readPosMap();
+    map[fp] = index;
+    const keys = Object.keys(map);
+    if (keys.length > 30) delete map[keys[0]];
+    writeStore(READ_POS_KEY, JSON.stringify(map));
+  }
+
+  function readingFingerprint(items) {
+    return items.map((item) => item.tweet.id || String(item.tweet.text || "").slice(0, 32)).join(">");
+  }
+
+  function sentHtml(text) {
+    return escapeHtml(text).replace(/\n/g, "<br>");
+  }
+
+  function paintBand() {
+    const root = reader.root;
+    if (!root) return;
+    const stage = root.querySelector(".stage");
+    const h = stage?.clientHeight || 1;
+    reader.bandH = Math.max(56, Math.min(reader.bandH, Math.round(h * 0.55)));
+    reader.bandTop = Math.max(0, Math.min(reader.bandTop, h - reader.bandH));
+    const fade = Math.max(8, Math.min(24, Math.round(reader.bandH / 5)));
+    for (const el of [root, stage || root]) {
+      el.style.setProperty("--x2img-bt", `${reader.bandTop}px`);
+      el.style.setProperty("--x2img-bb", `${reader.bandTop + reader.bandH}px`);
+      el.style.setProperty("--x2img-bf", `${fade}px`);
+    }
+    root.classList.toggle("is-follow", reader.follow);
+    const followBtn = root.querySelector("[data-follow]");
+    if (followBtn) followBtn.setAttribute("aria-pressed", reader.follow ? "true" : "false");
+  }
+
+  function sentenceEls() {
+    return reader.root ? [...reader.root.querySelectorAll(".sent")] : [];
+  }
+
+  function sentenceInBand() {
+    const stage = reader.root?.querySelector(".stage");
+    if (!stage) return null;
+    const stageRect = stage.getBoundingClientRect();
+    const y0 = stageRect.top + reader.bandTop;
+    const y1 = y0 + reader.bandH;
+    let best = null;
+    let bestArea = 0;
+    for (const el of sentenceEls()) {
+      const rect = el.getBoundingClientRect();
+      const overlap = Math.min(rect.bottom, y1) - Math.max(rect.top, y0);
+      if (overlap > bestArea) {
+        bestArea = overlap;
+        best = el;
+      }
+    }
+    return best;
+  }
+
+  function persistBandSentence() {
+    const el = sentenceInBand();
+    if (!el || !reader.fp) return;
+    rememberReadPos(reader.fp, Number(el.dataset.i) || 0);
+  }
+
+  function schedulePersist() {
+    clearTimeout(reader.saveTimer);
+    reader.saveTimer = setTimeout(persistBandSentence, 240);
+  }
+
+  function sentenceIntoBand(el, instant) {
+    const root = reader.root;
+    const scroll = root?.querySelector(".scroll");
+    const stage = root?.querySelector(".stage");
+    if (!el || !scroll || !stage) return;
+    const extra = el.getBoundingClientRect().height + 16 - reader.bandH;
+    if (extra > 0) {
+      reader.bandH = Math.min(reader.bandH + extra, Math.round(stage.clientHeight * 0.55));
+      paintBand();
+    }
+    const delta = el.getBoundingClientRect().top - stage.getBoundingClientRect().top - (reader.bandTop + 8);
+    scroll.scrollBy({ top: delta, behavior: instant ? "auto" : "smooth" });
+    schedulePersist();
+  }
+
+  function closestSentence(target) {
+    return target?.closest?.(".sent") || null;
+  }
+
+  function sentenceFromPoint(x, y) {
+    const stack = document.elementsFromPoint(x, y);
+    for (const node of stack) {
+      const sent = closestSentence(node);
+      if (sent && reader.root?.contains(sent)) return sent;
+    }
+    return null;
+  }
+
+  function setFollow(on) {
+    reader.follow = Boolean(on);
+    paintBand();
+  }
+
+  function onReaderPointerMove(e) {
+    if (reader.drag) {
+      const stage = reader.root.querySelector(".stage");
+      const h = stage.clientHeight;
+      const dy = e.clientY - reader.drag.y;
+      if (reader.drag.kind === "move") {
+        reader.bandTop = reader.drag.top + dy;
+      } else if (reader.drag.kind === "n") {
+        const nextTop = reader.drag.top + dy;
+        const nextH = reader.drag.height - dy;
+        if (nextH >= 56) {
+          reader.bandTop = nextTop;
+          reader.bandH = nextH;
+        }
+      } else if (reader.drag.kind === "s") {
+        reader.bandH = reader.drag.height + dy;
+      }
+      reader.bandTop = Math.max(0, Math.min(reader.bandTop, h - 56));
+      paintBand();
+      return;
+    }
+    if (!reader.follow || !reader.root) return;
+    const sent = sentenceFromPoint(e.clientX, e.clientY);
+    if (sent) sentenceIntoBand(sent, true);
+  }
+
+  function onReaderPointerUp() {
+    if (!reader.drag) return;
+    reader.drag = null;
+    reader.root?.classList.remove("is-drag");
+    persistBandSentence();
+  }
+
+  function onReaderKey(e) {
+    if (!reader.root || e.isComposing) return;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      if (reader.follow) setFollow(false);
+      else closeReader();
+      return;
+    }
+    const typing =
+      /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "") ||
+      document.activeElement?.isContentEditable;
+    if (typing) return;
+    if ((e.key === "f" || e.key === "F") && !e.altKey && !e.metaKey && !e.ctrlKey) {
+      e.preventDefault();
+      setFollow(!reader.follow);
+    }
+  }
+
+  function bindReaderChrome(root) {
+    root.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", closeReader));
+    root.addEventListener("click", (e) => {
+      if (e.target === root) closeReader();
+    });
+    root.querySelector("[data-follow]")?.addEventListener("click", () => setFollow(!reader.follow));
+    root.querySelector(".scroll")?.addEventListener(
+      "click",
+      (e) => {
+        if (reader.drag) return;
+        const sent = closestSentence(e.target);
+        if (!sent) return;
+        e.preventDefault();
+        sentenceIntoBand(sent, false);
+      },
+      true
+    );
+    root.querySelector(".scroll")?.addEventListener("scroll", schedulePersist, { passive: true });
+    const startDrag = (kind) => (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      reader.follow = false;
+      reader.drag = { kind, y: e.clientY, top: reader.bandTop, height: reader.bandH };
+      root.classList.add("is-drag");
+    };
+    root.querySelector(".grip")?.addEventListener("pointerdown", startDrag("move"));
+    root.querySelector(".edge.n")?.addEventListener("pointerdown", startDrag("n"));
+    root.querySelector(".edge.s")?.addEventListener("pointerdown", startDrag("s"));
+  }
+
+  function renderReader(items) {
+    closeReader();
+    const first = items[0].tweet;
+    const many = items.length > 1;
+    const root = document.createElement("div");
+    root.id = "x2img-reader";
+    root.setAttribute("role", "dialog");
+    root.setAttribute("aria-modal", "true");
+    root.setAttribute("aria-label", "阅读光带");
+    if (!pageIsDark()) root.dataset.light = "1";
+    let sentIndex = 0;
+    const blocks = items
+      .map((item) => {
+        const paras = String(item.tweet.text || "")
+          .replace(/\r\n/g, "\n")
+          .trim()
+          .split(/\n{2,}/)
+          .filter(Boolean)
+          .map((para) => {
+            const sents = splitSentences(para)
+              .map((sent) => `<span class="sent" data-i="${sentIndex++}">${sentHtml(sent)}</span>`)
+              .join("\n");
+            return `<p>${sents}</p>`;
+          })
+          .join("");
+        const by = many
+          ? `<div class="by">${escapeHtml(item.tweet.name || item.tweet.handle || "")} <span>@${escapeHtml(
+              item.tweet.handle || ""
+            )}</span></div>`
+          : "";
+        return `<section class="block">${by}<div class="body">${paras}</div></section>`;
+      })
+      .join("");
+    const handle = first.handle ? `@${first.handle}` : "";
+    root.innerHTML = `
+      <div class="sheet">
+        <div class="top">
+          <div class="who">${escapeHtml(many ? `${first.name || handle}的线程` : first.name || handle)}<span>${escapeHtml(
+            many ? `${items.length} 条` : handle
+          )}</span></div>
+          <button type="button" class="x" data-close aria-label="关闭" title="关闭">×</button>
+        </div>
+        <div class="stage">
+          <div class="scroll"><div class="prose">${blocks}</div></div>
+          <div class="veil" aria-hidden="true"></div>
+          <div class="glow" aria-hidden="true"></div>
+          <div class="grip" aria-hidden="true"><i></i></div>
+          <div class="edge n" aria-hidden="true"></div>
+          <div class="edge s" aria-hidden="true"></div>
+        </div>
+        <div class="foot">
+          <span>拖动光带 · 点一句 · F 跟随 · Esc 退出</span>
+          <button type="button" data-follow aria-pressed="false">跟随</button>
+        </div>
+      </div>
+    `;
+    reader.root = root;
+    reader.follow = false;
+    reader.drag = null;
+    reader.fp = readingFingerprint(items);
+    reader.sourceId = String(first.id || "");
+    reader.prevOverflow = document.documentElement.style.overflow;
+    document.documentElement.dataset.x2imgReading = "1";
+    document.documentElement.style.overflow = "hidden";
+    document.documentElement.appendChild(root);
+    bindReaderChrome(root);
+    const stage = root.querySelector(".stage");
+    reader.bandH = Math.max(96, Math.round((stage.clientHeight || 600) * 0.16));
+    reader.bandTop = Math.round((stage.clientHeight || 600) * 0.36);
+    paintBand();
+    const saved = Number(readPosMap()[reader.fp]);
+    const sents = sentenceEls();
+    const want = Number.isFinite(saved) ? sents[saved] || sents[0] : sents[0];
+    requestAnimationFrame(() => {
+      paintBand();
+      if (want) sentenceIntoBand(want, true);
+    });
+    window.addEventListener("pointermove", onReaderPointerMove);
+    window.addEventListener("pointerup", onReaderPointerUp);
+    window.addEventListener("pointercancel", onReaderPointerUp);
+    window.addEventListener("keydown", onReaderKey);
+    window.addEventListener("resize", paintBand);
+  }
+
+  function closeReader() {
+    if (!reader.root) return;
+    persistBandSentence();
+    window.removeEventListener("pointermove", onReaderPointerMove);
+    window.removeEventListener("pointerup", onReaderPointerUp);
+    window.removeEventListener("pointercancel", onReaderPointerUp);
+    window.removeEventListener("keydown", onReaderKey);
+    window.removeEventListener("resize", paintBand);
+    reader.root.remove();
+    reader.root = null;
+    reader.follow = false;
+    reader.drag = null;
+    reader.sourceId = "";
+    document.documentElement.style.overflow = reader.prevOverflow;
+    delete document.documentElement.dataset.x2imgReading;
+  }
+
+  async function openReader(article) {
+    const target = article || readingArticles()[0];
+    if (!target) throw new Error("没有读到贴文内容");
+    const id =
+      tweetIdFromHref(target.querySelector('a[href*="/status/"]')?.href || "") ||
+      hydrateTweet(target).id ||
+      "";
+    if (reader.root && reader.sourceId && id && reader.sourceId === id) {
+      closeReader();
+      return;
+    }
+    const items = await collectReadingItems(target);
+    if (!items.length) throw new Error("这篇没有正文");
+    renderReader(items);
+  }
+
+  async function toggleReader() {
+    if (reader.root) {
+      closeReader();
+      return;
+    }
+    await openReader();
+  }
+
   function closeSettingsPanel() {
     document.getElementById("x2img-panel")?.remove();
   }
@@ -2334,6 +2819,9 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <label class="row">多媒体网格视图 <input type="checkbox" data-k="mediaGrid" ${settings.mediaGrid ? "checked" : ""}></label>
       <label class="row">本地去掉年龄遮罩 <input type="checkbox" data-k="unmaskAge" ${settings.unmaskAge ? "checked" : ""}></label>
       <div class="hint">帖内年龄遮罩，以及个人资料敏感提示。只作用于当前页，不改 X 账号设置。</div>
+      <h3>阅读</h3>
+      <label class="row">阅读光带 <input type="checkbox" data-k="readingBand" ${settings.readingBand ? "checked" : ""}></label>
+      <div class="hint">长帖或线程里开一个窄栏阅读层，光带盯着当前几行。周围只降对比，不遮、不虚化。Alt+S 开关，F 跟随鼠标。</div>
       </div>
       <div class="bar">
         <button type="button" class="act pri" data-save>保存</button>
@@ -2354,6 +2842,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         fileName: read("fileName").value,
         mediaGrid: read("mediaGrid").checked,
         unmaskAge: read("unmaskAge").checked,
+        readingBand: read("readingBand").checked,
       });
       closeSettingsPanel();
       toast("设置已保存");
@@ -2375,8 +2864,22 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
     }
     injectAll();
+    document.addEventListener("keydown", (e) => {
+      if (e.isComposing) return;
+      const typing =
+        /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "") ||
+        document.activeElement?.isContentEditable;
+      if (typing || e.metaKey || e.ctrlKey) return;
+      if (e.altKey && (e.key === "s" || e.key === "S")) {
+        e.preventDefault();
+        toggleReader().catch((err) => toast(err.message || "打不开阅读光带", "err"));
+      }
+    });
     if (typeof GM_registerMenuCommand === "function") {
       GM_registerMenuCommand("设置", openSettingsPanel);
+      GM_registerMenuCommand("阅读光带", () => {
+        toggleReader().catch((err) => toast(err.message || "打不开阅读光带", "err"));
+      });
       GM_registerMenuCommand("将当前贴文转成图卡", () => {
         const article = document.querySelector('article[data-testid="tweet"]');
         if (!article) {
@@ -2419,6 +2922,9 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       applyTimelineExtras,
       openSettingsPanel,
       dismissSensitiveProfileGate,
+      openReader,
+      closeReader,
+      toggleReader,
     };
   }
 })();
