@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.6.1
+// @version      0.6.2
 // @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、时间线整页阅读光带
 // @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers, spotlight the timeline
 // @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、时间线整页阅读光带
@@ -81,6 +81,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     xlogo: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 10.3L22 2h-2.2l-6 6.9L8.8 2H2l7.7 10.9L2 22h2.2l6.6-7.6L15.2 22H22l-7.3-11.7zm-2.3 2.7l-.8-1.1L4.8 3.5h2.6l5.1 7.3.8 1.1 6.7 9.6h-2.6l-5.4-7.5z" fill="currentColor"/></svg>`,
     download: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.41 6.3 15.7l1.41-1.42L11 17.59V8h2v9.59l3.29-3.3 1.42 1.42L12 21.41zM3 9l.02-3.51C3.02 4.11 4.14 3 5.52 3H18.5C19.88 3 21 4.12 21 5.5V9h-2V5.5c0-.28-.22-.5-.5-.5H5.52c-.28 0-.5.22-.5.5L5 9H3z"/></svg>`,
     band: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" opacity=".38" d="M5 3.75h14c.69 0 1.25.56 1.25 1.25v2.25H3.75V5c0-.69.56-1.25 1.25-1.25zm-1.25 12.5H20.25V19c0 .69-.56 1.25-1.25 1.25H5c-.69 0-1.25-.56-1.25-1.25v-2.75z"/><path fill="currentColor" d="M3.75 8.75h16.5v6.5H3.75z"/></svg>`,
+    navSpot: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 4.75h18v2.5H3v-2.5zm0 12h18v2.5H3v-2.5zM3.5 9.25h17A1.5 1.5 0 0 1 22 10.75v2.5a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 13.25v-2.5A1.5 1.5 0 0 1 3.5 9.25z"/></svg>`,
   };
 
   const PAGE_CSS = `
@@ -157,6 +158,9 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     #x2img-spot .hud button:hover{background:rgba(239,243,244,.1);}
     #x2img-spot[data-light="1"] .hud button:hover{background:rgba(15,20,25,.08);}
     @media (max-width:700px){#x2img-spot .hud{bottom:76px;}}
+    [data-x2img-nav-spot]{cursor:pointer;}
+    [data-x2img-nav-spot] a,[data-x2img-nav-spot] button{color:inherit;text-decoration:none;}
+    [data-x2img-nav-spot][data-on="1"],[data-x2img-nav-spot][data-on="1"] span{font-weight:700;}
   `;
 
   const CARD_CSS = `
@@ -1547,6 +1551,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 
   function injectAll() {
     applyTimelineExtras();
+    mountNavSpot();
     document.querySelectorAll('article[data-testid="tweet"]').forEach((article) => {
       mountButton(article);
       mountDownload(article);
@@ -2179,6 +2184,126 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     tools.appendChild(wrap);
   }
 
+  function findPrimaryNav() {
+    return (
+      document.querySelector('header[role="banner"] nav') ||
+      document.querySelector('nav[aria-label="Primary"]') ||
+      document.querySelector('[data-testid="sidebarColumn"] nav')
+    );
+  }
+
+  function isMoreNavItem(el) {
+    if (!el || el.closest("[data-x2img-nav-spot]")) return false;
+    const testid = el.getAttribute("data-testid") || "";
+    if (/AppTabBar_More_Menu/i.test(testid)) return true;
+    const aria = String(el.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
+    if (/^(更多|更多菜单|More|More menu|もっと見る)$/i.test(aria)) return true;
+    const text = String(el.textContent || "").replace(/\s+/g, "").trim();
+    return text === "更多" || text === "More" || text === "もっと見る";
+  }
+
+  function findMoreNavItem() {
+    const scope = findPrimaryNav();
+    if (!scope) return null;
+    return [...scope.querySelectorAll("a, button, [role='link'], [role='button']")].find(isMoreNavItem) || null;
+  }
+
+  function navItemRoot(el) {
+    let node = el;
+    while (node.parentElement) {
+      const siblings = [...node.parentElement.children].filter(
+        (child) => child.matches?.("a, button, [role='link'], [role='button']") || child.querySelector?.("a, button, [role='link'], [role='button']")
+      );
+      if (siblings.length >= 3) return node;
+      node = node.parentElement;
+    }
+    return el;
+  }
+
+  function navControl(root) {
+    return root.matches?.("a, button, [role='link'], [role='button']")
+      ? root
+      : root.querySelector("a, button, [role='link'], [role='button']");
+  }
+
+  function replaceNavIcon(root) {
+    const svg = root.querySelector("svg");
+    if (!svg) return;
+    const box = document.createElement("span");
+    box.innerHTML = ICONS.navSpot;
+    const next = box.firstElementChild;
+    if (!next) return;
+    next.setAttribute("aria-hidden", "true");
+    if (svg.getAttribute("class")) next.setAttribute("class", svg.getAttribute("class"));
+    if (svg.getAttribute("width")) next.setAttribute("width", svg.getAttribute("width"));
+    if (svg.getAttribute("height")) next.setAttribute("height", svg.getAttribute("height"));
+    if (svg.style.cssText) next.style.cssText = svg.style.cssText;
+    svg.replaceWith(next);
+  }
+
+  function replaceNavLabel(root) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    let node;
+    while ((node = walker.nextNode())) {
+      if (/更多菜单|More menu|更多|More|もっと見る/.test(node.nodeValue)) nodes.push(node);
+    }
+    for (const item of nodes) {
+      item.nodeValue = item.nodeValue.replace(/更多菜单|More menu|更多|More|もっと見る/g, "聚光");
+    }
+  }
+
+  function syncNavSpot() {
+    document.querySelectorAll("[data-x2img-nav-spot]").forEach((root) => {
+      const on = Boolean(spot.root);
+      root.dataset.on = on ? "1" : "0";
+      const control = navControl(root);
+      if (!control) return;
+      control.setAttribute("aria-pressed", on ? "true" : "false");
+      control.setAttribute("aria-label", "聚光");
+      control.setAttribute("title", "聚光");
+    });
+  }
+
+  function mountNavSpot() {
+    const existing = document.querySelector("[data-x2img-nav-spot]");
+    if (!settings.readingBand) {
+      existing?.remove();
+      return;
+    }
+    const more = findMoreNavItem();
+    if (!more) return;
+    const moreRoot = navItemRoot(more);
+    if (existing) {
+      if (existing.nextElementSibling !== moreRoot) moreRoot.parentElement?.insertBefore(existing, moreRoot);
+      syncNavSpot();
+      return;
+    }
+    const root = moreRoot.cloneNode(true);
+    root.dataset.x2imgNavSpot = "1";
+    replaceNavIcon(root);
+    replaceNavLabel(root);
+    const control = navControl(root);
+    if (control) {
+      control.removeAttribute("href");
+      control.removeAttribute("data-testid");
+      control.removeAttribute("aria-haspopup");
+      control.removeAttribute("aria-expanded");
+      if (control.tagName === "A") control.setAttribute("role", "button");
+      control.addEventListener(
+        "click",
+        (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleSpot();
+        },
+        true
+      );
+    }
+    moreRoot.parentElement?.insertBefore(root, moreRoot);
+    syncNavSpot();
+  }
+
   function mountRead(article) {
     if (!settings.readingBand) {
       article.querySelector("[data-x2img-read]")?.remove();
@@ -2383,7 +2508,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   };
 
   function isSpotChrome(node) {
-    return Boolean(node?.closest?.("#x2img-spot, #x2img-panel, #x2img-toast, [data-x2img-tools]"));
+    return Boolean(node?.closest?.("#x2img-spot, #x2img-panel, #x2img-toast, [data-x2img-tools], [data-x2img-nav-spot]"));
   }
 
   function caretFromPoint(x, y) {
@@ -2705,6 +2830,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     window.addEventListener("keydown", onSpotKey);
     window.addEventListener("resize", paintSpot);
     document.addEventListener("click", onSpotClick, true);
+    syncNavSpot();
   }
 
   function closeSpot() {
@@ -2720,6 +2846,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     spot.follow = false;
     spot.drag = null;
     spot.sourceEl = null;
+    syncNavSpot();
   }
 
   function firstVisibleTweet() {
@@ -2781,7 +2908,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <div class="hint">帖内年龄遮罩，以及个人资料敏感提示。只作用于当前页，不改 X 账号设置。</div>
       <h3>阅读</h3>
       <label class="row">阅读光带 <input type="checkbox" data-k="readingBand" ${settings.readingBand ? "checked" : ""}></label>
-      <div class="hint">盖在时间线整页上，光带盯着当前几行。周围只降对比，不遮、不虚化。Alt+S 开关，F 跟随鼠标，点一句跳一句。</div>
+      <div class="hint">左侧栏「更多」上面进入。盖在时间线整页上，周围只降对比。Alt+S 开关，F 跟随，点一句跳一句。</div>
       </div>
       <div class="bar">
         <button type="button" class="act pri" data-save>保存</button>
