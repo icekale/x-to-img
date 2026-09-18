@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.6.6
+// @version      0.6.7
 // @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光跟帖
 // @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers, whole-page tweet spotlight
 // @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光跟帖
@@ -150,18 +150,9 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     #x2img-spot.is-snap{transition:--x2img-t var(--snap) ease-out,--x2img-b var(--snap) ease-out;}
     #x2img-spot.is-snap .bandbox,#x2img-spot.is-snap .grip{transition:top var(--snap) ease-out,height var(--snap) ease-out,right var(--snap) ease-out;}
     #x2img-spot.is-drag,#x2img-spot.is-drag .bandbox,#x2img-spot.is-drag .grip{transition:none;}
-    #x2img-spot .dock{position:absolute;left:0;right:0;bottom:0;z-index:4;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 14px max(8px,env(safe-area-inset-bottom));pointer-events:auto;background:rgba(var(--pf),.92);color:inherit;border-top:1px solid rgba(255,255,255,.08);font:12px/1.3 TwitterChirp,"PingFang SC",sans-serif;}
-    #x2img-spot[data-light="1"] .dock{border-top-color:rgba(15,20,25,.1);}
-    #x2img-spot .dock .hint{flex:1;min-width:120px;color:inherit;opacity:.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    #x2img-spot .dock button.tbtn{border:0;border-radius:999px;padding:6px 11px;background:transparent;color:inherit;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(139,152,165,.45);font:650 12px/1 TwitterChirp,"PingFang SC",sans-serif;}
-    #x2img-spot .dock button.tbtn[aria-pressed="true"]{background:currentColor;}
-    #x2img-spot .dock button.tbtn[data-follow][aria-pressed="true"]{background:#1d9bf0;color:#fff;box-shadow:none;}
-    #x2img-spot .tune{display:none;position:absolute;left:12px;right:12px;bottom:58px;z-index:4;max-width:420px;margin:0 auto;padding:14px 16px 12px;border-radius:14px;pointer-events:auto;background:rgba(var(--pf),.96);box-shadow:0 10px 28px rgba(0,0,0,.28);font:12px/1.4 TwitterChirp,"PingFang SC",sans-serif;}
-    #x2img-spot .tune.on{display:block;}
-    #x2img-spot .tune .row{display:flex;align-items:center;gap:10px;}
-    #x2img-spot .tune input[type="range"]{flex:1;accent-color:#1d9bf0;}
-    #x2img-spot .tune b{min-width:3.6em;text-align:right;opacity:.7;}
-    #x2img-spot .tune .link{margin-top:10px;border:0;background:transparent;color:#1d9bf0;cursor:pointer;padding:0;font:650 12px/1 TwitterChirp,sans-serif;}
+    #x2img-spot .dock{position:absolute;right:16px;bottom:max(12px,env(safe-area-inset-bottom));z-index:4;display:flex;pointer-events:auto;}
+    #x2img-spot .dock button.tbtn{border:0;border-radius:999px;padding:7px 14px;background:rgba(var(--pf),.92);color:inherit;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(139,152,165,.35);font:650 12px/1 TwitterChirp,"PingFang SC",sans-serif;}
+    #x2img-spot[data-light="1"] .dock button.tbtn{box-shadow:inset 0 0 0 1px rgba(15,20,25,.12);}
     [data-x2img-nav-spot]{cursor:pointer;}
     [data-x2img-nav-spot] a,[data-x2img-nav-spot] button{color:inherit;text-decoration:none;}
     [data-x2img-nav-spot][data-on="1"],[data-x2img-nav-spot][data-on="1"] span{font-weight:700;}
@@ -1576,6 +1567,11 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       mountButton(article);
       mountDownload(article);
     });
+    if (spot.root && (!spot.sourceEl?.isConnected || !listRootTweets().includes(spot.sourceEl))) {
+      const tweet = firstVisibleTweet();
+      if (tweet) applyTweetBand(tweet, { snap: false });
+      else paintSpot();
+    }
   }
 
   const SETTINGS_KEY = "x2img-settings-v1";
@@ -1606,7 +1602,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     { id: "mist", name: "雾蓝", pf: "240,243,246", paper: "#F0F3F6", ink2: "#666E73", band: "rgba(150,186,219,.28)", dim: ".84" },
     { id: "moss", name: "苔绿", pf: "236,243,235", paper: "#ECF3EB", ink2: "#5F6B5E", band: "rgba(140,182,140,.32)", dim: ".84" },
     { id: "ash", name: "雾灰", pf: "242,242,241", paper: "#F2F2F1", ink2: "#6B6B6A", band: "rgba(120,120,118,.14)", dim: ".84" },
-    { id: "night", name: "夜色", pf: "24,23,22", paper: "#181716", ink2: "#948D85", band: "rgba(255,255,255,.075)", dim: ".88" },
+    { id: "night", name: "夜色", pf: "24,23,22", paper: "#181716", ink2: "#948D85", band: "rgba(255,255,255,.14)", dim: ".68" },
   ];
   const SPOT_PAPER_IDS = SPOT_PAPERS.map((item) => item.id);
   const ADULT_STRONG = [
@@ -1682,7 +1678,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       spotPaperLight: SPOT_PAPER_IDS.includes(parsed.spotPaperLight) ? parsed.spotPaperLight : DEFAULT_SETTINGS.spotPaperLight,
       spotPaperDark: SPOT_PAPER_IDS.includes(parsed.spotPaperDark) ? parsed.spotPaperDark : DEFAULT_SETTINGS.spotPaperDark,
       spotHeight: clampSpotHeight(parsed.spotHeight),
-      spotFollow: Boolean(parsed.spotFollow),
+      spotFollow: false,
       spotMix: normalizeList(parsed.spotMix).filter((id) => SPOT_PAPER_IDS.includes(id)).slice(0, 3),
     };
     return settings;
@@ -1701,7 +1697,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     settings.spotPaperLight = SPOT_PAPER_IDS.includes(settings.spotPaperLight) ? settings.spotPaperLight : DEFAULT_SETTINGS.spotPaperLight;
     settings.spotPaperDark = SPOT_PAPER_IDS.includes(settings.spotPaperDark) ? settings.spotPaperDark : DEFAULT_SETTINGS.spotPaperDark;
     settings.spotHeight = clampSpotHeight(settings.spotHeight);
-    settings.spotFollow = Boolean(settings.spotFollow);
+    settings.spotFollow = false;
     settings.spotMix = normalizeList(settings.spotMix).filter((id) => SPOT_PAPER_IDS.includes(id)).slice(0, 3);
     writeStore(SETTINGS_KEY, JSON.stringify(settings));
     applyTimelineExtras();
@@ -2567,9 +2563,20 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   function listRootTweets() {
     return [...document.querySelectorAll('article[data-testid="tweet"]')].filter((article) => {
       if (!isRootTweet(article)) return false;
+      if (article.closest('[data-x2img-hide="1"]') || article.hidden) return false;
       const box = article.getBoundingClientRect();
       return box.width > 8 && box.height > 8;
     });
+  }
+
+  function tweetFocusHead(article) {
+    const name = ownTweetEl(article, '[data-testid="User-Name"]');
+    const text = mainTweetText(article);
+    const box = (name || text)?.getBoundingClientRect();
+    if (box && box.height) return { top: box.top, bottom: box.bottom };
+    const rect = tweetContentRect(article);
+    if (!rect) return null;
+    return { top: rect.top, bottom: Math.min(rect.bottom, rect.top + 56) };
   }
 
   function tweetVisibleScore(article) {
@@ -2581,10 +2588,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
 
   function tweetStillFocused(article) {
-    const rect = tweetContentRect(article);
-    if (!rect) return false;
-    const mid = window.innerHeight * 0.42;
-    return rect.top < mid + 40 && rect.bottom > mid - 40 && tweetVisibleScore(article) >= 48;
+    const head = tweetFocusHead(article);
+    if (!head || tweetVisibleScore(article) < 40) return false;
+    const mid = window.innerHeight * 0.38;
+    return head.bottom > mid - 24 && head.top < mid + 90;
   }
 
   function isLongTweet(article) {
@@ -2933,18 +2940,15 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (spot.sourceEl?.isConnected && tweets.includes(spot.sourceEl) && tweetStillFocused(spot.sourceEl)) {
       return spot.sourceEl;
     }
-    const bandMid = spot.bandTop + spot.bandH / 2;
+    const mid = window.innerHeight * 0.38;
     let best = null;
-    let bestScore = -Infinity;
+    let bestScore = Infinity;
     for (const tweet of tweets) {
-      const rect = tweetContentRect(tweet);
-      if (!rect) continue;
-      const visible = tweetVisibleScore(tweet);
-      if (visible < 24) continue;
-      const mid = (rect.top + rect.bottom) / 2;
-      const score = visible - Math.abs(mid - bandMid) * 0.2;
-      if (score > bestScore) {
-        bestScore = score;
+      const head = tweetFocusHead(tweet);
+      if (!head || tweetVisibleScore(tweet) < 24) continue;
+      const dist = Math.abs((head.top + head.bottom) / 2 - mid);
+      if (dist < bestScore) {
+        bestScore = dist;
         best = tweet;
       }
     }
@@ -3006,8 +3010,11 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 
   function setFollow(on) {
     spot.follow = Boolean(on);
+    settings.spotFollow = spot.follow;
     spot.lastLine = null;
-    persistSpot({ spotFollow: spot.follow });
+    paintSpot();
+    syncSpotChrome();
+    syncSettingsSpotControls();
   }
 
   function spotScroller() {
@@ -3201,19 +3208,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <div class="veil" aria-hidden="true"></div>
       <div class="bandbox" aria-hidden="true"></div>
       <div class="grip" aria-hidden="true"></div>
-      <div class="tune">
-        <div class="row">
-          <span>高度</span>
-          <input type="range" data-bh min="56" max="260" value="${settings.spotHeight}" aria-label="光带高度">
-          <b data-hv>${settings.spotHeight}px</b>
-        </div>
-        <button type="button" class="link" data-spot-reset>恢复默认</button>
-      </div>
       <div class="dock">
-        <div class="papers">${paperButtonsHtml()}</div>
-        <button type="button" class="tbtn" data-tune>高度</button>
-        <button type="button" class="tbtn" data-follow aria-pressed="false">跟随鼠标</button>
-        <span class="hint">j/k 换帖 · Shift 点帖对准 · F 跟随 · Esc 关</span>
         <button type="button" class="tbtn" data-close>退出</button>
       </div>
     `;
@@ -3334,9 +3329,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <div class="papers">${paperButtonsHtml()}</div>
       <div class="hint">长帖开窗高度。短帖跟帖走，不按这个裁。</div>
       <label class="slide"><input type="range" data-k="spotHeight" min="56" max="260" value="${settings.spotHeight}"><b data-hv>${settings.spotHeight}px</b></label>
-      <label class="row">跟随鼠标 <input type="checkbox" data-k="spotFollow" ${settings.spotFollow ? "checked" : ""}></label>
+      <label class="row">跟随鼠标 <input type="checkbox" data-k="spotFollow" ${spot.follow ? "checked" : ""}></label>
+      <div class="hint">只在这次有效。F 也能开关。</div>
       <button type="button" class="link" data-spot-reset>恢复聚光默认</button>
-      <div class="hint">j/k 换帖，Shift 点帖对准，长帖 Shift 点句开窗，F 跟随，Esc 关。Alt+S 也能开。</div>
+      <div class="hint">j/k 换帖，Shift 点帖对准，长帖 Shift 点句开窗，1–7 换纸，Esc 关。Alt+S 也能开。</div>
       </div>
       <div class="bar">
         <button type="button" class="act pri" data-save>保存</button>
@@ -3359,7 +3355,6 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         unmaskAge: read("unmaskAge").checked,
         readingBand: read("readingBand").checked,
         spotHeight: read("spotHeight").value,
-        spotFollow: read("spotFollow").checked,
         spotPaperLight: settings.spotPaperLight,
         spotPaperDark: settings.spotPaperDark,
         spotMix: settings.spotMix,
