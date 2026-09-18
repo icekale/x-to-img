@@ -21,6 +21,12 @@
 
 [Greasy Fork 上安装](https://greasyfork.org/zh-CN/scripts/595869-x-%E8%B4%B4%E6%96%87%E8%BD%AC%E5%9B%BE%E5%8D%A1)。先装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)，再点安装，刷新 x.com。也可以直接打开 [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js)。
 
+也可以当 Chrome / Edge / Arc 扩展本地加载，不用油猴。`extension/` 已带当前脚本和图标；不要和油猴同时开。
+
+打开 `chrome://extensions`（Edge 是 `edge://extensions`），打开「开发者模式」，「加载已解压的扩展程序」，选仓库里的 `extension/`。打开 x.com，工具栏图标里是设置、聚光、出图卡。还没上架。
+
+从仓库更新 `x-to-img.user.js` 后，运行 `./extension/prepare.sh`，再在扩展管理页点刷新。
+
 # X Post to Image Card
 
 I got tired of pasting x.com links into chats that don't unfurl them. There's a small icon next to Share. Click it and you get a card on the clipboard. Light or dark follows X unless you lock it in Settings. If the clipboard is blocked, it downloads a PNG.
@@ -40,6 +46,12 @@ Also on the timeline:
 There's a gear above More in the left rail; changes apply immediately. Settings are also in the userscript menu. Card color, QR, and stats live there.
 
 [Install from Greasy Fork](https://greasyfork.org/en/scripts/595869). You'll need [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/). Or open [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js) directly.
+
+You can also load it as an unpacked Chrome / Edge / Arc extension. `extension/` already contains the current script and icons. Don't run it next to the userscript.
+
+Open `chrome://extensions` (or `edge://extensions`), turn on Developer mode, Load unpacked, and pick `extension/`. On x.com the toolbar icon is Settings, Spotlight, and Make card. Not on the Chrome Web Store yet.
+
+After changing `x-to-img.user.js` in this repository, run `./extension/prepare.sh`, then click Reload on the extension-management page.
 
 本地看一眼：
 

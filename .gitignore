@@ -5,3 +5,4 @@ node_modules/
 !docs/**
 !docs/*.jpg
 !docs/*.png
+!extension/icons/*.png
