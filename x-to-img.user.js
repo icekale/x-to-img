@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.6.5
+// @version      0.6.6
 // @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光跟帖
 // @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers, whole-page tweet spotlight
 // @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光跟帖
@@ -80,13 +80,12 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     verified: `<svg viewBox="0 0 22 22" aria-hidden="true"><path d="M11 1.6l2.1 1.5 2.5-.4 1.2 2.3 2.3 1.2-.4 2.5L20.2 11l-1.5 2.1.4 2.5-2.3 1.2-1.2 2.3-2.5-.4L11 20.4l-2.1-1.5-2.5.4-1.2-2.3-2.3-1.2.4-2.5L1.8 11l1.5-2.1L2.9 6.4l2.3-1.2 1.2-2.3 2.5.4L11 1.6z" fill="#60a5fa"/><path d="M9.4 11.6l-1.5-1.5-1.1 1.1 2.6 2.6 5.1-5.1-1.1-1.1-4 4z" fill="#fff"/></svg>`,
     xlogo: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 10.3L22 2h-2.2l-6 6.9L8.8 2H2l7.7 10.9L2 22h2.2l6.6-7.6L15.2 22H22l-7.3-11.7zm-2.3 2.7l-.8-1.1L4.8 3.5h2.6l5.1 7.3.8 1.1 6.7 9.6h-2.6l-5.4-7.5z" fill="currentColor"/></svg>`,
     download: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.41 6.3 15.7l1.41-1.42L11 17.59V8h2v9.59l3.29-3.3 1.42 1.42L12 21.41zM3 9l.02-3.51C3.02 4.11 4.14 3 5.52 3H18.5C19.88 3 21 4.12 21 5.5V9h-2V5.5c0-.28-.22-.5-.5-.5H5.52c-.28 0-.5.22-.5.5L5 9H3z"/></svg>`,
-    band: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" opacity=".38" d="M5 3.75h14c.69 0 1.25.56 1.25 1.25v2.25H3.75V5c0-.69.56-1.25 1.25-1.25zm-1.25 12.5H20.25V19c0 .69-.56 1.25-1.25 1.25H5c-.69 0-1.25-.56-1.25-1.25v-2.75z"/><path fill="currentColor" d="M3.75 8.75h16.5v6.5H3.75z"/></svg>`,
     navSpot: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 4.75h18v2.5H3v-2.5zm0 12h18v2.5H3v-2.5zM3.5 9.25h17A1.5 1.5 0 0 1 22 10.75v2.5a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 13.25v-2.5A1.5 1.5 0 0 1 3.5 9.25z"/></svg>`,
   };
 
   const PAGE_CSS = `
     [data-x2img-tools]{display:inline-flex;align-items:center;align-self:center;vertical-align:middle;flex:0 0 auto;line-height:0;}
-    [data-x2img-action],[data-x2img-download],[data-x2img-read]{display:flex;align-items:center;justify-content:center;width:34.75px;height:34.75px;margin:0;line-height:0;flex:0 0 auto;}
+    [data-x2img-action],[data-x2img-download]{display:flex;align-items:center;justify-content:center;width:34.75px;height:34.75px;margin:0;line-height:0;flex:0 0 auto;}
     [data-x2img-tools] button{width:34.75px;height:34.75px;border:0;padding:0;background:transparent;border-radius:999px;color:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;}
     [data-x2img-tools] button svg{width:18.75px;height:18.75px;display:block;}
     [data-x2img-tools] button:hover{background:rgba(29,155,240,.1);color:rgb(29,155,240);}
@@ -1456,13 +1455,12 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (tools && tools.previousElementSibling === anchor) return tools;
     const card = tools?.querySelector("[data-x2img-action]");
     const download = tools?.querySelector("[data-x2img-download]");
-    const read = tools?.querySelector("[data-x2img-read]");
+    tools?.querySelector("[data-x2img-read]")?.remove();
     tools?.remove();
     tools = document.createElement("div");
     tools.dataset.x2imgTools = "1";
     if (card) tools.appendChild(card);
     if (download) tools.appendChild(download);
-    if (read) tools.appendChild(read);
     const shareCell = wrappingCell(findShareButton(article));
     if (shareCell) {
       const height = getComputedStyle(shareCell).height;
@@ -1577,7 +1575,6 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     document.querySelectorAll('article[data-testid="tweet"]').forEach((article) => {
       mountButton(article);
       mountDownload(article);
-      mountRead(article);
     });
   }
 
@@ -2196,7 +2193,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (!settings.mediaDownload) {
       article.querySelector("[data-x2img-download]")?.remove();
       const tools = article.querySelector("[data-x2img-tools]");
-      if (tools && !tools.querySelector("[data-x2img-action], [data-x2img-read]")) tools.remove();
+      if (tools && !tools.querySelector("[data-x2img-action]")) tools.remove();
       return;
     }
     if (article.parentElement?.closest('article[data-testid="tweet"]')) return;
@@ -2355,47 +2352,6 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     }
     moreRoot.parentElement?.insertBefore(root, moreRoot);
     syncNavSpot();
-  }
-
-  function mountRead(article) {
-    if (!settings.readingBand) {
-      article.querySelector("[data-x2img-read]")?.remove();
-      const tools = article.querySelector("[data-x2img-tools]");
-      if (tools && !tools.querySelector("[data-x2img-action], [data-x2img-download]")) tools.remove();
-      return;
-    }
-    if (article.parentElement?.closest('article[data-testid="tweet"]')) return;
-    const id =
-      tweetIdFromHref(article.querySelector('a[href*="/status/"]')?.href || "") ||
-      article.querySelector("time")?.dateTime ||
-      "x";
-    const anchor = findMountAnchor(article);
-    if (!anchor) return;
-    const tools = ensureToolsWrap(article, anchor);
-    let wrap = tools.querySelector("[data-x2img-read]");
-    if (wrap && wrap.dataset.tweetId === id) return;
-    wrap?.remove();
-    wrap = document.createElement("div");
-    wrap.dataset.x2imgRead = "1";
-    wrap.dataset.tweetId = id;
-    const colorSource = tools.querySelector("[data-x2img-action], [data-x2img-download]") || findShareButton(article);
-    if (colorSource) wrap.style.color = getComputedStyle(colorSource).color;
-    wrap.innerHTML = `<button type="button" aria-label="对准这张帖" title="对准这张帖">${ICONS.band}</button>`;
-    wrap.addEventListener(
-      "click",
-      (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (spot.root && spot.sourceEl === article) {
-          closeSpot();
-          return;
-        }
-        openSpot();
-        snapToArticle(article);
-      },
-      true
-    );
-    tools.appendChild(wrap);
   }
 
   function applyMediaGrid(article) {
