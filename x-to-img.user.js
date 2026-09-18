@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.6.7
+// @version      0.6.8
 // @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光跟帖
 // @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers, whole-page tweet spotlight
 // @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光跟帖
@@ -81,6 +81,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     xlogo: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 10.3L22 2h-2.2l-6 6.9L8.8 2H2l7.7 10.9L2 22h2.2l6.6-7.6L15.2 22H22l-7.3-11.7zm-2.3 2.7l-.8-1.1L4.8 3.5h2.6l5.1 7.3.8 1.1 6.7 9.6h-2.6l-5.4-7.5z" fill="currentColor"/></svg>`,
     download: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.41 6.3 15.7l1.41-1.42L11 17.59V8h2v9.59l3.29-3.3 1.42 1.42L12 21.41zM3 9l.02-3.51C3.02 4.11 4.14 3 5.52 3H18.5C19.88 3 21 4.12 21 5.5V9h-2V5.5c0-.28-.22-.5-.5-.5H5.52c-.28 0-.5.22-.5.5L5 9H3z"/></svg>`,
     navSpot: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 4.75h18v2.5H3v-2.5zm0 12h18v2.5H3v-2.5zM3.5 9.25h17A1.5 1.5 0 0 1 22 10.75v2.5a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 13.25v-2.5A1.5 1.5 0 0 1 3.5 9.25z"/></svg>`,
+    navSettings: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M10.27 3.2h3.46l.42 2.3a7.4 7.4 0 0 1 1.88.78l2.16-.9 1.73 3-1.74 1.5c.12.5.18 1 .18 1.52 0 .52-.06 1.02-.18 1.52l1.74 1.5-1.73 3-2.16-.9a7.4 7.4 0 0 1-1.88.78l-.42 2.3h-3.46l-.42-2.3a7.4 7.4 0 0 1-1.88-.78l-2.16.9-1.73-3 1.74-1.5A7.3 7.3 0 0 1 6.4 12c0-.52.06-1.02.18-1.52L4.84 9l1.73-3 2.16.9a7.4 7.4 0 0 1 1.88-.78l.42-2.3zM12 9.2A2.8 2.8 0 1 0 12 14.8 2.8 2.8 0 0 0 12 9.2z"/></svg>`,
   };
 
   const PAGE_CSS = `
@@ -156,6 +157,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     [data-x2img-nav-spot]{cursor:pointer;}
     [data-x2img-nav-spot] a,[data-x2img-nav-spot] button{color:inherit;text-decoration:none;}
     [data-x2img-nav-spot][data-on="1"],[data-x2img-nav-spot][data-on="1"] span{font-weight:700;}
+    [data-x2img-nav-settings]{display:flex;align-items:center;justify-content:center;width:50px;height:50px;margin:0;border:0;padding:0;border-radius:999px;background:transparent;color:inherit;cursor:pointer;}
+    [data-x2img-nav-settings]:hover{background:rgba(139,152,165,.16);}
+    [data-x2img-nav-settings] svg{width:26.25px;height:26.25px;display:block;}
+    [data-x2img-nav-settings][data-on="1"]{color:#1d9bf0;}
   `;
 
   const CARD_CSS = `
@@ -309,9 +314,25 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     return false;
   }
 
+  function normalizeCardTheme(value) {
+    return value === "light" || value === "dark" ? value : "auto";
+  }
+
   function wantsDarkCard(options) {
     if (options && options.darkCard != null) return Boolean(options.darkCard);
+    if (settings.cardTheme === "light") return false;
+    if (settings.cardTheme === "dark") return true;
     return pageIsDark();
+  }
+
+  function cardRenderOptions(options) {
+    return {
+      ...OPTIONS,
+      showStats: settings.showStats !== false,
+      showQr: settings.showQr !== false,
+      darkCard: wantsDarkCard(options),
+      ...options,
+    };
   }
 
   function formatStamp(iso) {
@@ -359,7 +380,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     }
   }
 
-  function qrHtml(tweet) {
+  function qrHtml(tweet, options) {
+    if (options && options.showQr === false) return "";
     const url = tweetPermalink(tweet);
     const svg = makeQr(url);
     if (!url || !svg.startsWith("<svg")) return "";
@@ -1230,7 +1252,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
 
   function renderCard(tweet, options) {
-    const opts = { ...OPTIONS, ...options, verified: options.verified ?? tweet.verified };
+    const opts = { ...cardRenderOptions(options), verified: options?.verified ?? tweet.verified };
     const initial = (tweet.name || tweet.handle || "X").slice(0, 1).toUpperCase();
     const avatar = opts.showAvatar
       ? `<div class="avatar">${tweet.avatar ? `<img alt="" src="${escapeHtml(tweet.avatar)}">` : `<div class="avatar-fallback">${escapeHtml(initial)}</div>`}</div>`
@@ -1266,7 +1288,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 
   function cardFootHtml(tweet, options) {
     const stats = statsHtml(tweet, options);
-    const qr = qrHtml(tweet);
+    const qr = qrHtml(tweet, options);
     if (!stats && !qr) return "";
     return `<div class="foot">${stats || "<div></div>"}${qr}</div>`;
   }
@@ -1354,9 +1376,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   async function renderCanvas(tweet, options) {
     await ensureLibs();
     const resolved = await resolveTweet(tweet);
-    const darkCard = wantsDarkCard(options);
+    const opts = cardRenderOptions(options);
+    const darkCard = opts.darkCard;
     const shadow = renderer();
-    shadow.querySelector(".stage").innerHTML = renderCard(resolved, { verified: resolved.verified, darkCard });
+    shadow.querySelector(".stage").innerHTML = renderCard(resolved, { ...opts, verified: resolved.verified, darkCard });
     await waitForImages(shadow);
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     const node = shadow.querySelector("[data-card-root]");
@@ -1563,6 +1586,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   function injectAll() {
     applyTimelineExtras();
     mountNavSpot();
+    mountNavSettings();
     document.querySelectorAll('article[data-testid="tweet"]').forEach((article) => {
       mountButton(article);
       mountDownload(article);
@@ -1588,6 +1612,9 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     fileName: "{handle}_{id}",
     mediaGrid: true,
     unmaskAge: true,
+    cardTheme: "auto",
+    showQr: true,
+    showStats: true,
     readingBand: true,
     spotPaperLight: "moss",
     spotPaperDark: "night",
@@ -1675,6 +1702,9 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       customWords: normalizeList(parsed.customWords),
       whitelist: normalizeList(parsed.whitelist).map((item) => item.toLowerCase()),
       fileName: String(parsed.fileName || DEFAULT_SETTINGS.fileName).slice(0, 180) || DEFAULT_SETTINGS.fileName,
+      cardTheme: normalizeCardTheme(parsed.cardTheme),
+      showQr: parsed.showQr !== false,
+      showStats: parsed.showStats !== false,
       spotPaperLight: SPOT_PAPER_IDS.includes(parsed.spotPaperLight) ? parsed.spotPaperLight : DEFAULT_SETTINGS.spotPaperLight,
       spotPaperDark: SPOT_PAPER_IDS.includes(parsed.spotPaperDark) ? parsed.spotPaperDark : DEFAULT_SETTINGS.spotPaperDark,
       spotHeight: clampSpotHeight(parsed.spotHeight),
@@ -1694,6 +1724,9 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     settings = { ...loadSettings(), ...next };
     settings.customWords = normalizeList(settings.customWords);
     settings.whitelist = normalizeList(settings.whitelist).map((item) => item.toLowerCase());
+    settings.cardTheme = normalizeCardTheme(settings.cardTheme);
+    settings.showQr = settings.showQr !== false;
+    settings.showStats = settings.showStats !== false;
     settings.spotPaperLight = SPOT_PAPER_IDS.includes(settings.spotPaperLight) ? settings.spotPaperLight : DEFAULT_SETTINGS.spotPaperLight;
     settings.spotPaperDark = SPOT_PAPER_IDS.includes(settings.spotPaperDark) ? settings.spotPaperDark : DEFAULT_SETTINGS.spotPaperDark;
     settings.spotHeight = clampSpotHeight(settings.spotHeight);
@@ -2193,6 +2226,13 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       return;
     }
     if (article.parentElement?.closest('article[data-testid="tweet"]')) return;
+    const { items } = collectDownloadMedia(article);
+    if (!items.length) {
+      article.querySelector("[data-x2img-download]")?.remove();
+      const tools = article.querySelector("[data-x2img-tools]");
+      if (tools && !tools.querySelector("[data-x2img-action]")) tools.remove();
+      return;
+    }
     const id =
       tweetIdFromHref(article.querySelector('a[href*="/status/"]')?.href || "") ||
       article.querySelector("time")?.dateTime ||
@@ -2239,7 +2279,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
 
   function isMoreNavItem(el) {
-    if (!el || el.closest("[data-x2img-nav-spot]")) return false;
+    if (!el || el.closest("[data-x2img-nav-spot], [data-x2img-nav-settings]")) return false;
     const testid = el.getAttribute("data-testid") || "";
     if (/AppTabBar_More_Menu/i.test(testid)) return true;
     const aria = String(el.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
@@ -2307,8 +2347,20 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       if (!control) return;
       control.setAttribute("aria-pressed", on ? "true" : "false");
       control.setAttribute("aria-label", "聚光");
-      control.setAttribute("title", "聚光");
+      control.setAttribute("title", "单击开关聚光，长按打开设置");
     });
+  }
+
+  function navInsertBeforeMore(node) {
+    const more = findMoreNavItem();
+    if (!more || !node) return null;
+    const moreRoot = navItemRoot(more);
+    const parent = moreRoot.parentElement;
+    if (!parent) return moreRoot;
+    const gear = document.querySelector("[data-x2img-nav-settings]");
+    const before = node !== gear && gear?.parentElement === parent ? gear : moreRoot;
+    if (node.nextElementSibling !== before) parent.insertBefore(node, before);
+    return moreRoot;
   }
 
   function mountNavSpot() {
@@ -2321,7 +2373,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (!more) return;
     const moreRoot = navItemRoot(more);
     if (existing) {
-      if (existing.nextElementSibling !== moreRoot) moreRoot.parentElement?.insertBefore(existing, moreRoot);
+      navInsertBeforeMore(existing);
       syncNavSpot();
       return;
     }
@@ -2336,18 +2388,74 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       control.removeAttribute("aria-haspopup");
       control.removeAttribute("aria-expanded");
       if (control.tagName === "A") control.setAttribute("role", "button");
+      let holdTimer = 0;
+      let held = false;
+      const clearHold = () => {
+        clearTimeout(holdTimer);
+        holdTimer = 0;
+      };
+      control.addEventListener("pointerdown", (e) => {
+        if (e.button) return;
+        held = false;
+        holdTimer = window.setTimeout(() => {
+          held = true;
+          openSettingsPanel();
+        }, 520);
+      });
+      control.addEventListener("pointerup", clearHold);
+      control.addEventListener("pointercancel", clearHold);
+      control.addEventListener("pointerleave", clearHold);
       control.addEventListener(
         "click",
         (e) => {
           e.preventDefault();
           e.stopPropagation();
+          if (held || e.shiftKey) {
+            held = false;
+            if (e.shiftKey) openSettingsPanel();
+            return;
+          }
           toggleSpot();
         },
         true
       );
     }
-    moreRoot.parentElement?.insertBefore(root, moreRoot);
+    navInsertBeforeMore(root);
     syncNavSpot();
+  }
+
+  function syncNavSettings() {
+    const open = Boolean(document.getElementById("x2img-panel"));
+    document.querySelectorAll("[data-x2img-nav-settings]").forEach((el) => {
+      el.dataset.on = open ? "1" : "0";
+    });
+  }
+
+  function mountNavSettings() {
+    const more = findMoreNavItem();
+    if (!more) return;
+    const moreRoot = navItemRoot(more);
+    const parent = moreRoot.parentElement;
+    if (!parent) return;
+    let gear = document.querySelector("[data-x2img-nav-settings]");
+    if (!gear) {
+      gear = document.createElement("button");
+      gear.type = "button";
+      gear.dataset.x2imgNavSettings = "1";
+      gear.setAttribute("aria-label", "设置");
+      gear.setAttribute("title", "设置");
+      gear.innerHTML = ICONS.navSettings;
+      gear.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (document.getElementById("x2img-panel")) closeSettingsPanel();
+        else openSettingsPanel();
+      });
+    }
+    if (gear.nextElementSibling !== moreRoot) parent.insertBefore(gear, moreRoot);
+    const spotNav = document.querySelector("[data-x2img-nav-spot]");
+    if (spotNav && spotNav.nextElementSibling !== gear) parent.insertBefore(spotNav, gear);
+    syncNavSettings();
   }
 
   function applyMediaGrid(article) {
@@ -2491,7 +2599,6 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
 
   function applyTimelineExtras() {
-    loadSettings();
     document.documentElement.dataset.x2imgGrid = settings.mediaGrid ? "1" : "0";
     document.documentElement.dataset.x2imgUnmask = settings.unmaskAge || settings.whitelist.length ? "1" : "0";
     dismissSensitiveProfileGate();
@@ -2517,7 +2624,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   };
 
   function isSpotChrome(node) {
-    return Boolean(node?.closest?.("#x2img-spot, #x2img-panel, #x2img-toast, [data-x2img-tools], [data-x2img-nav-spot]"));
+    return Boolean(node?.closest?.("#x2img-spot, #x2img-panel, #x2img-toast, [data-x2img-tools], [data-x2img-nav-spot], [data-x2img-nav-settings]"));
   }
 
   function isRootTweet(article) {
@@ -3005,7 +3112,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     const label = panel.querySelector("[data-hv]");
     if (label) label.textContent = `${settings.spotHeight}px`;
     const follow = panel.querySelector('[data-k="spotFollow"]');
-    if (follow) follow.checked = settings.spotFollow;
+    if (follow) follow.checked = spot.follow;
   }
 
   function setFollow(on) {
@@ -3286,10 +3393,46 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 
   function closeSettingsPanel() {
     document.getElementById("x2img-panel")?.remove();
+    syncNavSettings();
+  }
+
+  function readPanelSettings(panel) {
+    const read = (key) => panel.querySelector(`[data-k="${key}"]`);
+    const checked = (key) => Boolean(read(key)?.checked);
+    return {
+      hideAdult: checked("hideAdult"),
+      hideAds: checked("hideAds"),
+      skipFollowing: checked("skipFollowing"),
+      adultLevel: read("adultLevel")?.value || "balanced",
+      customWords: read("customWords")?.value || "",
+      whitelist: read("whitelist")?.value || "",
+      mediaDownload: checked("mediaDownload"),
+      zipMulti: checked("zipMulti"),
+      fileName: read("fileName")?.value || DEFAULT_SETTINGS.fileName,
+      mediaGrid: checked("mediaGrid"),
+      unmaskAge: checked("unmaskAge"),
+      cardTheme: normalizeCardTheme(read("cardTheme")?.value),
+      showQr: checked("showQr"),
+      showStats: checked("showStats"),
+      readingBand: checked("readingBand"),
+      spotHeight: read("spotHeight")?.value,
+      spotPaperLight: settings.spotPaperLight,
+      spotPaperDark: settings.spotPaperDark,
+      spotMix: settings.spotMix,
+    };
+  }
+
+  function applyPanelSettings(panel) {
+    const followOn = spot.follow;
+    saveSettings(readPanelSettings(panel));
+    spot.follow = followOn;
+    if (spot.root) spot.bandH = settings.spotHeight;
+    if (!settings.readingBand) closeSpot();
+    else paintSpot();
+    injectAll();
   }
 
   function openSettingsPanel() {
-    loadSettings();
     closeSettingsPanel();
     const panel = document.createElement("div");
     panel.id = "x2img-panel";
@@ -3300,6 +3443,15 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         <button type="button" class="x" data-close aria-label="关闭" title="关闭">×</button>
       </div>
       <div class="body">
+      <h3>图卡</h3>
+      <div class="hint">颜色。刷深色 X 往微信粘时，选浅色更清楚。</div>
+      <select data-k="cardTheme">
+        <option value="auto" ${settings.cardTheme === "auto" ? "selected" : ""}>跟随 X</option>
+        <option value="light" ${settings.cardTheme === "light" ? "selected" : ""}>浅色</option>
+        <option value="dark" ${settings.cardTheme === "dark" ? "selected" : ""}>深色</option>
+      </select>
+      <label class="row">显示二维码 <input type="checkbox" data-k="showQr" ${settings.showQr ? "checked" : ""}></label>
+      <label class="row">显示互动数 <input type="checkbox" data-k="showStats" ${settings.showStats ? "checked" : ""}></label>
       <h3>内容净化</h3>
       <label class="row">隐藏黄推 / 引流机器人 <input type="checkbox" data-k="hideAdult" ${settings.hideAdult ? "checked" : ""}></label>
       <label class="row">隐藏广告 / Premium 推销 <input type="checkbox" data-k="hideAds" ${settings.hideAds ? "checked" : ""}></label>
@@ -3317,7 +3469,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <h3>媒体</h3>
       <label class="row">一键下载图片 / 视频 / GIF <input type="checkbox" data-k="mediaDownload" ${settings.mediaDownload ? "checked" : ""}></label>
       <label class="row">多个媒体打成 ZIP <input type="checkbox" data-k="zipMulti" ${settings.zipMulti ? "checked" : ""}></label>
-      <div class="hint">文件名，可用 {handle} {id} {name} {date} {n}</div>
+      <div class="hint">文件名，可用 {handle} {id} {name} {date} {n}。没图没视频的帖不显示下载。</div>
       <input type="text" data-k="fileName" value="${escapeHtml(settings.fileName)}">
       <label class="row">多媒体网格视图 <input type="checkbox" data-k="mediaGrid" ${settings.mediaGrid ? "checked" : ""}></label>
       <label class="row">本地去掉年龄遮罩 <input type="checkbox" data-k="unmaskAge" ${settings.unmaskAge ? "checked" : ""}></label>
@@ -3332,39 +3484,26 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <label class="row">跟随鼠标 <input type="checkbox" data-k="spotFollow" ${spot.follow ? "checked" : ""}></label>
       <div class="hint">只在这次有效。F 也能开关。</div>
       <button type="button" class="link" data-spot-reset>恢复聚光默认</button>
-      <div class="hint">j/k 换帖，Shift 点帖对准，长帖 Shift 点句开窗，1–7 换纸，Esc 关。Alt+S 也能开。</div>
+      <div class="hint">j/k 换帖，Shift 点帖对准，长帖 Shift 点句开窗，1–7 换纸，Esc 关。Alt+S 也能开。长按聚光也能打开设置。</div>
       </div>
       <div class="bar">
-        <button type="button" class="act pri" data-save>保存</button>
-        <button type="button" class="act ghost" data-close>关闭</button>
+        <button type="button" class="act pri" data-close>关闭</button>
       </div>
     `;
-    panel.querySelector("[data-save]").addEventListener("click", () => {
-      const read = (key) => panel.querySelector(`[data-k="${key}"]`);
-      saveSettings({
-        hideAdult: read("hideAdult").checked,
-        hideAds: read("hideAds").checked,
-        skipFollowing: read("skipFollowing").checked,
-        adultLevel: read("adultLevel").value,
-        customWords: read("customWords").value,
-        whitelist: read("whitelist").value,
-        mediaDownload: read("mediaDownload").checked,
-        zipMulti: read("zipMulti").checked,
-        fileName: read("fileName").value,
-        mediaGrid: read("mediaGrid").checked,
-        unmaskAge: read("unmaskAge").checked,
-        readingBand: read("readingBand").checked,
-        spotHeight: read("spotHeight").value,
-        spotPaperLight: settings.spotPaperLight,
-        spotPaperDark: settings.spotPaperDark,
-        spotMix: settings.spotMix,
-      });
-      if (spot.root) spot.bandH = settings.spotHeight;
-      closeSettingsPanel();
-      toast("设置已保存");
-      if (!settings.readingBand) closeSpot();
-      else paintSpot();
-      injectAll();
+    let liveTimer = 0;
+    const persistSoon = (delay) => {
+      clearTimeout(liveTimer);
+      liveTimer = window.setTimeout(() => applyPanelSettings(panel), delay);
+    };
+    panel.querySelectorAll("[data-k]").forEach((el) => {
+      const key = el.dataset.k;
+      if (key === "spotFollow" || key === "spotHeight") return;
+      if (el.tagName === "TEXTAREA" || el.type === "text") {
+        el.addEventListener("input", () => persistSoon(360));
+        el.addEventListener("change", () => persistSoon(40));
+        return;
+      }
+      el.addEventListener("change", () => persistSoon(40));
     });
     panel.querySelectorAll("[data-paper]").forEach((btn) => {
       btn.addEventListener("click", (e) => {
@@ -3384,6 +3523,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     });
     panel.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", closeSettingsPanel));
     document.documentElement.appendChild(panel);
+    syncNavSettings();
   }
 
   function boot() {
@@ -3413,7 +3553,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       GM_registerMenuCommand("设置", openSettingsPanel);
       GM_registerMenuCommand("聚光", toggleSpot);
       GM_registerMenuCommand("将当前贴文转成图卡", () => {
-        const article = document.querySelector('article[data-testid="tweet"]');
+        const article = firstVisibleTweet() || document.querySelector('article[data-testid="tweet"]');
         if (!article) {
           toast("没有读到贴文内容", "err");
           return;
