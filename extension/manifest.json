@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "X 贴文转图卡",
   "short_name": "x-to-img",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "description": "分享旁边出图卡。藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光跟帖。",
   "homepage_url": "https://github.com/icekale/x-to-img",
   "icons": {

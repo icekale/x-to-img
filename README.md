@@ -17,7 +17,7 @@
 - **揭开年龄遮罩。** 帖里的成人内容提示、个人资料敏感页，只在当前页拿掉，不改你的 X 账号设置。片子还在。
 - **整页聚光。** 左侧栏「更多」上面进入，光带跟当前帖走，周围用纸色压对比，不遮、不虚化。点赞、进帖都还能用。七张纸、长帖开窗、跟随都能改，浅色深色分开记。j/k 换帖，Shift 点帖对准，F 跟随。Alt+S 也能开。
 
-左侧栏「更多」上面有齿轮，改完立刻生效。油猴菜单里也有「设置」。图卡颜色、二维码、互动数都在里面。
+设置在油猴菜单或扩展图标里，长按左侧栏「聚光」也能开。改完立刻生效。图卡颜色、二维码、互动数都在里面。
 
 [Greasy Fork 上安装](https://greasyfork.org/zh-CN/scripts/595869-x-%E8%B4%B4%E6%96%87%E8%BD%AC%E5%9B%BE%E5%8D%A1)。先装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)，再点安装，刷新 x.com。也可以直接打开 [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js)。
 
@@ -43,7 +43,7 @@ Also on the timeline:
 - **Lift age covers** and the sensitive-profile prompt on this page only. The video stays put.
 - **Whole-page spotlight.** Enter it above More in the left rail. The band hugs the current post; everything else drops to a paper veil — no cover, no blur. Likes and opening a post still work. Seven papers, a long-post window, and follow are in Settings; light and dark are remembered separately. Use j/k to move posts, Shift-click to pin one, or F to follow. Alt+S toggles it.
 
-There's a gear above More in the left rail; changes apply immediately. Settings are also in the userscript menu. Card color, QR, and stats live there.
+Settings live in the userscript menu or the extension icon; a long-press on Spotlight in the left rail also opens them. Changes apply immediately. Card color, QR, and stats live there.
 
 [Install from Greasy Fork](https://greasyfork.org/en/scripts/595869). You'll need [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/). Or open [`x-to-img.user.js`](https://github.com/icekale/x-to-img/raw/main/x-to-img.user.js) directly.
 

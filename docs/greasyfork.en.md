@@ -16,7 +16,7 @@ The timeline extras, if you want them:
 - **Lift age covers** on the post and the sensitive-profile prompt. This page only; it doesn't change your X account settings. The video stays put.
 - **Whole-page spotlight.** Enter it above More in the left rail. The band hugs the current post; everything else drops to a paper veil — no cover, no blur. Likes and opening a post still work. Seven papers, a long-post window, and follow are in Settings; light and dark are remembered separately. Use j/k to move posts, Shift-click to pin one, or F to follow. Alt+S toggles it.
 
-There's a gear above More in the left rail; changes apply immediately. Settings are also in the userscript menu. Card color, QR, and stats live there.
+Settings live in the userscript menu or the extension icon; a long-press on Spotlight in the left rail also opens them. Changes apply immediately. Card color, QR, and stats live there.
 
 Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/), then hit **Install this script** on this page and refresh x.com.
 

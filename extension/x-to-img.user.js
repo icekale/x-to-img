@@ -3,7 +3,7 @@
 // @name:en      X Post to Image Card
 // @name:zh-CN   X 贴文转图卡
 // @namespace    https://github.com/icekale/x-to-img
-// @version      0.6.8
+// @version      0.6.9
 // @description  分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光跟帖
 // @description:en Click next to Share for a card. Hide adult spam and ads, download photos and videos, lift age covers, whole-page tweet spotlight
 // @description:zh-CN 分享旁边出图卡，还能藏黄推广告、下原图视频、揭开年龄遮罩、整页聚光跟帖
@@ -81,7 +81,6 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     xlogo: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 10.3L22 2h-2.2l-6 6.9L8.8 2H2l7.7 10.9L2 22h2.2l6.6-7.6L15.2 22H22l-7.3-11.7zm-2.3 2.7l-.8-1.1L4.8 3.5h2.6l5.1 7.3.8 1.1 6.7 9.6h-2.6l-5.4-7.5z" fill="currentColor"/></svg>`,
     download: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.41 6.3 15.7l1.41-1.42L11 17.59V8h2v9.59l3.29-3.3 1.42 1.42L12 21.41zM3 9l.02-3.51C3.02 4.11 4.14 3 5.52 3H18.5C19.88 3 21 4.12 21 5.5V9h-2V5.5c0-.28-.22-.5-.5-.5H5.52c-.28 0-.5.22-.5.5L5 9H3z"/></svg>`,
     navSpot: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 4.75h18v2.5H3v-2.5zm0 12h18v2.5H3v-2.5zM3.5 9.25h17A1.5 1.5 0 0 1 22 10.75v2.5a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 13.25v-2.5A1.5 1.5 0 0 1 3.5 9.25z"/></svg>`,
-    navSettings: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M10.27 3.2h3.46l.42 2.3a7.4 7.4 0 0 1 1.88.78l2.16-.9 1.73 3-1.74 1.5c.12.5.18 1 .18 1.52 0 .52-.06 1.02-.18 1.52l1.74 1.5-1.73 3-2.16-.9a7.4 7.4 0 0 1-1.88.78l-.42 2.3h-3.46l-.42-2.3a7.4 7.4 0 0 1-1.88-.78l-2.16.9-1.73-3 1.74-1.5A7.3 7.3 0 0 1 6.4 12c0-.52.06-1.02.18-1.52L4.84 9l1.73-3 2.16.9a7.4 7.4 0 0 1 1.88-.78l.42-2.3zM12 9.2A2.8 2.8 0 1 0 12 14.8 2.8 2.8 0 0 0 12 9.2z"/></svg>`,
   };
 
   const PAGE_CSS = `
@@ -157,10 +156,6 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     [data-x2img-nav-spot]{cursor:pointer;}
     [data-x2img-nav-spot] a,[data-x2img-nav-spot] button{color:inherit;text-decoration:none;}
     [data-x2img-nav-spot][data-on="1"],[data-x2img-nav-spot][data-on="1"] span{font-weight:700;}
-    [data-x2img-nav-settings]{display:flex;align-items:center;justify-content:center;width:50px;height:50px;margin:0;border:0;padding:0;border-radius:999px;background:transparent;color:inherit;cursor:pointer;}
-    [data-x2img-nav-settings]:hover{background:rgba(139,152,165,.16);}
-    [data-x2img-nav-settings] svg{width:26.25px;height:26.25px;display:block;}
-    [data-x2img-nav-settings][data-on="1"]{color:#1d9bf0;}
   `;
 
   const CARD_CSS = `
@@ -1585,8 +1580,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 
   function injectAll() {
     applyTimelineExtras();
+    document.querySelectorAll("[data-x2img-nav-settings]").forEach((el) => el.remove());
     mountNavSpot();
-    mountNavSettings();
     document.querySelectorAll('article[data-testid="tweet"]').forEach((article) => {
       mountButton(article);
       mountDownload(article);
@@ -2279,7 +2274,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
 
   function isMoreNavItem(el) {
-    if (!el || el.closest("[data-x2img-nav-spot], [data-x2img-nav-settings]")) return false;
+    if (!el || el.closest("[data-x2img-nav-spot]")) return false;
     const testid = el.getAttribute("data-testid") || "";
     if (/AppTabBar_More_Menu/i.test(testid)) return true;
     const aria = String(el.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
@@ -2357,9 +2352,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     const moreRoot = navItemRoot(more);
     const parent = moreRoot.parentElement;
     if (!parent) return moreRoot;
-    const gear = document.querySelector("[data-x2img-nav-settings]");
-    const before = node !== gear && gear?.parentElement === parent ? gear : moreRoot;
-    if (node.nextElementSibling !== before) parent.insertBefore(node, before);
+    if (node.nextElementSibling !== moreRoot) parent.insertBefore(node, moreRoot);
     return moreRoot;
   }
 
@@ -2422,40 +2415,6 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     }
     navInsertBeforeMore(root);
     syncNavSpot();
-  }
-
-  function syncNavSettings() {
-    const open = Boolean(document.getElementById("x2img-panel"));
-    document.querySelectorAll("[data-x2img-nav-settings]").forEach((el) => {
-      el.dataset.on = open ? "1" : "0";
-    });
-  }
-
-  function mountNavSettings() {
-    const more = findMoreNavItem();
-    if (!more) return;
-    const moreRoot = navItemRoot(more);
-    const parent = moreRoot.parentElement;
-    if (!parent) return;
-    let gear = document.querySelector("[data-x2img-nav-settings]");
-    if (!gear) {
-      gear = document.createElement("button");
-      gear.type = "button";
-      gear.dataset.x2imgNavSettings = "1";
-      gear.setAttribute("aria-label", "设置");
-      gear.setAttribute("title", "设置");
-      gear.innerHTML = ICONS.navSettings;
-      gear.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (document.getElementById("x2img-panel")) closeSettingsPanel();
-        else openSettingsPanel();
-      });
-    }
-    if (gear.nextElementSibling !== moreRoot) parent.insertBefore(gear, moreRoot);
-    const spotNav = document.querySelector("[data-x2img-nav-spot]");
-    if (spotNav && spotNav.nextElementSibling !== gear) parent.insertBefore(spotNav, gear);
-    syncNavSettings();
   }
 
   function applyMediaGrid(article) {
@@ -2624,7 +2583,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   };
 
   function isSpotChrome(node) {
-    return Boolean(node?.closest?.("#x2img-spot, #x2img-panel, #x2img-toast, [data-x2img-tools], [data-x2img-nav-spot], [data-x2img-nav-settings]"));
+    return Boolean(node?.closest?.("#x2img-spot, #x2img-panel, #x2img-toast, [data-x2img-tools], [data-x2img-nav-spot]"));
   }
 
   function isRootTweet(article) {
@@ -3393,7 +3352,6 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 
   function closeSettingsPanel() {
     document.getElementById("x2img-panel")?.remove();
-    syncNavSettings();
   }
 
   function readPanelSettings(panel) {
@@ -3523,7 +3481,6 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     });
     panel.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", closeSettingsPanel));
     document.documentElement.appendChild(panel);
-    syncNavSettings();
   }
 
   function boot() {
